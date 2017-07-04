@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">CarWorkshop</string>
     <string name="action_settings">Settings</string>
+    <string name="close_action">close_action</string>
+    <string name="view_more_info">view_more_info</string>
 </resources>

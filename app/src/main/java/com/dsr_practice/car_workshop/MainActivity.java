@@ -6,10 +6,19 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.widget.ExpandableListView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    List<String> listHeaders;
+    HashMap<String, List<String>> listItems;
+    ExpandableListView elvCars;
+    ExpandableListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,7 +27,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-       FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        elvCars = (ExpandableListView) findViewById(R.id.elvCars);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -26,27 +36,18 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+        listHeaders = new ArrayList<>();
+        listItems = new HashMap<>();
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        String[] sampleData = new String[] {"First", "Second", "Third", "Fourth", "5", "6", "7", "8", "9", "10"};
+        List<String> sampleItems = new ArrayList<>(Arrays.asList("Car wash", "Change color", "Full repair"));
+        for (String header: sampleData) {
+            listHeaders.add(header);
+            listItems.put(header, sampleItems);
         }
 
-        return super.onOptionsItemSelected(item);
+        adapter = new ExpandableListAdapter(this, listHeaders, listItems);
+        elvCars.setAdapter(adapter);
     }
 }
