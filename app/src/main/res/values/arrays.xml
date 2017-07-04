@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="car_marks">
+        <item>Aston-Martin</item>
+        <item>Audi</item>
+        <item>Bentley</item>
+        <item>BMW</item>
+        <item>Chevrolet</item>
+        <item>Citroen</item>
+        <item>Ferrari</item>
+        <item>Ford</item>
+        <item>Honda</item>
+        <item>Hummer</item>
+        <item>Hyundai</item>
+        <item>Jaguar</item>
+        <item>Jeep</item>
+        <item>Kia</item>
+        <item>Lada</item>
+        <item>Lamborghini</item>
+        <item>Land Rover</item>
+        <item>Lexus</item>
+        <item>Maserati</item>
+        <item>Mazda</item>
+        <item>Mercedes-Benz</item>
+        <item>Mitsubishi</item>
+        <item>Peugeot</item>
+        <item>Porsche</item>
+        <item>Renault</item>
+        <item>Rolls-Royce</item>
+        <item>Tesla</item>
+        <item>Toyota</item>
+        <item>Volkswagen</item>
+        <item>Volvo</item>
+    </string-array>
+
+    <string-array name="car_models">
+        <item>Aston Martin DB9 Volante</item>
+        <item>Aston Martin Rapide</item>
+        <item>Aston Martin Vanquish</item>
+
+        <item>Audi A3</item>
+        <item>Audi A4</item>
+        <item>Audi A5</item>
+        <item>Audi A6</item>
+
+    </string-array>
+</resources>

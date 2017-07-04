@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="false"
+    android:clipChildren="false"
+    app:columnCount="2"
+    app:useDefaultMargins="true"
+    tools:context="com.dsr_practice.car_workshop.TaskActivity">
+
+    <!-- VIN -->
+    <TextView
+        android:id="@+id/tvVIN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/vin"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_gravity="fill" />
+
+    <EditText
+        android:id="@+id/etVIN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textCapCharacters"
+        android:maxEms="17"
+        android:maxLength="17"
+        app:layout_gravity="fill" />
+
+    <!-- Mark -->
+    <TextView
+        android:id="@+id/tvMark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/mark"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_gravity="fill" />
+
+    <Spinner
+        android:id="@+id/spinnerMark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_gravity="fill" />
+
+    <!-- Model -->
+    <TextView
+        android:id="@+id/tvModel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/model"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_gravity="fill" />
+
+    <Spinner
+        android:id="@+id/spinnerModel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_gravity="fill" />
+
+    <!-- Number -->
+    <TextView
+        android:id="@+id/tvNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/number"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_gravity="fill" />
+
+    <EditText
+        android:id="@+id/etNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textCapCharacters"
+        app:layout_gravity="fill" />
+
+    <!-- Work list -->
+    <TextView
+        android:id="@+id/tvWorks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/works"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_gravity="fill" />
+
+    <TextView
+        android:id="@+id/tvWorkList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:maxLines="5"
+        android:minLines="1"
+        android:textColor="@android:color/black"
+        app:layout_gravity="fill" />
+
+    <!-- Add work option -->
+    <TextView
+        android:id="@+id/tvAddWork"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/add_work"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_gravity="fill" />
+
+    <Spinner
+        android:id="@+id/spinnerWorks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_gravity="fill" />
+
+    <!-- Save task -->
+    <Button
+        android:id="@+id/btnTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/save_task"
+        app:layout_columnSpan="2" />
+
+</android.support.v7.widget.GridLayout>
