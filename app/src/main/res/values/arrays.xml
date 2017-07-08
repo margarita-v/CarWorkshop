@@ -10,19 +10,14 @@
         <item>Ferrari</item>
         <item>Ford</item>
         <item>Honda</item>
-        <item>Hummer</item>
         <item>Hyundai</item>
         <item>Jaguar</item>
-        <item>Jeep</item>
         <item>Kia</item>
         <item>Lada</item>
-        <item>Lamborghini</item>
         <item>Land Rover</item>
         <item>Lexus</item>
-        <item>Maserati</item>
         <item>Mazda</item>
         <item>Mercedes-Benz</item>
-        <item>Mitsubishi</item>
         <item>Peugeot</item>
         <item>Porsche</item>
         <item>Renault</item>
@@ -43,5 +38,102 @@
         <item>Audi A5</item>
         <item>Audi A6</item>
 
+        <item>Bentley Flying Spur</item>
+        <item>Bentley Continental GT</item>
+        <item>Bentley Mulsanne</item>
+
+        <item>BMW 2</item>
+        <item>BMW 3</item>
+        <item>BMW 4</item>
+        <item>BMW 4 Gran Coupe</item>
+
+        <item>Chevrolet Camaro</item>
+        <item>Chevrolet Corvette Stringray</item>
+
+        <item>Citroen C4</item>
+        <item>Citroen C4 Picasso</item>
+        <item>Citroen Jumper</item>
+
+        <item>Ferrari 488 GTB</item>
+        <item>Ferrari F12 Berlinetta</item>
+        <item>Ferrari 458 Speciale</item>
+        <item>Ferrari California T</item>
+
+        <item>Ford Fiesta</item>
+        <item>Ford Focus</item>
+        <item>Ford Mondeo</item>
+        <item>Ford Mustang</item>
+
+        <item>Honda CR-V</item>
+        <item>Honda Pilot</item>
+
+        <item>Hyundai Solaris</item>
+        <item>Hyundai Elantra</item>
+
+        <item>Jaguar XE</item>
+        <item>Jaguar XF</item>
+        <item>Jaguar XJ</item>
+
+        <item>Kia Rio</item>
+        <item>Kia Cerato</item>
+        <item>Kia Optima</item>
+
+        <item>Lada Granta</item>
+        <item>Lada Priora</item>
+        <item>Lada Vesta</item>
+        <item>Lada Kalina</item>
+
+        <item>Land Rover Defender</item>
+        <item>Land Rover Discovery</item>
+        <item>Land Rover Range Rover</item>
+
+        <item>Lexus ES</item>
+        <item>Lexus RC</item>
+        <item>Lexus LS</item>
+        <item>Lexus LC</item>
+
+        <item>Mazda 3</item>
+        <item>Mazda 6</item>
+        <item>Mazda CX-5</item>
+
+        <item>Mercedes-Benz C</item>
+        <item>Mercedes-Benz CLA</item>
+        <item>Mercedes-Benz E</item>
+        <item>Mercedes-Benz G</item>
+
+        <item>Peugeot 408</item>
+        <item>Peugeot 308</item>
+        <item>Peugeot 508</item>
+        <item>Peugeot 3008</item>
+
+        <item>Porsche 718 Cayman</item>
+        <item>Porsche 911 Carrera</item>
+        <item>Porsche Panamera</item>
+        <item>Porsche Cayenne</item>
+
+        <item>Renault Logan</item>
+        <item>Renault Fluence</item>
+        <item>Renault Sandero</item>
+
+        <item>Rolls-Royce Ghost</item>
+        <item>Rolls-Royce Phantom</item>
+        <item>Rolls-Royce Wraith</item>
+        <item>Rolls-Royce Dawn</item>
+
+        <item>Tesla Model S</item>
+        <item>Tesla Model X</item>
+
+        <item>Toyota Corolla</item>
+        <item>Toyota Camry</item>
+        <item>Toyota Prius</item>
+
+        <item>Volkswagen Polo</item>
+        <item>Volkswagen Jetta</item>
+        <item>Volkswagen Passat</item>
+
+        <item>Volvo S60</item>
+        <item>Volvo S90</item>
+        <item>Volvo V90</item>
+        <item>Volvo XC60</item>
     </string-array>
 </resources>

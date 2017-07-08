@@ -82,6 +82,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textCapCharacters"
+        android:maxLength="9"
         app:layout_gravity="fill" />
 
     <!-- Work list -->
