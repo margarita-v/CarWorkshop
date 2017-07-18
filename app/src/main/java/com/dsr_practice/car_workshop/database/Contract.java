@@ -12,9 +12,9 @@ public class Contract {
 
     static final String CONTENT_AUTHORITY = "com.dsr_practice.car_workshop.database";
     static final Uri    BASE_CONTENT_URI  = Uri.parse("content://" + CONTENT_AUTHORITY);
-    private static final String PATH_MARKS  = "marks";
-    private static final String PATH_MODELS = "models";
-    private static final String PATH_JOBS   = "jobs";
+    static final String PATH_MARKS  = "marks";
+    static final String PATH_MODELS = "models";
+    static final String PATH_JOBS   = "jobs";
     private static final String SEPARATOR   = "/";
 
     // Columns supported by "marks" records
