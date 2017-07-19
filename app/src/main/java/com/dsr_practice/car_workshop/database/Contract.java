@@ -10,7 +10,7 @@ public class Contract {
     // give it an empty constructor.
     public Contract() {}
 
-    static final String CONTENT_AUTHORITY = "com.dsr_practice.car_workshop.database";
+    public static final String CONTENT_AUTHORITY = "com.dsr_practice.car_workshop.database";
     static final Uri    BASE_CONTENT_URI  = Uri.parse("content://" + CONTENT_AUTHORITY);
     static final String PATH_MARKS  = "marks";
     static final String PATH_MODELS = "models";
