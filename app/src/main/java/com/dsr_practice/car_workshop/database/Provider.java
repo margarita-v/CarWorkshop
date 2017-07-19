@@ -19,24 +19,35 @@ public class Provider extends ContentProvider {
     // Content authority for this provider
     private static final String AUTHORITY = Contract.CONTENT_AUTHORITY;
 
+    private static final String PATH_GET_MODELS_FOR_MARK = "models_for_mark";
+    public static final Uri URI_MODELS_FOR_MARK =
+            Uri.parse("content://" + AUTHORITY + "/" + PATH_GET_MODELS_FOR_MARK);
+    private static final String SQL_GET_MODELS_FOR_MARK = "SELECT * FROM " +
+            Contract.MarkEntry.TABLE_NAME + " JOIN " + Contract.ModelEntry.TABLE_NAME + " ON " +
+            Contract.MarkEntry.COLUMN_NAME_MARK_ID + " = " + Contract.ModelEntry.COLUMN_NAME_MODEL_ID +
+            "WHERE " + Contract.MarkEntry.COLUMN_NAME_MARK_ID + "= ?";
+
     // URI ID for route: /marks
     public static final int ROUTE_MARKS = 1;
     // URI ID for route: /marks/{ID}
     public static final int ROUTE_MARKS_ID = 2;
+    // URI ID for route: /models_for_mark/{ID}
+    public static final int ROUTE_MODELS_FOR_MARK = 3;
     // URI ID for route: /models
-    public static final int ROUTE_MODELS = 3;
+    public static final int ROUTE_MODELS = 4;
     // URI ID for route: /models/{ID}
-    public static final int ROUTE_MODELS_ID = 4;
+    public static final int ROUTE_MODELS_ID = 5;
     // URI ID for route: /jobs
-    public static final int ROUTE_JOBS = 5;
+    public static final int ROUTE_JOBS = 6;
     // URI ID for route: /jobs/{ID}
-    public static final int ROUTE_JOBS_ID = 6;
+    public static final int ROUTE_JOBS_ID = 7;
 
     // UriMatcher, used to decode incoming URIs
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
         sUriMatcher.addURI(AUTHORITY, Contract.PATH_MARKS, ROUTE_MARKS);
         sUriMatcher.addURI(AUTHORITY, Contract.PATH_MARKS + ADD_TO_PATH, ROUTE_MARKS_ID);
+        sUriMatcher.addURI(AUTHORITY, PATH_GET_MODELS_FOR_MARK, ROUTE_MODELS_FOR_MARK);
         sUriMatcher.addURI(AUTHORITY, Contract.PATH_MODELS, ROUTE_MODELS);
         sUriMatcher.addURI(AUTHORITY, Contract.PATH_MODELS + ADD_TO_PATH, ROUTE_MODELS_ID);
         sUriMatcher.addURI(AUTHORITY, Contract.PATH_JOBS, ROUTE_JOBS);
@@ -59,6 +70,8 @@ public class Provider extends ContentProvider {
                 return Contract.MarkEntry.CONTENT_TYPE;
             case ROUTE_MARKS_ID:
                 return Contract.MarkEntry.CONTENT_ITEM_TYPE;
+            case ROUTE_MODELS_FOR_MARK:
+                return Contract.ModelEntry.CONTENT_TYPE; // return models for mark
             case ROUTE_MODELS:
                 return Contract.ModelEntry.CONTENT_TYPE;
             case ROUTE_MODELS_ID:
@@ -92,6 +105,9 @@ public class Provider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
+                break;
+            case ROUTE_MODELS_FOR_MARK:
+                cursor = db.rawQuery(SQL_GET_MODELS_FOR_MARK, selectionArgs);
                 break;
             case ROUTE_MODELS:
                 cursor = db.query(Contract.ModelEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
