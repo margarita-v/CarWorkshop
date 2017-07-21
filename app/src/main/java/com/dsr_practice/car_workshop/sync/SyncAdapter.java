@@ -75,6 +75,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         contentResolver = context.getContentResolver();
     }
 
+    /* Merge strategy:
+     * 1. Get cursor to all items
+     * 2. For each item, check if it's in the incoming data
+     *    a. YES: Remove from "incoming" list.
+     *            Check if data has mutated, if so, perform database UPDATE
+     *    b. NO: Schedule DELETE from database
+     * (At this point, incoming list only contains missing items)
+     * 3. For any items remaining in incoming list, ADD to database
+     */
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, final SyncResult syncResult) {
@@ -99,7 +108,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         apiInterface.getModels().enqueue(new Callback<List<Model>>() {
             @Override
             public void onResponse(Call<List<Model>> call, Response<List<Model>> response) {
-                syncModelList(response.body(), syncResult);
+                try {
+                    syncModelList(response.body(), syncResult);
+                } catch (RemoteException | OperationApplicationException e) {
+                    syncResult.databaseError = true;
+                }
             }
 
             @Override
@@ -112,7 +125,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         apiInterface.getJobs().enqueue(new Callback<List<Job>>() {
             @Override
             public void onResponse(Call<List<Job>> call, Response<List<Job>> response) {
-                syncJobList(response.body(), syncResult);
+                try {
+                    syncJobList(response.body(), syncResult);
+                } catch (RemoteException | OperationApplicationException e) {
+                    syncResult.databaseError = true;
+                }
             }
 
             @Override
@@ -138,18 +155,18 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         assert cursor != null;
 
         // Cursor fields
-        int id, entryId;
+        int id, markId;
         String name;
         while (cursor.moveToNext()) {
             syncResult.stats.numEntries++;
             id = cursor.getInt(COLUMN_ID);
-            entryId = cursor.getInt(COLUMN_ENTRY_ID);
+            markId = cursor.getInt(COLUMN_ENTRY_ID);
             name = cursor.getString(COLUMN_ENTRY_NAME);
 
-            Mark match = entryArray.get(entryId);
+            Mark match = entryArray.get(markId);
             if (match != null) {
                 // Mark exists. Remove from entry map to prevent insert later
-                entryArray.remove(entryId);
+                entryArray.remove(markId);
                 // Check to see if the mark needs to be updated
                 Uri uri = Contract.MarkEntry.CONTENT_URI.buildUpon()
                         .appendPath(Integer.toString(id)).build();
@@ -186,12 +203,136 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 false);
     }
 
-    private void syncModelList(List<Model> newList, SyncResult syncResult) {
+    private void syncModelList(List<Model> newList, SyncResult syncResult)
+            throws RemoteException, OperationApplicationException {
+        ArrayList<ContentProviderOperation> batch = new ArrayList<>();
 
+        // Build hash table of incoming models
+        SparseArray<Model> entryArray = new SparseArray<>();
+        for (Model model : newList) {
+            entryArray.put(model.getId(), model);
+        }
+
+        // Get all models in local database to compare with data from server
+        Cursor cursor = contentResolver.query(Contract.ModelEntry.CONTENT_URI, MODEL_PROJECTION, null, null, null);
+        assert cursor != null;
+
+        // Cursor fields
+        int id, modelId;
+        String name;
+        while (cursor.moveToNext()) {
+            syncResult.stats.numEntries++;
+            id = cursor.getInt(COLUMN_ID);
+            modelId = cursor.getInt(COLUMN_ENTRY_ID);
+            name = cursor.getString(COLUMN_ENTRY_NAME);
+
+            Model match = entryArray.get(modelId);
+            if (match != null) {
+                // Model exists. Remove from entry map to prevent insert later
+                entryArray.remove(modelId);
+                // Check to see if the model needs to be updated
+                Uri uri = Contract.ModelEntry.CONTENT_URI.buildUpon()
+                        .appendPath(Integer.toString(id)).build();
+                if (match.getName() != null && !match.getName().equals(name)) {
+                    // Update existing record
+                    batch.add(ContentProviderOperation.newUpdate(uri)
+                            .withValue(Contract.ModelEntry.COLUMN_NAME_MODEL_NAME, match.getName())
+                            .build());
+                    syncResult.stats.numUpdates++;
+                }
+                else {
+                    // Model doesn't exist anymore. Remove it from the database
+                    batch.add(ContentProviderOperation.newDelete(uri).build());
+                    syncResult.stats.numDeletes++;
+                }
+            }
+        } // while
+        cursor.close();
+
+        // Add new models
+        for (int i = 0; i < entryArray.size(); i++) {
+            int key = entryArray.keyAt(i);
+            Model model = entryArray.get(key);
+            batch.add(ContentProviderOperation.newInsert(Contract.ModelEntry.CONTENT_URI)
+                    .withValue(Contract.ModelEntry.COLUMN_NAME_MODEL_ID, model.getId())
+                    .withValue(Contract.ModelEntry.COLUMN_NAME_MODEL_NAME, model.getName())
+                    .withValue(Contract.ModelEntry.COLUMN_NAME_FK_MARK_ID, model.getMark())
+                    .build());
+            syncResult.stats.numInserts++;
+        }
+        contentResolver.applyBatch(Contract.CONTENT_AUTHORITY, batch);
+        contentResolver.notifyChange(
+                Contract.ModelEntry.CONTENT_URI, // URI where data was modified
+                null,                           // No local observer
+                false);
     }
 
-    private void syncJobList(List<Job> newList, SyncResult syncResult) {
+    private void syncJobList(List<Job> newList, SyncResult syncResult)
+            throws RemoteException, OperationApplicationException {
+        ArrayList<ContentProviderOperation> batch = new ArrayList<>();
 
+        // Build hash table of incoming jobs
+        SparseArray<Job> entryArray = new SparseArray<>();
+        for (Job job : newList) {
+            entryArray.put(job.getId(), job);
+
+        }
+
+        // Get all jobs in local database to compare with data from server
+        Cursor cursor = contentResolver.query(Contract.JobEntry.CONTENT_URI, JOB_PROJECTION, null, null, null);
+        assert cursor != null;
+
+        // Cursor fields
+        int id, jobId, price;
+        String name;
+        while (cursor.moveToNext()) {
+            syncResult.stats.numEntries++;
+            id = cursor.getInt(COLUMN_ID);
+            jobId = cursor.getInt(COLUMN_ENTRY_ID);
+            name = cursor.getString(COLUMN_ENTRY_NAME);
+            price = cursor.getInt(COLUMN_OPTIONAL_FIELD);
+
+            Job match = entryArray.get(jobId);
+            if (match != null) {
+                // Job exists. Remove from entry map to prevent insert later
+                entryArray.remove(jobId);
+                // Check to see if the job needs to be updated
+                Uri uri = Contract.JobEntry.CONTENT_URI.buildUpon()
+                        .appendPath(Integer.toString(id)).build();
+                if (match.getName() != null && !match.getName().equals(name) ||
+                        match.getPrice() != price) {
+                    // Update existing record
+                    batch.add(ContentProviderOperation.newUpdate(uri)
+                            .withValue(Contract.JobEntry.COLUMN_NAME_JOB_NAME, match.getName())
+                            .withValue(Contract.JobEntry.COLUMN_NAME_PRICE, match.getPrice())
+                            .build());
+                    syncResult.stats.numUpdates++;
+                }
+                else {
+                    // Job doesn't exist anymore. Remove it from the database
+                    batch.add(ContentProviderOperation.newDelete(uri).build());
+                    syncResult.stats.numDeletes++;
+                }
+            }
+        } // while
+        cursor.close();
+
+        // Add new models
+        for (int i = 0; i < entryArray.size(); i++) {
+            int key = entryArray.keyAt(i);
+            Job job = entryArray.get(key);
+            batch.add(ContentProviderOperation.newInsert(Contract.JobEntry.CONTENT_URI)
+                    .withValue(Contract.JobEntry.COLUMN_NAME_JOB_ID, job.getId())
+                    .withValue(Contract.JobEntry.COLUMN_NAME_JOB_NAME, job.getName())
+                    .withValue(Contract.JobEntry.COLUMN_NAME_PRICE, job.getPrice())
+                    .build());
+            syncResult.stats.numInserts++;
+        }
+        contentResolver.applyBatch(Contract.CONTENT_AUTHORITY, batch);
+        contentResolver.notifyChange(
+                Contract.JobEntry.CONTENT_URI,  // URI where data was modified
+                null,                           // No local observer
+                false);
     }
     //endregion
 }
