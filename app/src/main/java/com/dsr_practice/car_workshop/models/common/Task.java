@@ -1,4 +1,4 @@
-package com.dsr_practice.car_workshop.models;
+package com.dsr_practice.car_workshop.models.common;
 
 import java.util.Date;
 import java.util.List;

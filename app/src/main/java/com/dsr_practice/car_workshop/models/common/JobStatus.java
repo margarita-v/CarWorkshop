@@ -1,4 +1,4 @@
-package com.dsr_practice.car_workshop.models;
+package com.dsr_practice.car_workshop.models.common;
 
 public class JobStatus {
     private int id;

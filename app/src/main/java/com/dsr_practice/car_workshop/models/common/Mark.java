@@ -1,19 +1,14 @@
-package com.dsr_practice.car_workshop.models;
+package com.dsr_practice.car_workshop.models.common;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Model {
+public class Mark {
     private int id;
-    private int mark;
-    @SerializedName("model_name")
+    @SerializedName("mark_name")
     private String name;
 
     public int getId() {
         return id;
-    }
-
-    public int getMark() {
-        return mark;
     }
 
     public String getName() {
