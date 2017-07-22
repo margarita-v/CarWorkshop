@@ -71,8 +71,13 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = inflater.inflate(R.layout.list_group, null);
         }
 
-        TextView lblListHeader = (TextView) convertView.findViewById(R.id.tvCarName);
-        lblListHeader.setText(headerTitle);
+        TextView lblCarName = (TextView) convertView.findViewById(R.id.tvCarName);
+        TextView lblDate = (TextView) convertView.findViewById(R.id.tvDate);
+        TextView lblNumber = (TextView) convertView.findViewById(R.id.tvNumber);
+
+        lblCarName.setText(headerTitle);
+        lblDate.setText("2012/07/04");
+        lblNumber.setText("A001AA");
 
         ImageButton imgBtnClose = (ImageButton) convertView.findViewById(R.id.imgBtnClose);
 
@@ -93,8 +98,12 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.list_item, null);
         }
-        TextView txtListChild = (TextView) convertView.findViewById(R.id.tvWork);
-        txtListChild.setText(childText);
+        TextView lblWork = (TextView) convertView.findViewById(R.id.tvWork);
+        TextView lblPrice = (TextView) convertView.findViewById(R.id.tvPrice);
+
+        lblWork.setText(childText);
+        lblPrice.setText("300 RUB");
+
         return convertView;
     }
 

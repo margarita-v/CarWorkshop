@@ -1,32 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
-    android:columnCount="3"
-    android:rowCount="2"
-    android:useDefaultMargins="true">
+    android:descendantFocusability="blocksDescendants"
+    app:columnCount="3"
+    app:rowCount="2"
+    app:useDefaultMargins="true">
 
     <TextView
         android:id="@+id/tvCarName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_column="0"
-        android:layout_columnWeight="1"
-        android:text="Bentley"
-        android:textColor="@android:color/black"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/tvNumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_column="1"
-        android:layout_row="0"
-        android:layout_rowSpan="2"
-        android:layout_columnWeight="1"
-        android:text="TextView"
+        app:layout_column="0"
+        app:layout_row="0"
+        app:layout_columnWeight="3"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
 
@@ -34,18 +23,30 @@
         android:id="@+id/tvDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_column="0"
-        android:layout_row="1"
-        android:layout_columnWeight="1"
-        android:text="TextView" />
+        app:layout_column="0"
+        app:layout_row="1"
+        app:layout_columnWeight="3" />
+
+    <TextView
+        android:id="@+id/tvNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_column="1"
+        app:layout_row="0"
+        app:layout_columnWeight="1"
+        app:layout_rowSpan="2"
+        app:layout_gravity="center_vertical"
+        android:gravity="end"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
 
     <ImageButton
         android:id="@+id/imgBtnClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_column="2"
-        android:layout_row="0"
-        android:layout_rowSpan="2"
+        app:layout_column="2"
+        app:layout_row="0"
+        app:layout_rowSpan="2"
         android:contentDescription="@string/close_action"
         app:srcCompat="@drawable/ic_done_all_black_24dp" />
-</GridLayout>
+</android.support.v7.widget.GridLayout>
