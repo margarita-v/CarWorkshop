@@ -75,15 +75,8 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
         lblListHeader.setText(headerTitle);
 
         ImageButton imgBtnClose = (ImageButton) convertView.findViewById(R.id.imgBtnClose);
-        ImageButton imgBtnMore = (ImageButton) convertView.findViewById(R.id.imgBtnMore);
 
         imgBtnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-        imgBtnMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 

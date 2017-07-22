@@ -53,6 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
-        AccountGeneral.createSyncAccount(this);
+        //AccountGeneral.createSyncAccount(this);
     }
 }

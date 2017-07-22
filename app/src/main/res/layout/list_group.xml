@@ -32,15 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:contentDescription="@string/close_action"
-                app:srcCompat="@drawable/ic_error_outline_black_24dp" />
-
-            <ImageButton
-                android:id="@+id/imgBtnMore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/view_more_info"
-                app:srcCompat="@drawable/ic_more_horiz_black_24dp" />
-
+                app:srcCompat="@drawable/ic_done_all_black_24dp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
