@@ -8,6 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ExpandableListView;
 
+import com.dsr_practice.car_workshop.accounts.AccountGeneral;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,5 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
         adapter = new ExpandableListAdapter(this, listHeaders, listItems);
         elvCars.setAdapter(adapter);
+
+        // This will create a new account with the system for our application, register our
+        // SyncService with it, and establish a sync schedule
+        AccountGeneral.createSyncAccount(this);
     }
 }

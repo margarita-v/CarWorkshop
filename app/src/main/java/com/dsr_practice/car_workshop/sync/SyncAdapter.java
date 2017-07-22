@@ -15,6 +15,7 @@ import android.os.RemoteException;
 import android.util.SparseArray;
 import android.widget.Toast;
 
+import com.dsr_practice.car_workshop.accounts.AccountGeneral;
 import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.models.common.Job;
 import com.dsr_practice.car_workshop.models.common.Mark;
@@ -30,8 +31,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
-    private static final String TAG = "SYNC_ADAPTER";
-
     // Content resolver, for performing database operations
     private final ContentResolver contentResolver;
 
@@ -335,4 +334,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 false);
     }
     //endregion
+
+    // Manual force Android to perform a sync with SyncAdapter
+    public static void performSync() {
+        Bundle bundle = new Bundle();
+        // Disable sync backoff and ignore sync preferences
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        ContentResolver.requestSync(AccountGeneral.getAccount(),
+                Contract.CONTENT_AUTHORITY, bundle);
+    }
 }
