@@ -98,8 +98,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < dateArray.length; i++) {
             try {
                 Date newDate = format.parse(dateArray[i]);
-                boolean status = i % 2 == 0;
-                Task task = new Task(i, newDate, 1, 2, "A001AA", "dfghj", "name", status);
+                Task task = new Task(i, newDate, 1, 2, "A001AA", "dfghj", "name", false);
                 task.setJobs(jobs);
                 taskList.add(task);
             } catch (ParseException e) {
