@@ -12,8 +12,6 @@
         android:id="@+id/imgBtnCloseJob"
         android:layout_width="@dimen/image_button_width"
         android:layout_height="@dimen/image_button_height"
-        app:srcCompat="@drawable/ic_done_black_24dp"
-        android:tint="@android:color/holo_green_light"
         android:background="?android:selectableItemBackground"
         android:contentDescription="@string/close_job" />
 

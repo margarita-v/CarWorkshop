@@ -14,6 +14,17 @@ public class Task {
     private boolean status;
     private List<JobStatus> jobs;
 
+    public Task(int id, Date date, int model, int mark, String number, String vin, String name, boolean status) {
+        this.id = id;
+        this.date = date;
+        this.model = model;
+        this.mark = mark;
+        this.number = number;
+        this.vin = vin;
+        this.name = name;
+        this.status = status;
+    }
+
     public int getId() {
         return id;
     }
@@ -48,5 +59,9 @@ public class Task {
 
     public List<JobStatus> getJobs() {
         return jobs;
+    }
+
+    public void setJobs(List<JobStatus> jobs) {
+        this.jobs = jobs;
     }
 }

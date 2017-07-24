@@ -49,7 +49,5 @@
         app:layout_rowSpan="2"
         app:layout_gravity="center_vertical"
         android:contentDescription="@string/close_action"
-        app:srcCompat="@drawable/ic_done_all_black_24dp"
-        android:tint="@android:color/holo_green_light"
         android:background="?android:selectableItemBackground"/>
 </android.support.v7.widget.GridLayout>
