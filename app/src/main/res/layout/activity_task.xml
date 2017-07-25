@@ -14,7 +14,7 @@
         android:clipChildren="false"
         app:columnCount="2"
         app:useDefaultMargins="true"
-        tools:context="com.dsr_practice.car_workshop.TaskActivity">
+        tools:context="com.dsr_practice.car_workshop.activities.TaskActivity">
 
         <!-- VIN -->
         <TextView
@@ -72,6 +72,24 @@
             android:layout_height="wrap_content"
             android:visibility="invisible"
             app:layout_gravity="fill" />
+
+        <!-- Date -->
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/date"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:gravity="center"
+            app:layout_gravity="fill" />
+
+        <EditText
+            android:id="@+id/etDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="date" />
 
         <!-- Number -->
         <TextView

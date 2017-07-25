@@ -13,4 +13,5 @@
     <string name="add_work">Добавить работу</string>
     <string name="save_task">Сохранить задачу</string>
     <string name="close_job">Close Job</string>
+    <string name="date">Дата</string>
 </resources>

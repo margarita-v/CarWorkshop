@@ -1,4 +1,4 @@
-package com.dsr_practice.car_workshop;
+package com.dsr_practice.car_workshop.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.dsr_practice.car_workshop.R;
+import com.dsr_practice.car_workshop.adapters.TaskListAdapter;
 import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;

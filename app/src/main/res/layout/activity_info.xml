@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main"
-    tools:context="com.dsr_practice.car_workshop.MainActivity">
+    tools:context="com.dsr_practice.car_workshop.activities.MainActivity">
 
     <ExpandableListView
         android:id="@+id/elvTask"

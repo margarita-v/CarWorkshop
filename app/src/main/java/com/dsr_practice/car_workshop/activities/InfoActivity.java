@@ -1,7 +1,9 @@
-package com.dsr_practice.car_workshop;
+package com.dsr_practice.car_workshop.activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.dsr_practice.car_workshop.R;
 
 public class InfoActivity extends AppCompatActivity {
 

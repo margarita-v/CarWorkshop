@@ -9,7 +9,7 @@
     android:clipChildren="false"
     app:columnCount="2"
     app:useDefaultMargins="true"
-    tools:context="com.dsr_practice.car_workshop.TaskActivity">
+    tools:context="com.dsr_practice.car_workshop.activities.TaskActivity">
 
     <TextView
         android:id="@+id/tvVinName"
@@ -21,7 +21,7 @@
         android:textColor="@android:color/black" />
 
     <TextView
-        android:id="@+id/tvVin"
+        android:id="@+id/tvVIN"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_columnWeight="1"
@@ -60,6 +60,23 @@
         android:layout_height="wrap_content"
         app:layout_columnWeight="1"
         android:gravity="center" />
+
+    <TextView
+        android:id="@+id/tvDateName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_columnWeight="1"
+        android:gravity="center"
+        android:text="@string/date"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:id="@+id/tvDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_columnWeight="1"
+        android:gravity="center"
+        android:textColor="@android:color/black" />
 
     <TextView
         android:id="@+id/tvNumberName"

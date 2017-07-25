@@ -1,9 +1,11 @@
-package com.dsr_practice.car_workshop;
+package com.dsr_practice.car_workshop.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import com.dsr_practice.car_workshop.R;
 
 public class TaskActivity extends AppCompatActivity {
 

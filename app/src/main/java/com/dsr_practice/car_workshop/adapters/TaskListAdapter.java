@@ -1,4 +1,4 @@
-package com.dsr_practice.car_workshop;
+package com.dsr_practice.car_workshop.adapters;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -15,13 +15,14 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 
 import java.text.DateFormat;
 import java.util.List;
 
-class TaskListAdapter extends BaseExpandableListAdapter {
+public class TaskListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
     private List<Task> taskList;
@@ -33,7 +34,7 @@ class TaskListAdapter extends BaseExpandableListAdapter {
     // Resource for buttons
     private static int resource;
 
-    TaskListAdapter(Context context, List<Task> taskList) {
+    public TaskListAdapter(Context context, List<Task> taskList) {
         this.context = context;
         this.taskList = taskList;
 
