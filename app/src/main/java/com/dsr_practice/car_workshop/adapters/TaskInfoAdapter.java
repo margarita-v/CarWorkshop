@@ -2,9 +2,11 @@ package com.dsr_practice.car_workshop.adapters;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -16,8 +18,9 @@ import com.dsr_practice.car_workshop.models.common.Task;
 
 import java.text.DateFormat;
 import java.util.List;
+import java.util.Locale;
 
-public class TaskInfoAdapter extends BaseExpandableListAdapter {
+public class TaskInfoAdapter extends ArrayAdapter<JobStatus> {
 
     private Context context;
     private Task task;
@@ -30,10 +33,10 @@ public class TaskInfoAdapter extends BaseExpandableListAdapter {
     private static int resource;
 
     public TaskInfoAdapter(Context context, Task task) {
+        super(context, -1, task.getJobs());
         this.context = context;
         this.task = task;
         //TODO Get jobs (query to DB)
-        // Maybe getChild() will change: return job
 
         // Set icons
         closedIcon = IconsUtils.getIcon(
@@ -45,91 +48,39 @@ public class TaskInfoAdapter extends BaseExpandableListAdapter {
         resource = IconsUtils.getResource(this.context);
     }
 
-    @Override
-    public int getGroupCount() {
-        return 1;
+    private static class ViewHolder {
+        ImageButton imgBtn;
+        TextView tvJob;
+        TextView tvPrice;
     }
 
+    @NonNull
     @Override
-    public int getChildrenCount(int groupPosition) {
-        return this.task.getJobs().size();
-    }
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        final JobStatus jobStatus = getItem(position);
+        ViewHolder viewHolder;
 
-    @Override
-    public Object getGroup(int groupPosition) {
-        return this.task;
-    }
-
-    @Override
-    public Object getChild(int groupPosition, int childPosition) {
-        return this.task.getJobs().get(childPosition);
-    }
-
-    @Override
-    public long getGroupId(int groupPosition) {
-        return 1;
-    }
-
-    @Override
-    public long getChildId(int groupPosition, int childPosition) {
-        return childPosition;
-    }
-
-    @Override
-    public boolean hasStableIds() {
-        return false;
-    }
-
-    @Override
-    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            LayoutInflater inflater= (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.info_group, null);
+            viewHolder = new ViewHolder();
+            LayoutInflater layoutInflater = LayoutInflater.from(context);
+            convertView = layoutInflater.inflate(R.layout.list_item, parent, false);
+            viewHolder.imgBtn = (ImageButton) convertView.findViewById(R.id.imgBtnCloseJob);
+            viewHolder.tvJob = (TextView) convertView.findViewById(R.id.tvWork);
+            viewHolder.tvPrice = (TextView) convertView.findViewById(R.id.tvPrice);
+            convertView.setTag(viewHolder);
         }
+        else
+            viewHolder = (ViewHolder) convertView.getTag();
 
-        TextView tvVin = (TextView) convertView.findViewById(R.id.tvVIN);
-        TextView tvMark = (TextView) convertView.findViewById(R.id.tvMark);
-        TextView tvModel = (TextView) convertView.findViewById(R.id.tvModel);
-        TextView tvDate = (TextView) convertView.findViewById(R.id.tvDate);
-        TextView tvNumber = (TextView) convertView.findViewById(R.id.tvNumber);
+        viewHolder.tvJob.setText("Job");
+        viewHolder.tvPrice.setText("300 RUB");
 
-        tvVin.setText(this.task.getVin());
-        tvMark.setText(this.task.getMark());
-        tvModel.setText(this.task.getModel());
-        DateFormat dateFormat = DateFormat.getDateTimeInstance();
-        tvDate.setText(dateFormat.format(task.getDate()));
-        tvNumber.setText(this.task.getNumber());
-
-        return convertView;
-    }
-
-    @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        final JobStatus jobStatus = (JobStatus) getChild(groupPosition, childPosition);
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_item, null);
-        }
-
-        ImageButton imgBtnJobStatus = (ImageButton) convertView.findViewById(R.id.imgBtnCloseJob);
-        TextView lblWork = (TextView) convertView.findViewById(R.id.tvWork);
-        TextView lblPrice = (TextView) convertView.findViewById(R.id.tvPrice);
-
-        imgBtnJobStatus.setClickable(false);
-        imgBtnJobStatus.setBackgroundResource(resource);
+        viewHolder.imgBtn.setBackgroundResource(resource);
         // If job is closed
         if (jobStatus.getStatus())
-            imgBtnJobStatus.setImageDrawable(closedIcon);
+            viewHolder.imgBtn.setImageDrawable(openedIcon);
         else // job is opened
-            imgBtnJobStatus.setImageDrawable(openedIcon);
-
-        // Set text and icons
-
-        return null;
-    }
-
-    @Override
-    public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return true;
+            viewHolder.imgBtn.setImageDrawable(openedIcon);
+        return convertView;
     }
 }

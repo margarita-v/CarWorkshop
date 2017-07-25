@@ -1,9 +1,10 @@
 package com.dsr_practice.car_workshop.models.common;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Task {
+public class Task implements Serializable {
     private int id;
     private Date date;
     private int model;

@@ -1,6 +1,8 @@
 package com.dsr_practice.car_workshop.models.common;
 
-public class JobStatus {
+import java.io.Serializable;
+
+public class JobStatus implements Serializable {
     private int id;
     private int task;
     private int job;
