@@ -21,7 +21,7 @@ import com.dsr_practice.car_workshop.models.common.Task;
 import java.text.DateFormat;
 import java.util.List;
 
-class ExpandableListAdapter extends BaseExpandableListAdapter {
+class TaskListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
     private List<Task> taskList;
@@ -33,7 +33,7 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
     // Resource for buttons
     private static int resource;
 
-    ExpandableListAdapter(Context context, List<Task> taskList) {
+    TaskListAdapter(Context context, List<Task> taskList) {
         this.context = context;
         this.taskList = taskList;
 
@@ -125,6 +125,7 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         close(imgBtnClose, closedTaskIcon);
+                        //TODO Send POST request to server
                         task.setStatus(true);
                         Toast.makeText(context, "The task was closed", Toast.LENGTH_SHORT).show();
                         //TODO Close all jobs in this task
@@ -176,6 +177,7 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         close(imgBtnCloseJob, closedIcon);
+                        //TODO Send POST request to server
                         jobStatus.setStatus(true);
                         Toast.makeText(context, "The job was closed", Toast.LENGTH_SHORT).show();
                         //TODO Check if all jobs in task are closed

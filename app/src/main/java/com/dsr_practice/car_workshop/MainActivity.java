@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
@@ -19,7 +20,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -28,10 +28,8 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    List<String> listHeaders;
-    HashMap<String, List<String>> listItems;
     ExpandableListView elvCars;
-    ExpandableListAdapter adapter;
+    TaskListAdapter adapter;
 
     private static final String[] JOB_PROJECTION = new String[] {
             Contract.JobEntry.COLUMN_NAME_JOB_NAME,
@@ -68,20 +66,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*
-        listHeaders = new ArrayList<>();
-        listItems = new HashMap<>();
-
-        String[] sampleData = new String[] {"First", "Second", "Third", "Fourth", "5", "6", "7", "8", "9", "10"};
-        List<String> sampleItems = new ArrayList<>(Arrays.asList("Car wash", "Change color", "Full repair"));
-        for (String header: sampleData) {
-            listHeaders.add(header);
-            listItems.put(header, sampleItems);
-        }
-
-        adapter = new ExpandableListAdapter(this, listHeaders, listItems);
-        elvCars.setAdapter(adapter);*/
-
         // Stub methods for testing the adapter
         String[] dateArray = new String[] {
                 "2012-04-05T20:40:45Z",
@@ -105,8 +89,16 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Invalid date format!", Toast.LENGTH_SHORT).show();
             }
         }
-        adapter = new ExpandableListAdapter(this, taskList);
+        adapter = new TaskListAdapter(this, taskList);
         elvCars.setAdapter(adapter);
+
+        elvCars.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                startActivity(new Intent(MainActivity.this, InfoActivity.class));
+                return true;
+            }
+        });
 
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
