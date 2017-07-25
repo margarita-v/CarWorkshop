@@ -12,6 +12,24 @@
     tools:context="com.dsr_practice.car_workshop.activities.TaskActivity">
 
     <TextView
+        android:id="@+id/tvStatusName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_columnWeight="1"
+        android:gravity="center"
+        android:text="@string/status"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_columnWeight="1"
+        android:gravity="center"
+        android:textSize="16sp" />
+
+    <TextView
         android:id="@+id/tvVinName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

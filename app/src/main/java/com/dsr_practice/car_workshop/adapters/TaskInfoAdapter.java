@@ -1,6 +1,7 @@
 package com.dsr_practice.car_workshop.adapters;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.models.common.Job;
+import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 
 import java.text.DateFormat;
@@ -21,10 +23,26 @@ public class TaskInfoAdapter extends BaseExpandableListAdapter {
     private Task task;
     private List<Job> jobs;
 
+    // Icons for buttons
+    private static Drawable closedIcon;
+    private static Drawable openedIcon;
+    // Resource for buttons
+    private static int resource;
+
     public TaskInfoAdapter(Context context, Task task) {
         this.context = context;
         this.task = task;
         //TODO Get jobs (query to DB)
+        // Maybe getChild() will change: return job
+
+        // Set icons
+        closedIcon = IconsUtils.getIcon(
+                this.context, R.drawable.ic_done_black_24dp, android.R.color.holo_green_light);
+        openedIcon = IconsUtils.getIcon(
+                this.context, R.drawable.ic_error_outline_black_24dp, android.R.color.holo_red_dark);
+
+        // Set resource
+        resource = IconsUtils.getResource(this.context);
     }
 
     @Override
@@ -87,6 +105,7 @@ public class TaskInfoAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+        final JobStatus jobStatus = (JobStatus) getChild(groupPosition, childPosition);
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.list_item, null);
@@ -97,8 +116,15 @@ public class TaskInfoAdapter extends BaseExpandableListAdapter {
         TextView lblPrice = (TextView) convertView.findViewById(R.id.tvPrice);
 
         imgBtnJobStatus.setClickable(false);
+        imgBtnJobStatus.setBackgroundResource(resource);
+        // If job is closed
+        if (jobStatus.getStatus())
+            imgBtnJobStatus.setImageDrawable(closedIcon);
+        else // job is opened
+            imgBtnJobStatus.setImageDrawable(openedIcon);
 
         // Set text and icons
+
         return null;
     }
 

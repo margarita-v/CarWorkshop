@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         elvCars.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                //TODO Send task through intent
                 startActivity(new Intent(MainActivity.this, InfoActivity.class));
                 return true;
             }

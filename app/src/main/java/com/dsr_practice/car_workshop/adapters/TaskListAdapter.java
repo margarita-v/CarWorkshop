@@ -4,9 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,20 +36,15 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         this.taskList = taskList;
 
         // Set icons
-        closedTaskIcon = ContextCompat.getDrawable(this.context, R.drawable.ic_done_all_black_24dp);
-        DrawableCompat.setTint(closedTaskIcon, ContextCompat.getColor(
-                this.context, android.R.color.holo_green_light));
-        closedIcon = ContextCompat.getDrawable(this.context, R.drawable.ic_done_black_24dp);
-        DrawableCompat.setTint(closedIcon, ContextCompat.getColor(
-                this.context, android.R.color.holo_green_light));
-        openedIcon = ContextCompat.getDrawable(this.context, R.drawable.ic_error_outline_black_24dp);
-        DrawableCompat.setTint(openedIcon, ContextCompat.getColor(
-                this.context, android.R.color.holo_red_dark));
+        closedTaskIcon = IconsUtils.getIcon(
+                this.context, R.drawable.ic_done_all_black_24dp, android.R.color.holo_green_light);
+        closedIcon = IconsUtils.getIcon(
+                this.context, R.drawable.ic_done_black_24dp, android.R.color.holo_green_light);
+        openedIcon = IconsUtils.getIcon(
+                this.context, R.drawable.ic_error_outline_black_24dp, android.R.color.holo_red_dark);
 
         // Set resource
-        TypedValue typedValue = new TypedValue();
-        this.context.getTheme().resolveAttribute(R.attr.selectableItemBackground, typedValue, true);
-        resource = typedValue.resourceId;
+        resource = IconsUtils.getResource(this.context);
     }
 
     @Override
