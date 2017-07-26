@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <android.support.v7.widget.GridLayout
         android:layout_width="match_parent"
@@ -59,11 +58,11 @@
             android:id="@+id/tvModel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:gravity="center"
             android:text="@string/model"
             android:textColor="@android:color/black"
             android:textSize="16sp"
-            android:enabled="false"
             app:layout_gravity="fill" />
 
         <Spinner
@@ -78,10 +77,10 @@
             android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="@string/date"
             android:textColor="@android:color/black"
             android:textSize="16sp"
-            android:gravity="center"
             app:layout_gravity="fill" />
 
         <EditText
@@ -148,13 +147,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_gravity="fill" />
-    </android.support.v7.widget.GridLayout>
 
-    <!-- Save task -->
-    <Button
-        android:id="@+id/btnTask"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/save_task"
-        android:layout_gravity="center" />
-</LinearLayout>
+        <!-- Save task -->
+        <Button
+            android:id="@+id/btnTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_gravity="center"
+            app:layout_columnSpan="2"
+            android:text="@string/save_task" />
+    </android.support.v7.widget.GridLayout>
+</ScrollView>

@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
@@ -120,7 +119,6 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                         close(imgBtnClose, closedTaskIcon);
                         //TODO Send POST request to server
                         task.setStatus(true);
-                        Toast.makeText(context, "The task was closed", Toast.LENGTH_SHORT).show();
                         //TODO Close all jobs in this task
                     }
                 });
@@ -172,7 +170,6 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                         close(imgBtnCloseJob, closedIcon);
                         //TODO Send POST request to server
                         jobStatus.setStatus(true);
-                        Toast.makeText(context, "The job was closed", Toast.LENGTH_SHORT).show();
                         //TODO Check if all jobs in task are closed
                     }
                 });
