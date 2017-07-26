@@ -93,17 +93,20 @@ public class MainActivity extends AppCompatActivity {
         }
         adapter = new TaskListAdapter(this, taskList);
         elvCars.setAdapter(adapter);
-
         elvCars.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(MainActivity.this, InfoActivity.class);
-                intent.putExtra("Task", (Task) adapter.getGroup(position));
-                startActivity(intent);
+                long packedPosition = elvCars.getExpandableListPosition(position);
+
+                int itemType = ExpandableListView.getPackedPositionType(packedPosition);
+                int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
+                int childPosition = ExpandableListView.getPackedPositionChild(packedPosition);
+
+                if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP)
+                    adapter.onGroupLongClick(groupPosition);
                 return true;
             }
         });
-
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
         //AccountGeneral.createSyncAccount(this);

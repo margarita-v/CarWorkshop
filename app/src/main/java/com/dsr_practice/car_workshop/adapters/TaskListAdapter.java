@@ -3,6 +3,7 @@ package com.dsr_practice.car_workshop.adapters;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.dsr_practice.car_workshop.R;
+import com.dsr_practice.car_workshop.activities.InfoActivity;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 
@@ -103,7 +105,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
             imgBtnClose.setBackgroundResource(resource);
             // If task is closed
             if (task.getStatus())
-                close(imgBtnClose, closedTaskIcon);
+                closeAction(imgBtnClose, closedTaskIcon);
             else // task is open
                 imgBtnClose.setImageDrawable(openedIcon);
         }
@@ -116,7 +118,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        close(imgBtnClose, closedTaskIcon);
+                        closeAction(imgBtnClose, closedTaskIcon);
                         //TODO Send POST request to server
                         task.setStatus(true);
                         //TODO Close all jobs in this task
@@ -154,7 +156,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
             imgBtnCloseJob.setBackgroundResource(resource);
             // If job is closed
             if (jobStatus.getStatus())
-                close(imgBtnCloseJob, closedIcon);
+                closeAction(imgBtnCloseJob, closedIcon);
             else // job is opened
                 imgBtnCloseJob.setImageDrawable(openedIcon);
         }
@@ -167,7 +169,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        close(imgBtnCloseJob, closedIcon);
+                        closeAction(imgBtnCloseJob, closedIcon);
                         //TODO Send POST request to server
                         jobStatus.setStatus(true);
                         //TODO Check if all jobs in task are closed
@@ -191,7 +193,13 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    private void close(ImageButton imageButton, Drawable drawable) {
+    public void onGroupLongClick(int groupPosition) {
+        // View task info
+        Task task = (Task) getGroup(groupPosition);
+        context.startActivity(new Intent(context, InfoActivity.class).putExtra("Task", task));
+    }
+
+    private void closeAction(ImageButton imageButton, Drawable drawable) {
         imageButton.setImageDrawable(drawable);
         imageButton.setClickable(false);
     }
