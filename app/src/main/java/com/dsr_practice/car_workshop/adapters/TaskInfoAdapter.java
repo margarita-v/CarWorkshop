@@ -78,7 +78,7 @@ public class TaskInfoAdapter extends ArrayAdapter<JobStatus> {
         viewHolder.imgBtn.setBackgroundResource(resource);
         // If job is closed
         if (jobStatus.getStatus())
-            viewHolder.imgBtn.setImageDrawable(openedIcon);
+            viewHolder.imgBtn.setImageDrawable(closedIcon);
         else // job is opened
             viewHolder.imgBtn.setImageDrawable(openedIcon);
         return convertView;

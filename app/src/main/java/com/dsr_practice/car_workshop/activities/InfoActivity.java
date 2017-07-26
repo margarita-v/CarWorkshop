@@ -1,7 +1,10 @@
 package com.dsr_practice.car_workshop.activities;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,6 +29,10 @@ public class InfoActivity extends AppCompatActivity {
         Task task = (Task) getIntent().getSerializableExtra("Task");
         adapter = new TaskInfoAdapter(this, task);
         lvJobs.setAdapter(adapter);
+
+        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View listHeader = inflater.inflate(R.layout.info_header, null);
+        lvJobs.addHeaderView(listHeader);
 
         TextView tvVin = (TextView) findViewById(R.id.tvVIN);
         TextView tvMark = (TextView) findViewById(R.id.tvMark);
