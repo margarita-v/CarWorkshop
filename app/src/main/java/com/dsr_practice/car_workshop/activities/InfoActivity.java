@@ -34,11 +34,15 @@ public class InfoActivity extends AppCompatActivity {
         View listHeader = inflater.inflate(R.layout.info_header, null);
         lvJobs.addHeaderView(listHeader);
 
+        TextView tvStatus = (TextView) findViewById(R.id.tvStatus);
         TextView tvVin = (TextView) findViewById(R.id.tvVIN);
         TextView tvMark = (TextView) findViewById(R.id.tvMark);
         TextView tvModel = (TextView) findViewById(R.id.tvModel);
         TextView tvDate = (TextView) findViewById(R.id.tvDate);
         TextView tvNumber = (TextView) findViewById(R.id.tvNumber);
+
+        final String statusName = task.getStatus() ? "Закрыта" : "Открыта";
+        tvStatus.setText(statusName);
 
         tvVin.setText(task.getVin());
         tvMark.setText(Integer.toString(task.getMark()));

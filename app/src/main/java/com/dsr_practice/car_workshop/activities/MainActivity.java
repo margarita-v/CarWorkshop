@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.adapters.TaskListAdapter;
-import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 import com.dsr_practice.car_workshop.rest.ApiClient;
@@ -32,12 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
     ExpandableListView elvCars;
     TaskListAdapter adapter;
-
-    private static final String[] JOB_PROJECTION = new String[] {
-            Contract.JobEntry.COLUMN_NAME_JOB_NAME,
-            Contract.JobEntry.COLUMN_NAME_PRICE
-    };
-    private static final int[] LIST_ITEM_PROJECTION = new int[] { R.id.tvWork, R.id.tvPrice };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
 
                 int itemType = ExpandableListView.getPackedPositionType(packedPosition);
                 int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
-                int childPosition = ExpandableListView.getPackedPositionChild(packedPosition);
 
                 if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP)
                     adapter.onGroupLongClick(groupPosition);

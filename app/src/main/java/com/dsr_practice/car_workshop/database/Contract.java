@@ -43,13 +43,13 @@ public class Contract {
         public static final String COLUMN_NAME_MODEL_NAME = "model_name";
         public static final String COLUMN_NAME_FK_MARK_ID = "fk_mark_id";
 
-        // Fully qualified URI for "mark" resources
+        // Fully qualified URI for "model" resources
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_MODELS).build();
-        // MIME type for lists of marks
+        // MIME type for lists of models
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + CONTENT_URI + SEPARATOR + PATH_MODELS;
-        // MIME type for individual marks
+        // MIME type for individual models
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + CONTENT_URI + SEPARATOR + PATH_MODELS;
     }
@@ -62,13 +62,13 @@ public class Contract {
         public static final String COLUMN_NAME_JOB_NAME = "job_name";
         public static final String COLUMN_NAME_PRICE = "price";
 
-        // Fully qualified URI for "mark" resources
+        // Fully qualified URI for "job" resources
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_JOBS).build();
-        // MIME type for lists of marks
+        // MIME type for lists of jobs
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + CONTENT_URI + SEPARATOR + PATH_JOBS;
-        // MIME type for individual marks
+        // MIME type for individual jobs
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + CONTENT_URI + SEPARATOR + PATH_JOBS;
     }

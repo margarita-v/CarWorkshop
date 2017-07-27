@@ -30,8 +30,9 @@
             android:id="@+id/tvStatus"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_columnWeight="1"
-            android:textSize="16sp" />
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            app:layout_columnWeight="1" />
 
         <TextView
             android:id="@+id/tvVinName"
