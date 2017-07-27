@@ -16,7 +16,7 @@ public class TaskActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
-        setTitle("Новая задача");
+        setTitle(R.string.task_title);
 
         etVIN = (EditText) findViewById(R.id.etVIN);
         etNumber = (EditText) findViewById(R.id.etNumber);

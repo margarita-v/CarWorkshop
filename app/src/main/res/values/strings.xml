@@ -1,10 +1,21 @@
 <resources>
+    <!-- App general -->
     <string name="app_name">CarWorkshop</string>
     <string name="action_settings">Settings</string>
 
-    <string name="close_action">close_action</string>
-    <string name="view_more_info">view_more_info</string>
+    <!-- Activity's titles -->
+    <string name="main_title">Список задач</string>
+    <string name="info_title">Информация о задаче</string>
+    <string name="task_title">Новая задача</string>
 
+    <!-- Intents -->
+    <string name="task_intent">Task</string>
+
+    <!-- Task statuses -->
+    <string name="closed">Закрыта</string>
+    <string name="opened">Открыта</string>
+
+    <!-- TextView's texts -->
     <string name="vin">VIN</string>
     <string name="mark">Марка</string>
     <string name="model">Модель</string>
@@ -15,4 +26,20 @@
     <string name="close_job">Close Job</string>
     <string name="date">Дата</string>
     <string name="status">Статус</string>
+
+    <!-- Image button's content descriptions -->
+    <string name="btn_close_task">Закрыть задачу</string>
+    <string name="btn_close_job">Закрыть работу</string>
+
+    <!-- Toast messages -->
+    <string name="toast_cant_load">Can\'t load tasks!</string>
+    <string name="toast_invalid_date">Invalid date format!</string>
+
+    <!-- Dialogs -->
+    <string name="close_task_title">Close task</string>
+    <string name="close_task_message">Are you sure to close this task?</string>
+    <string name="close_job_title">Close job</string>
+    <string name="close_job_message">Are you sure to close this job?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

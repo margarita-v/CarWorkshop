@@ -23,10 +23,10 @@ public class InfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
-        setTitle("Информация о задаче");
+        setTitle(R.string.info_title);
 
         lvJobs = (ListView) findViewById(R.id.lvJobs);
-        Task task = (Task) getIntent().getSerializableExtra("Task");
+        Task task = (Task) getIntent().getSerializableExtra(getString(R.string.task_intent));
         adapter = new TaskInfoAdapter(this, task);
         lvJobs.setAdapter(adapter);
 
@@ -41,7 +41,7 @@ public class InfoActivity extends AppCompatActivity {
         TextView tvDate = (TextView) findViewById(R.id.tvDate);
         TextView tvNumber = (TextView) findViewById(R.id.tvNumber);
 
-        final String statusName = task.getStatus() ? "Закрыта" : "Открыта";
+        final String statusName = task.getStatus() ? getString(R.string.closed) : getString(R.string.opened);
         tvStatus.setText(statusName);
 
         tvVin.setText(task.getVin());

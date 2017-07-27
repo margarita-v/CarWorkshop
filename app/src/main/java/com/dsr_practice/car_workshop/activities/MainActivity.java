@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setTitle(R.string.main_title);
 
         elvCars = (ExpandableListView) findViewById(R.id.elvCars);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<Task>> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Can't load tasks!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, R.string.toast_cant_load, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 task.setJobs(jobs);
                 taskList.add(task);
             } catch (ParseException e) {
-                Toast.makeText(this, "Invalid date format!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_invalid_date, Toast.LENGTH_SHORT).show();
             }
         }
         adapter = new TaskListAdapter(this, taskList);

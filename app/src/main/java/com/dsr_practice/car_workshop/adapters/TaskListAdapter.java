@@ -114,8 +114,8 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Close task").setMessage("Are you sure to close this task?");
-                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                builder.setTitle(R.string.close_task_title).setMessage(R.string.close_task_message);
+                builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         closeAction(imgBtnClose, closedTaskIcon);
@@ -124,7 +124,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                         //TODO Close all jobs in this task
                     }
                 });
-                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -165,8 +165,8 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Close job").setMessage("Are you sure to close this job?");
-                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                builder.setTitle(R.string.close_job_title).setMessage(R.string.close_job_message);
+                builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         closeAction(imgBtnCloseJob, closedIcon);
@@ -175,7 +175,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                         //TODO Check if all jobs in task are closed
                     }
                 });
-                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -196,7 +196,9 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
     public void onGroupLongClick(int groupPosition) {
         // View task info
         Task task = (Task) getGroup(groupPosition);
-        context.startActivity(new Intent(context, InfoActivity.class).putExtra("Task", task));
+        Intent intent = new Intent(context, InfoActivity.class);
+        intent.putExtra(context.getString(R.string.task_intent), task);
+        context.startActivity(intent);
     }
 
     private void closeAction(ImageButton imageButton, Drawable drawable) {
