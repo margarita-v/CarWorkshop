@@ -5,8 +5,15 @@ import java.io.Serializable;
 public class JobStatus implements Serializable {
     private int id;
     private int task;
-    private int job;
+    private Job job;
     private boolean status;
+
+    public JobStatus(int id, int task, Job job, boolean status) {
+        this.id = id;
+        this.task = task;
+        this.job = job;
+        this.status = status;
+    }
 
     public int getId() {
         return id;
@@ -16,7 +23,7 @@ public class JobStatus implements Serializable {
         return task;
     }
 
-    public int getJob() {
+    public Job getJob() {
         return job;
     }
 

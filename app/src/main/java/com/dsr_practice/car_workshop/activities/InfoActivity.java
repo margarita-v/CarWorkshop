@@ -45,6 +45,7 @@ public class InfoActivity extends AppCompatActivity {
         tvStatus.setText(statusName);
 
         tvVin.setText(task.getVin());
+        //TODO Get mark and model names from database
         tvMark.setText(Integer.toString(task.getMark()));
         tvModel.setText(Integer.toString(task.getModel()));
         DateFormat dateFormat = DateFormat.getDateTimeInstance();

@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.adapters.TaskListAdapter;
+import com.dsr_practice.car_workshop.models.common.Job;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 import com.dsr_practice.car_workshop.rest.ApiClient;
@@ -69,11 +70,19 @@ public class MainActivity extends AppCompatActivity {
                 "2014-04-06T20:40:45Z",
                 "2012-04-05T20:41:45Z"
         };
+        String[] jobsArray = new String[] {
+                "Car wash",
+                "Full repair",
+                "Cleaning",
+                "Change color"
+        };
+        int[] priceArray = new int[] { 300, 1000, 200, 500 };
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         List<Task> taskList = new ArrayList<>();
         List<JobStatus> jobs = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            jobs.add(new JobStatus());
+            Job job = new Job(i, priceArray[i], jobsArray[i]);
+            jobs.add(new JobStatus(i, i, job, false));
         }
         for (int i = 0; i < dateArray.length; i++) {
             try {

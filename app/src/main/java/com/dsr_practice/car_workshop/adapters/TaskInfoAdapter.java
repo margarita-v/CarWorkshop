@@ -1,12 +1,8 @@
 package com.dsr_practice.car_workshop.adapters;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,22 +11,13 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.dsr_practice.car_workshop.R;
-import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.models.common.Job;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 
-import java.util.HashMap;
-
-public class TaskInfoAdapter extends ArrayAdapter<JobStatus> implements LoaderManager.LoaderCallbacks<Cursor> {
+public class TaskInfoAdapter extends ArrayAdapter<JobStatus> {
 
     private Context context;
-    private HashMap<Integer, Job> jobs;
-
-    private static final String[] JOB_PROJECTION = new String[] {
-            Contract.JobEntry.COLUMN_NAME_JOB_NAME,
-            Contract.JobEntry.COLUMN_NAME_PRICE
-    };
 
     // Icons for buttons
     private static Drawable closedIcon;
@@ -50,21 +37,6 @@ public class TaskInfoAdapter extends ArrayAdapter<JobStatus> implements LoaderMa
 
         // Set resource
         resource = IconsUtils.getResource(this.context);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
     }
 
     private static class ViewHolder {
@@ -91,9 +63,10 @@ public class TaskInfoAdapter extends ArrayAdapter<JobStatus> implements LoaderMa
         else
             viewHolder = (ViewHolder) convertView.getTag();
 
+        Job job = jobStatus.getJob();
         viewHolder.imgBtn.setEnabled(false);
-        viewHolder.tvJob.setText("Job");
-        viewHolder.tvPrice.setText("300 RUB");
+        viewHolder.tvJob.setText(job.getName());
+        viewHolder.tvPrice.setText(job.getPriceToString());
 
         viewHolder.imgBtn.setBackgroundResource(resource);
         // If job is closed

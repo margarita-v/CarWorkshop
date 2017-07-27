@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.activities.InfoActivity;
+import com.dsr_practice.car_workshop.models.common.Job;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 
@@ -148,9 +149,9 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         TextView lblWork = (TextView) convertView.findViewById(R.id.tvWork);
         TextView lblPrice = (TextView) convertView.findViewById(R.id.tvPrice);
 
-        // Get job by id in job status!!!!
-        lblWork.setText("Car wash");
-        lblPrice.setText("300 RUB");
+        Job job = jobStatus.getJob();
+        lblWork.setText(job.getName());
+        lblPrice.setText(job.getPriceToString());
 
         if (imgBtnCloseJob.isClickable()) {
             imgBtnCloseJob.setBackgroundResource(resource);
