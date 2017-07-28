@@ -1,6 +1,8 @@
 package com.dsr_practice.car_workshop.activities;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.adapters.TaskInfoAdapter;
+import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.models.common.Task;
 
 import java.text.DateFormat;
@@ -44,12 +47,28 @@ public class InfoActivity extends AppCompatActivity {
         final String statusName = task.getStatus() ? getString(R.string.closed) : getString(R.string.opened);
         tvStatus.setText(statusName);
 
+        Uri markUri = Contract.MarkEntry.CONTENT_URI.buildUpon()
+                .appendPath(Integer.toString(task.getMark())).build();
+        Uri modelUri = Contract.ModelEntry.CONTENT_URI.buildUpon()
+                .appendPath(Integer.toString(task.getModel())).build();
+
         tvVin.setText(task.getVin());
-        //TODO Get mark and model names from database
+        //setNameFromDatabase(markUri, Contract.MARK_NAMES_PROJECTION, tvMark);
+        //setNameFromDatabase(modelUri, Contract.MODEL_NAMES_PROJECTION, tvModel);
         tvMark.setText(Integer.toString(task.getMark()));
         tvModel.setText(Integer.toString(task.getModel()));
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
         tvDate.setText(dateFormat.format(task.getDate()));
         tvNumber.setText(task.getNumber());
+    }
+
+    private void setNameFromDatabase(Uri uri, String[] projection, TextView textView) {
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        assert cursor != null;
+        if (cursor.moveToFirst()) {
+            String name = cursor.getString(0);
+            textView.setText(name);
+        }
+        cursor.close();
     }
 }
