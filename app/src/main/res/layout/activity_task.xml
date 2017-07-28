@@ -51,6 +51,7 @@
             android:id="@+id/spinnerMark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:spinnerMode="dialog"
             app:layout_gravity="fill" />
 
         <!-- Model -->
@@ -69,6 +70,7 @@
             android:id="@+id/spinnerModel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:spinnerMode="dialog"
             android:visibility="invisible"
             app:layout_gravity="fill" />
 
@@ -146,6 +148,7 @@
             android:id="@+id/spinnerWorks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:spinnerMode="dialog"
             app:layout_gravity="fill" />
 
         <!-- Save task -->

@@ -11,7 +11,7 @@ public class Contract {
     public Contract() {}
 
     public static final String CONTENT_AUTHORITY = "com.dsr_practice.car_workshop.database";
-    static final Uri    BASE_CONTENT_URI  = Uri.parse("content://" + CONTENT_AUTHORITY);
+    private static final Uri BASE_CONTENT_URI  = Uri.parse("content://" + CONTENT_AUTHORITY);
     static final String PATH_MARKS  = "marks";
     static final String PATH_MODELS = "models";
     static final String PATH_JOBS   = "jobs";
@@ -20,6 +20,11 @@ public class Contract {
     // The most useful projections
     public static final String[] MARK_NAMES_PROJECTION = new String[] {MarkEntry.COLUMN_NAME_MARK_NAME};
     public static final String[] MODEL_NAMES_PROJECTION = new String[] {ModelEntry.COLUMN_NAME_MODEL_NAME};
+    public static final String[] JOB_NAMES_PROJECTION = new String[] {
+            JobEntry.COLUMN_NAME_JOB_NAME,
+            JobEntry.COLUMN_NAME_PRICE,
+            JobEntry._ID
+    };
 
     // Columns supported by "marks" records
     public static class MarkEntry implements BaseColumns {

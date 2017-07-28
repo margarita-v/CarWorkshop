@@ -5,12 +5,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
+    private static final int    DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "car_workshop.db";
 
     private static final String TYPE_TEXT = " TEXT";
     private static final String TYPE_INTEGER = " INTEGER";
-    private static final String PRIMARY_KEY = "INTEGER PRIMARY KEY";
+    private static final String PRIMARY_KEY = " INTEGER PRIMARY KEY";
     private static final String COMMA_SEP = ",";
 
     //region Create tables
@@ -26,7 +26,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
                     Contract.ModelEntry.COLUMN_NAME_MODEL_ID + TYPE_INTEGER + COMMA_SEP +
                     Contract.ModelEntry.COLUMN_NAME_MODEL_NAME + TYPE_TEXT + COMMA_SEP +
                     Contract.ModelEntry.COLUMN_NAME_FK_MARK_ID + TYPE_INTEGER + COMMA_SEP +
-                    "FOREIGN KEY(" + Contract.ModelEntry.COLUMN_NAME_FK_MARK_ID + ") REFERENCES" +
+                    "FOREIGN KEY(" + Contract.ModelEntry.COLUMN_NAME_FK_MARK_ID + ") REFERENCES " +
                     Contract.MarkEntry.TABLE_NAME + "(" + Contract.MarkEntry.COLUMN_NAME_MARK_ID +
                     ") ON DELETE CASCADE)";
 
@@ -63,6 +63,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         db.execSQL(SQL_DROP_MARKS);
+        db.execSQL(SQL_DROP_MODELS);
         db.execSQL(SQL_DROP_JOBS);
         onCreate(db);
     }
