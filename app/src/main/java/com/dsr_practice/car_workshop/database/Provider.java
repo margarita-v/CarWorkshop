@@ -24,8 +24,8 @@ public class Provider extends ContentProvider {
             Uri.parse("content://" + AUTHORITY + "/" + PATH_GET_MODELS_FOR_MARK);
     private static final String SQL_GET_MODELS_FOR_MARK = "SELECT * FROM " +
             Contract.MarkEntry.TABLE_NAME + " JOIN " + Contract.ModelEntry.TABLE_NAME + " ON " +
-            Contract.MarkEntry.COLUMN_NAME_MARK_ID + " = " + Contract.ModelEntry.COLUMN_NAME_MODEL_ID +
-            "WHERE " + Contract.MarkEntry.COLUMN_NAME_MARK_ID + "= ?";
+            Contract.MarkEntry.COLUMN_NAME_MARK_ID + " = " + Contract.ModelEntry.COLUMN_NAME_FK_MARK_ID +
+            " WHERE " + Contract.MarkEntry.COLUMN_NAME_MARK_ID + "= ?";
 
     // URI ID for route: /marks
     public static final int ROUTE_MARKS = 1;

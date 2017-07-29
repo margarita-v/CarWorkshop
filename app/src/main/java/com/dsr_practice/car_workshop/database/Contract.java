@@ -20,6 +20,7 @@ public class Contract {
     // The most useful projections
     public static final String[] MARK_PROJECTION = new String[] {
             MarkEntry.COLUMN_NAME_MARK_NAME,
+            MarkEntry.COLUMN_NAME_MARK_ID,
             MarkEntry._ID
     };
     public static final String[] MODEL_PROJECTION = new String[] {
