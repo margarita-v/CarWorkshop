@@ -1,17 +1,17 @@
 package com.dsr_practice.car_workshop.activities;
 
 import android.content.ContentResolver;
-import android.content.Context;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.database.Contract;
@@ -43,6 +43,10 @@ public class TaskActivity extends AppCompatActivity {
 
         // Load data for spinners from database
         contentResolver = getContentResolver();
+        ContentValues v1 = new ContentValues();
+        v1.put(Contract.MarkEntry.COLUMN_NAME_MARK_ID, 1);
+        v1.put(Contract.MarkEntry.COLUMN_NAME_MARK_NAME, "Aston Martin");
+        contentResolver.insert(Contract.MarkEntry.CONTENT_URI, v1);
 
         /*
         // Marks
@@ -65,8 +69,46 @@ public class TaskActivity extends AppCompatActivity {
         //TODO Multiple choice for jobs
         loadSpinnerInfo(Contract.JobEntry.CONTENT_URI, Contract.JOB_PROJECTION, spinnerWorks);
 
-        // Load models for concrete mark
-        spinnerModel.setVisibility(View.VISIBLE);
+        spinnerMark.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                markId = getMarkIdToString(cursor);
+                loadModelsForMark();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    // Load info for marks and jobs spinners
+    private void loadSpinnerInfo(Uri uri, String[] projection, Spinner spinner) {
+        Cursor cursor = contentResolver.query(uri, projection, null, null, null);
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(
+                this,
+                android.R.layout.simple_spinner_item,
+                cursor,
+                projection,
+                viewsId,
+                0
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        if (uri == Contract.MarkEntry.CONTENT_URI)
+            markId = getMarkIdToString(cursor);
+    }
+
+    // Get mark ID for chosen mark
+    private String getMarkIdToString(Cursor cursor) {
+        int markId = cursor.getInt(cursor.getColumnIndex(Contract.MarkEntry.COLUMN_NAME_MARK_ID));
+        return Integer.toString(markId);
+    }
+
+    // Load models for chosen mark
+    private void loadModelsForMark() {
         Cursor cursor = contentResolver.query(
                 Provider.URI_MODELS_FOR_MARK,
                 Contract.MODEL_PROJECTION,
@@ -81,24 +123,6 @@ public class TaskActivity extends AppCompatActivity {
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerModel.setAdapter(adapter);
-    }
-
-    private void loadSpinnerInfo(Uri uri, String[] projection, Spinner spinner) {
-        Cursor cursor = contentResolver.query(uri, projection, null, null, null);
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(
-                this,
-                android.R.layout.simple_spinner_item,
-                cursor,
-                projection,
-                viewsId,
-                0
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        if (uri == Contract.MarkEntry.CONTENT_URI && cursor.moveToFirst()) {
-            int id = cursor.getInt(cursor.getColumnIndex(Contract.MarkEntry.COLUMN_NAME_MARK_ID));
-            markId = Integer.toString(id);
-        }
     }
 
     /*
