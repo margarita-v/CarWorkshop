@@ -18,16 +18,16 @@ public class Contract {
     private static final String SEPARATOR   = "/";
 
     // The most useful projections
-    public static final String[] MARK_NAMES_PROJECTION = new String[] {
+    public static final String[] MARK_PROJECTION = new String[] {
             MarkEntry.COLUMN_NAME_MARK_NAME,
             MarkEntry._ID
     };
-    public static final String[] MODEL_NAMES_PROJECTION = new String[] {
+    public static final String[] MODEL_PROJECTION = new String[] {
             ModelEntry.COLUMN_NAME_MODEL_NAME,
             ModelEntry.COLUMN_NAME_FK_MARK_ID,
             ModelEntry._ID
     };
-    public static final String[] JOB_NAMES_PROJECTION = new String[] {
+    public static final String[] JOB_PROJECTION = new String[] {
             JobEntry.COLUMN_NAME_JOB_NAME,
             JobEntry.COLUMN_NAME_PRICE,
             JobEntry._ID

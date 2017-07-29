@@ -53,10 +53,8 @@ public class InfoActivity extends AppCompatActivity {
                 .appendPath(Integer.toString(task.getModel())).build();
 
         tvVin.setText(task.getVin());
-        //setNameFromDatabase(markUri, Contract.MARK_NAMES_PROJECTION, tvMark);
-        //setNameFromDatabase(modelUri, Contract.MODEL_NAMES_PROJECTION, tvModel);
-        tvMark.setText(Integer.toString(task.getMark()));
-        tvModel.setText(Integer.toString(task.getModel()));
+        setNameFromDatabase(markUri, Contract.MARK_PROJECTION, tvMark);
+        setNameFromDatabase(modelUri, Contract.MODEL_PROJECTION, tvModel);
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
         tvDate.setText(dateFormat.format(task.getDate()));
         tvNumber.setText(task.getNumber());

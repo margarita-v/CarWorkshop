@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int    DATABASE_VERSION = 6;
+    private static final int    DATABASE_VERSION = 8;
     private static final String DATABASE_NAME = "car_workshop.db";
 
     private static final String TYPE_TEXT = " TEXT";
@@ -25,10 +25,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
                     Contract.ModelEntry._ID + PRIMARY_KEY + COMMA_SEP +
                     Contract.ModelEntry.COLUMN_NAME_MODEL_ID + TYPE_INTEGER + COMMA_SEP +
                     Contract.ModelEntry.COLUMN_NAME_MODEL_NAME + TYPE_TEXT + COMMA_SEP +
-                    Contract.ModelEntry.COLUMN_NAME_FK_MARK_ID + TYPE_INTEGER + COMMA_SEP +
-                    "FOREIGN KEY(" + Contract.ModelEntry.COLUMN_NAME_FK_MARK_ID + ") REFERENCES " +
-                    Contract.MarkEntry.TABLE_NAME + "(" + Contract.MarkEntry.COLUMN_NAME_MARK_ID +
-                    ") ON DELETE CASCADE)";
+                    Contract.ModelEntry.COLUMN_NAME_FK_MARK_ID + TYPE_INTEGER + ")";
 
     private static final String SQL_CREATE_JOBS =
             "CREATE TABLE " + Contract.JobEntry.TABLE_NAME + " (" +
@@ -66,14 +63,5 @@ class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_DROP_MODELS);
         db.execSQL(SQL_DROP_JOBS);
         onCreate(db);
-    }
-
-    @Override
-    public void onOpen(SQLiteDatabase db) {
-        super.onOpen(db);
-        if (!db.isReadOnly()) {
-            // Enable foreign key constraints
-            db.execSQL("PRAGMA foreign_keys=ON;");
-        }
     }
 }

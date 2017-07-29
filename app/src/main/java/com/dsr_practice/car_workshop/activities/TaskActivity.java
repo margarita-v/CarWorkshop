@@ -1,13 +1,12 @@
 package com.dsr_practice.car_workshop.activities;
 
 import android.content.ContentResolver;
-import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
@@ -19,8 +18,12 @@ public class TaskActivity extends AppCompatActivity {
 
     EditText etVIN, etNumber;
     Spinner spinnerMark, spinnerModel, spinnerWorks;
+
     private ContentResolver contentResolver;
     private int[] viewsId = {android.R.id.text1};
+
+    SimpleCursorAdapter markAdapter;
+    SimpleCursorAdapter jobAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +40,26 @@ public class TaskActivity extends AppCompatActivity {
         // Load data for spinners from database
         contentResolver = getContentResolver();
 
-        loadSpinnerInfo(Contract.MarkEntry.CONTENT_URI, Contract.MARK_NAMES_PROJECTION, spinnerMark);
+        // Marks
+        markAdapter = new SimpleCursorAdapter(
+                this, android.R.layout.simple_spinner_item,
+                null, Contract.MARK_PROJECTION,
+                viewsId, 0);
+        markAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMark.setAdapter(markAdapter);
+
+        // Jobs
+        jobAdapter = new SimpleCursorAdapter(
+                this, android.R.layout.simple_spinner_item,
+                null, Contract.JOB_PROJECTION,
+                viewsId, 0);
+        jobAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerWorks.setAdapter(jobAdapter);
+
+        loadSpinnerInfo(Contract.MarkEntry.CONTENT_URI, Contract.MARK_PROJECTION, spinnerMark);
+        loadSpinnerInfo(Contract.ModelEntry.CONTENT_URI, Contract.MODEL_PROJECTION, spinnerModel);
         //TODO Multiple choice for jobs
-        loadSpinnerInfo(Contract.JobEntry.CONTENT_URI, Contract.JOB_NAMES_PROJECTION, spinnerWorks);
+        loadSpinnerInfo(Contract.JobEntry.CONTENT_URI, Contract.JOB_PROJECTION, spinnerWorks);
     }
 
     private void loadSpinnerInfo(Uri uri, String[] projection, Spinner spinner) {
@@ -54,5 +74,21 @@ public class TaskActivity extends AppCompatActivity {
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+    }
+
+    static class ItemLoader extends CursorLoader {
+        Uri uri;
+        String[] projection;
+
+        public ItemLoader(Context context, Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+            super(context, uri, projection, selection, selectionArgs, sortOrder);
+            this.uri = uri;
+            this.projection = projection;
+        }
+
+        @Override
+        public Cursor loadInBackground() {
+            return getContext().getContentResolver().query(uri, projection, null, null, null);
+        }
     }
 }
