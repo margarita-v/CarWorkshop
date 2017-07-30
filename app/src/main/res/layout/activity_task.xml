@@ -75,22 +75,6 @@
             app:layout_gravity="fill" />
 
         <!-- Date -->
-        <TextView
-            android:id="@+id/tvDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/date"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"
-            app:layout_gravity="fill" />
-
-        <EditText
-            android:id="@+id/etDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="date" />
 
         <!-- Number -->
         <TextView
@@ -144,11 +128,11 @@
 
         <!-- Save task -->
         <Button
-            android:id="@+id/btnTask"
+            android:id="@+id/btnSaveTask"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_gravity="center"
+            android:text="@string/save_task"
             app:layout_columnSpan="2"
-            android:text="@string/save_task" />
+            app:layout_gravity="center" />
     </android.support.v7.widget.GridLayout>
 </ScrollView>

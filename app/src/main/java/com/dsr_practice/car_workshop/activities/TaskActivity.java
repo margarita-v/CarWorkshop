@@ -5,7 +5,6 @@ import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -26,21 +25,20 @@ import com.dsr_practice.car_workshop.models.common.Job;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskActivity extends AppCompatActivity {
+public class TaskActivity extends AppCompatActivity implements View.OnClickListener {
 
     EditText etVIN, etNumber;
     Spinner spinnerMark, spinnerModel;
-    Button btnAddWork;
+    Button btnAddWork, btnSaveTask;
     TextView tvWorkList;
 
     private ContentResolver contentResolver;
     private int[] viewsId = {android.R.id.text1};
-    private String markId;
     private AlertDialog dialog;
     private List<Job> chosenJobs;
 
-    //SimpleCursorAdapter markAdapter;
-    //SimpleCursorAdapter jobAdapter;
+    private int markId;
+    private int modelId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,28 +51,15 @@ public class TaskActivity extends AppCompatActivity {
         spinnerMark = (Spinner) findViewById(R.id.spinnerMark);
         spinnerModel = (Spinner) findViewById(R.id.spinnerModel);
         btnAddWork = (Button) findViewById(R.id.btnAddWork);
+        btnSaveTask = (Button) findViewById(R.id.btnSaveTask);
         tvWorkList = (TextView) findViewById(R.id.tvWorkList);
+
+        btnAddWork.setOnClickListener(this);
+        btnSaveTask.setOnClickListener(this);
 
         // Load data for spinners from database
         contentResolver = getContentResolver();
         chosenJobs = new ArrayList<>();
-
-        /*
-        // Marks
-        markAdapter = new SimpleCursorAdapter(
-                this, android.R.layout.simple_spinner_item,
-                null, Contract.MARK_PROJECTION,
-                viewsId, 0);
-        markAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerMark.setAdapter(markAdapter);
-
-        // Jobs
-        jobAdapter = new SimpleCursorAdapter(
-                this, android.R.layout.simple_spinner_item,
-                null, Contract.JOB_PROJECTION,
-                viewsId, 0);
-        jobAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerWorks.setAdapter(jobAdapter);*/
 
         // Load mark info
         Cursor markCursor = contentResolver.query(
@@ -91,15 +76,29 @@ public class TaskActivity extends AppCompatActivity {
         );
         markAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMark.setAdapter(markAdapter);
-        markId = getMarkIdToString(markCursor);
 
         // Load models for chosen mark
+        // Save ID of chosen mark
         spinnerMark.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                markId = getMarkIdToString(cursor);
+                markId = getItemId(cursor, Contract.MarkEntry.COLUMN_NAME_MARK_ID);
                 loadModelsForMark();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        // Save ID of chosen model
+        spinnerModel.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                modelId = getItemId(cursor, Contract.ModelEntry.COLUMN_NAME_MODEL_ID);
             }
 
             @Override
@@ -157,20 +156,22 @@ public class TaskActivity extends AppCompatActivity {
             }
         });
         dialog = builder.create();
-
-        // Show dialog with jobs on button click
-        btnAddWork.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.show();
-            }
-        });
     }
 
-    // Get mark ID for chosen mark
-    private String getMarkIdToString(Cursor cursor) {
-        int markId = cursor.getInt(cursor.getColumnIndex(Contract.MarkEntry.COLUMN_NAME_MARK_ID));
-        return Integer.toString(markId);
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnAddWork:
+                dialog.show();
+                break;
+            case R.id.btnSaveTask:
+                break;
+        }
+    }
+
+    // Get ID for chosen mark or model
+    private int getItemId(Cursor cursor, String columnName) {
+        return cursor.getInt(cursor.getColumnIndex(columnName));
     }
 
     // Load models for chosen mark
@@ -178,7 +179,7 @@ public class TaskActivity extends AppCompatActivity {
         Cursor cursor = contentResolver.query(
                 Provider.URI_MODELS_FOR_MARK,
                 Contract.MODEL_PROJECTION,
-                null, new String[] {markId}, null, null);
+                null, new String[] {Integer.toString(markId)}, null, null);
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(
                 this,
                 android.R.layout.simple_spinner_item,

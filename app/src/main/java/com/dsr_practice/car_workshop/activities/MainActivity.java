@@ -94,6 +94,15 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, R.string.toast_invalid_date, Toast.LENGTH_SHORT).show();
             }
         }
+        // Sort taskList by date
+        for (int i = 0; i < taskList.size(); i++)
+            for (int j = 0; j < taskList.size(); j++) {
+                Task iTask = taskList.get(i), jTask = taskList.get(j);
+                if (iTask.getDate().before(jTask.getDate())) {
+                    taskList.set(i, jTask);
+                    taskList.set(j, iTask);
+                }
+            }
         adapter = new TaskListAdapter(this, taskList);
         elvCars.setAdapter(adapter);
         elvCars.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {

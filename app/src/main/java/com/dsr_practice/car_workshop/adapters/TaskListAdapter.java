@@ -122,6 +122,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                         closeAction(imgBtnClose, closedTaskIcon);
                         //TODO Send POST request to server
                         task.setStatus(true);
+                        notifyDataSetChanged();
                         //TODO Close all jobs in this task
                     }
                 });
@@ -173,6 +174,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                         closeAction(imgBtnCloseJob, closedIcon);
                         //TODO Send POST request to server
                         jobStatus.setStatus(true);
+                        notifyDataSetChanged();
                         //TODO Check if all jobs in task are closed
                     }
                 });
