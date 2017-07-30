@@ -119,12 +119,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                 // If task is closed
                 if (task.getStatus()) {
                     builder.setMessage(R.string.task_is_closed);
-                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
+                    builder.setPositiveButton(android.R.string.ok, onClickListener);
                 }
                 else { // If task is opened
                     builder.setMessage(R.string.close_task_message);
@@ -134,16 +129,14 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                             imgBtnClose.setImageDrawable(closedTaskIcon);
                             //TODO Send POST request to server
                             task.setStatus(true);
+                            for (JobStatus jobStatus: task.getJobs()) {
+                                jobStatus.setStatus(true);
+                            }
+                            closeTask(task);
                             notifyDataSetChanged();
-                            //TODO Close all jobs in this task
                         }
                     });
-                    builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
+                    builder.setNegativeButton(R.string.no, onClickListener);
                 }
                 AlertDialog dialog = builder.create();
                 dialog.show();
@@ -153,7 +146,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+    public View getChildView(final int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         final JobStatus jobStatus = (JobStatus) getChild(groupPosition, childPosition);
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -183,12 +176,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                 // If job is closed
                 if (jobStatus.getStatus()) {
                     builder.setMessage(R.string.job_is_closed);
-                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
+                    builder.setPositiveButton(android.R.string.ok, onClickListener);
                 }
                 else { // If job is opened
                     builder.setMessage(R.string.close_job_message);
@@ -198,16 +186,22 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                             imgBtnCloseJob.setImageDrawable(closedIcon);
                             //TODO Send POST request to server
                             jobStatus.setStatus(true);
+                            // Check if all jobs in task are closed
+                            Task task = (Task) getGroup(groupPosition);
+                            boolean allClosed = true;
+                            for (JobStatus jobStatus: task.getJobs()) {
+                                allClosed = jobStatus.getStatus();
+                                if (!allClosed)
+                                    break;
+                            }
+                            if (allClosed) {
+                                task.setStatus(true);
+                                closeTask(task);
+                            }
                             notifyDataSetChanged();
-                            //TODO Check if all jobs in task are closed
                         }
                     });
-                    builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
+                    builder.setNegativeButton(R.string.no, onClickListener);
                 }
                 AlertDialog dialog = builder.create();
                 dialog.show();
@@ -221,11 +215,33 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
+    // Dialog OnClickListener for dismiss dialogs
+    private DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            dialog.dismiss();
+        }
+    };
+
     public void onGroupLongClick(int groupPosition) {
         // View task info
         Task task = (Task) getGroup(groupPosition);
         Intent intent = new Intent(context, InfoActivity.class);
         intent.putExtra(context.getString(R.string.task_intent), task);
         context.startActivity(intent);
+    }
+
+    // Dialog for closing task which shows full price of all jobs in task
+    private void closeTask(Task task) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        int price = 0;
+        for (JobStatus jobStatus: task.getJobs()) {
+            price += jobStatus.getJob().getPrice();
+        }
+        builder.setTitle(R.string.task_was_closed)
+                .setMessage(context.getString(R.string.task_full_price).concat(Integer.toString(price)))
+                .setPositiveButton(android.R.string.ok, onClickListener);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

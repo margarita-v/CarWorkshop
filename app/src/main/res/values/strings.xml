@@ -34,6 +34,7 @@
     <!-- Toast messages -->
     <string name="toast_cant_load">Can\'t load tasks!</string>
     <string name="toast_invalid_date">Invalid date format!</string>
+    <string name="all_jobs_are_closed">All jobs in this task are closed</string>
 
     <!-- Dialogs -->
     <string name="close_task_title">Close task</string>
@@ -44,4 +45,6 @@
     <string name="no">No</string>
     <string name="job_is_closed">Job is closed!</string>
     <string name="task_is_closed">Task is closed!</string>
+    <string name="task_was_closed">This task was closed</string>
+    <string name="task_full_price">Full price of jobs in this task: </string>
 </resources>
