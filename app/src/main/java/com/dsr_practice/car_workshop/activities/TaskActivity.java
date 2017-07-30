@@ -1,7 +1,8 @@
 package com.dsr_practice.car_workshop.activities;
 
+import android.app.AlertDialog;
 import android.content.ContentResolver;
-import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,7 +10,10 @@ import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
@@ -21,10 +25,12 @@ public class TaskActivity extends AppCompatActivity {
 
     EditText etVIN, etNumber;
     Spinner spinnerMark, spinnerModel, spinnerWorks;
+    Button btnAddWork;
 
     private ContentResolver contentResolver;
     private int[] viewsId = {android.R.id.text1};
     private String markId;
+    private AlertDialog dialog;
 
     //SimpleCursorAdapter markAdapter;
     //SimpleCursorAdapter jobAdapter;
@@ -40,13 +46,10 @@ public class TaskActivity extends AppCompatActivity {
         spinnerMark = (Spinner) findViewById(R.id.spinnerMark);
         spinnerModel = (Spinner) findViewById(R.id.spinnerModel);
         spinnerWorks = (Spinner) findViewById(R.id.spinnerWorks);
+        btnAddWork = (Button) findViewById(R.id.btnAddWork);
 
         // Load data for spinners from database
         contentResolver = getContentResolver();
-        ContentValues v1 = new ContentValues();
-        v1.put(Contract.MarkEntry.COLUMN_NAME_MARK_ID, 1);
-        v1.put(Contract.MarkEntry.COLUMN_NAME_MARK_NAME, "Aston Martin");
-        contentResolver.insert(Contract.MarkEntry.CONTENT_URI, v1);
 
         /*
         // Marks
@@ -67,7 +70,7 @@ public class TaskActivity extends AppCompatActivity {
 
         loadSpinnerInfo(Contract.MarkEntry.CONTENT_URI, Contract.MARK_PROJECTION, spinnerMark);
         //TODO Multiple choice for jobs
-        loadSpinnerInfo(Contract.JobEntry.CONTENT_URI, Contract.JOB_PROJECTION, spinnerWorks);
+        //loadSpinnerInfo(Contract.JobEntry.CONTENT_URI, Contract.JOB_PROJECTION, spinnerWorks);
 
         spinnerMark.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -80,6 +83,53 @@ public class TaskActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
+            }
+        });
+
+        // Get all jobs from database
+        final Cursor jobCursor = contentResolver.query(
+                Contract.JobEntry.CONTENT_URI,
+                Contract.JOB_PROJECTION,
+                null, null, null);
+
+        // Create dialog for job choice
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.add_work);
+        builder.setMultiChoiceItems(
+                jobCursor,
+                Contract.JobEntry.COLUMN_NAME_PRICE,
+                Contract.JobEntry.COLUMN_NAME_JOB_NAME,
+                new DialogInterface.OnMultiChoiceClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+
+                            }
+                        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                ListView listView = ((AlertDialog)dialog).getListView();
+                long[] checkedItemIds = listView.getCheckedItemIds();
+                ListAdapter adapter = listView.getAdapter();
+                for (int i = 0; i < checkedItemIds.length; i++) {
+                    Cursor chosenJob = (Cursor) adapter.getItem(i);
+                    //TODO Get list of chosen jobs
+                }
+            }
+        });
+        dialog = builder.create();
+
+        // Show dialog with jobs on button click
+        btnAddWork.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.show();
             }
         });
     }
