@@ -34,6 +34,8 @@
     <!-- Toast messages -->
     <string name="toast_cant_load">Can\'t load tasks!</string>
     <string name="toast_invalid_date">Invalid date format!</string>
+    <string name="toast_cant_close_task">Can\'t close task!</string>
+    <string name="toast_cant_close_job">Can\'t close job!</string>
     <string name="all_jobs_are_closed">All jobs in this task are closed</string>
 
     <!-- Dialogs -->

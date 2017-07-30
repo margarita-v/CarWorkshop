@@ -8,4 +8,9 @@ public class CloseJobPost {
 
     @SerializedName("job_id")
     private int jobId;
+
+    public CloseJobPost(int taskId, int jobId) {
+        this.taskId = taskId;
+        this.jobId = jobId;
+    }
 }

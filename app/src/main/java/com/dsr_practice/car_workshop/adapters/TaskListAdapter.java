@@ -11,20 +11,30 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.activities.InfoActivity;
 import com.dsr_practice.car_workshop.models.common.Job;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
+import com.dsr_practice.car_workshop.models.post.CloseJobPost;
+import com.dsr_practice.car_workshop.rest.ApiClient;
+import com.dsr_practice.car_workshop.rest.ApiInterface;
 
 import java.text.DateFormat;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class TaskListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
     private List<Task> taskList;
+    private static ApiInterface apiInterface;
 
     // Icons for buttons
     private static Drawable closedTaskIcon;
@@ -36,6 +46,8 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
     public TaskListAdapter(Context context, List<Task> taskList) {
         this.context = context;
         this.taskList = taskList;
+
+        apiInterface = ApiClient.getApi();
 
         // Set icons
         closedTaskIcon = IconsUtils.getIcon(
@@ -127,13 +139,30 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             imgBtnClose.setImageDrawable(closedTaskIcon);
-                            //TODO Send POST request to server
                             task.setStatus(true);
                             for (JobStatus jobStatus: task.getJobs()) {
                                 jobStatus.setStatus(true);
                             }
                             closeTask(task);
                             notifyDataSetChanged();
+                            /*
+                            apiInterface.closeTask(task.getId()).enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    imgBtnClose.setImageDrawable(closedTaskIcon);
+                                    task.setStatus(true);
+                                    for (JobStatus jobStatus: task.getJobs()) {
+                                        jobStatus.setStatus(true);
+                                    }
+                                    closeTask(task);
+                                    notifyDataSetChanged();
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    Toast.makeText(context, R.string.toast_cant_close_task, Toast.LENGTH_SHORT).show();
+                                }
+                            });*/
                         }
                     });
                     builder.setNegativeButton(R.string.no, onClickListener);
@@ -184,10 +213,9 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             imgBtnCloseJob.setImageDrawable(closedIcon);
-                            //TODO Send POST request to server
                             jobStatus.setStatus(true);
                             // Check if all jobs in task are closed
-                            Task task = (Task) getGroup(groupPosition);
+                            final Task task = (Task) getGroup(groupPosition);
                             boolean allClosed = true;
                             for (JobStatus jobStatus: task.getJobs()) {
                                 allClosed = jobStatus.getStatus();
@@ -199,6 +227,34 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                                 closeTask(task);
                             }
                             notifyDataSetChanged();
+                            /*
+                            apiInterface.closeJobInTask(new CloseJobPost(jobStatus.getId(), task.getId()))
+                                    .enqueue(new Callback<ResponseBody>() {
+                                        @Override
+                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                            imgBtnCloseJob.setImageDrawable(closedIcon);
+                                            jobStatus.setStatus(true);
+                                            boolean allClosed = true;
+                                            for (JobStatus jobStatus: task.getJobs()) {
+                                                allClosed = jobStatus.getStatus();
+                                                if (!allClosed)
+                                                    break;
+                                            }
+                                            if (allClosed) {
+                                                task.setStatus(true);
+                                                closeTask(task);
+                                            }
+                                            notifyDataSetChanged();
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                            Toast.makeText(
+                                                    context,
+                                                    R.string.toast_cant_close_job,
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    });*/
                         }
                     });
                     builder.setNegativeButton(R.string.no, onClickListener);
