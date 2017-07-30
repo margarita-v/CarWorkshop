@@ -18,102 +18,110 @@
         <!-- VIN -->
         <TextView
             android:id="@+id/tvVIN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/task_item_height"
             android:gravity="center"
             android:text="@string/vin"
             android:textColor="@android:color/black"
             android:textSize="16sp"
+            app:layout_columnWeight="1"
             app:layout_gravity="fill" />
 
         <EditText
             android:id="@+id/etVIN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/task_item_height"
             android:ems="10"
             android:inputType="textCapCharacters"
             android:maxEms="17"
             android:maxLength="17"
+            app:layout_columnWeight="1"
             app:layout_gravity="fill" />
 
         <!-- Mark -->
         <TextView
             android:id="@+id/tvMark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/task_item_height"
             android:gravity="center"
             android:text="@string/mark"
             android:textColor="@android:color/black"
             android:textSize="16sp"
+            app:layout_columnWeight="1"
             app:layout_gravity="fill" />
 
         <Spinner
             android:id="@+id/spinnerMark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/task_item_height"
             android:spinnerMode="dialog"
+            app:layout_columnWeight="1"
             app:layout_gravity="fill" />
 
         <!-- Model -->
         <TextView
             android:id="@+id/tvModel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/task_item_height"
             android:enabled="false"
             android:gravity="center"
             android:text="@string/model"
             android:textColor="@android:color/black"
             android:textSize="16sp"
+            app:layout_columnWeight="1"
             app:layout_gravity="fill" />
 
         <Spinner
             android:id="@+id/spinnerModel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/task_item_height"
             android:spinnerMode="dialog"
             android:visibility="visible"
+            app:layout_columnWeight="1"
             app:layout_gravity="fill" />
-
-        <!-- Date -->
 
         <!-- Number -->
         <TextView
             android:id="@+id/tvNumber"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/task_item_height"
             android:gravity="center"
             android:text="@string/number"
             android:textColor="@android:color/black"
             android:textSize="16sp"
+            app:layout_columnWeight="1"
             app:layout_gravity="fill" />
 
         <EditText
             android:id="@+id/etNumber"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/task_item_height"
             android:ems="10"
             android:inputType="textCapCharacters"
             android:maxLength="9"
+            app:layout_columnWeight="1"
             app:layout_gravity="fill" />
 
         <!-- Work list -->
         <TextView
             android:id="@+id/tvWorks"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/works"
             android:textColor="@android:color/black"
             android:textSize="16sp"
+            app:layout_columnWeight="1"
             app:layout_gravity="fill" />
 
         <!-- Add work option -->
         <Button
             android:id="@+id/btnAddWork"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_gravity="fill"
-            android:text="@string/add_work" />
+            android:text="@string/add_work"
+            app:layout_columnWeight="1"
+            app:layout_gravity="fill" />
 
         <TextView
             android:id="@+id/tvWorkList"
