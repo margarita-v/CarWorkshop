@@ -102,36 +102,49 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         lblNumber.setText(task.getNumber());
 
         final ImageButton imgBtnClose = (ImageButton) convertView.findViewById(R.id.imgBtnClose);
-        if (imgBtnClose.isClickable()) {
-            imgBtnClose.setBackgroundResource(resource);
-            // If task is closed
-            if (task.getStatus())
-                closeAction(imgBtnClose, closedTaskIcon);
-            else // task is open
-                imgBtnClose.setImageDrawable(openedIcon);
-        }
+
+        imgBtnClose.setBackgroundResource(resource);
+        // If task is closed
+        if (task.getStatus())
+            imgBtnClose.setImageDrawable(closedTaskIcon);
+        else // task is open
+            imgBtnClose.setImageDrawable(openedIcon);
 
         imgBtnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle(R.string.close_task_title).setMessage(R.string.close_task_message);
-                builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        closeAction(imgBtnClose, closedTaskIcon);
-                        //TODO Send POST request to server
-                        task.setStatus(true);
-                        notifyDataSetChanged();
-                        //TODO Close all jobs in this task
-                    }
-                });
-                builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                builder.setTitle(R.string.close_task_title);
 
-                    }
-                });
+                // If task is closed
+                if (task.getStatus()) {
+                    builder.setMessage(R.string.task_is_closed);
+                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                }
+                else { // If task is opened
+                    builder.setMessage(R.string.close_task_message);
+                    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            imgBtnClose.setImageDrawable(closedTaskIcon);
+                            //TODO Send POST request to server
+                            task.setStatus(true);
+                            notifyDataSetChanged();
+                            //TODO Close all jobs in this task
+                        }
+                    });
+                    builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                }
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
@@ -154,36 +167,48 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         lblWork.setText(job.getName());
         lblPrice.setText(job.getPriceToString());
 
-        if (imgBtnCloseJob.isClickable()) {
-            imgBtnCloseJob.setBackgroundResource(resource);
-            // If job is closed
-            if (jobStatus.getStatus())
-                closeAction(imgBtnCloseJob, closedIcon);
-            else // job is opened
-                imgBtnCloseJob.setImageDrawable(openedIcon);
-        }
+        imgBtnCloseJob.setBackgroundResource(resource);
+        // If job is closed
+        if (jobStatus.getStatus())
+            imgBtnCloseJob.setImageDrawable(closedIcon);
+        else // job is opened
+            imgBtnCloseJob.setImageDrawable(openedIcon);
 
         imgBtnCloseJob.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle(R.string.close_job_title).setMessage(R.string.close_job_message);
-                builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        closeAction(imgBtnCloseJob, closedIcon);
-                        //TODO Send POST request to server
-                        jobStatus.setStatus(true);
-                        notifyDataSetChanged();
-                        //TODO Check if all jobs in task are closed
-                    }
-                });
-                builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                builder.setTitle(R.string.close_job_title);
 
-                    }
-                });
+                // If job is closed
+                if (jobStatus.getStatus()) {
+                    builder.setMessage(R.string.job_is_closed);
+                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                }
+                else { // If job is opened
+                    builder.setMessage(R.string.close_job_message);
+                    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            imgBtnCloseJob.setImageDrawable(closedIcon);
+                            //TODO Send POST request to server
+                            jobStatus.setStatus(true);
+                            notifyDataSetChanged();
+                            //TODO Check if all jobs in task are closed
+                        }
+                    });
+                    builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                }
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
@@ -202,10 +227,5 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         Intent intent = new Intent(context, InfoActivity.class);
         intent.putExtra(context.getString(R.string.task_intent), task);
         context.startActivity(intent);
-    }
-
-    private void closeAction(ImageButton imageButton, Drawable drawable) {
-        imageButton.setImageDrawable(drawable);
-        imageButton.setClickable(false);
     }
 }

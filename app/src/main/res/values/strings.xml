@@ -42,4 +42,6 @@
     <string name="close_job_message">Are you sure to close this job?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="job_is_closed">Job is closed!</string>
+    <string name="task_is_closed">Task is closed!</string>
 </resources>
