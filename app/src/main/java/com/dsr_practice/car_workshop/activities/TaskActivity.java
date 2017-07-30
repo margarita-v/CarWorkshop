@@ -4,10 +4,10 @@ import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -16,21 +16,28 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.database.Provider;
+import com.dsr_practice.car_workshop.models.common.Job;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaskActivity extends AppCompatActivity {
 
     EditText etVIN, etNumber;
-    Spinner spinnerMark, spinnerModel, spinnerWorks;
+    Spinner spinnerMark, spinnerModel;
     Button btnAddWork;
+    TextView tvWorkList;
 
     private ContentResolver contentResolver;
     private int[] viewsId = {android.R.id.text1};
     private String markId;
     private AlertDialog dialog;
+    private List<Job> chosenJobs;
 
     //SimpleCursorAdapter markAdapter;
     //SimpleCursorAdapter jobAdapter;
@@ -45,11 +52,12 @@ public class TaskActivity extends AppCompatActivity {
         etNumber = (EditText) findViewById(R.id.etNumber);
         spinnerMark = (Spinner) findViewById(R.id.spinnerMark);
         spinnerModel = (Spinner) findViewById(R.id.spinnerModel);
-        spinnerWorks = (Spinner) findViewById(R.id.spinnerWorks);
         btnAddWork = (Button) findViewById(R.id.btnAddWork);
+        tvWorkList = (TextView) findViewById(R.id.tvWorkList);
 
         // Load data for spinners from database
         contentResolver = getContentResolver();
+        chosenJobs = new ArrayList<>();
 
         /*
         // Marks
@@ -68,10 +76,24 @@ public class TaskActivity extends AppCompatActivity {
         jobAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerWorks.setAdapter(jobAdapter);*/
 
-        loadSpinnerInfo(Contract.MarkEntry.CONTENT_URI, Contract.MARK_PROJECTION, spinnerMark);
-        //TODO Multiple choice for jobs
-        //loadSpinnerInfo(Contract.JobEntry.CONTENT_URI, Contract.JOB_PROJECTION, spinnerWorks);
+        // Load mark info
+        Cursor markCursor = contentResolver.query(
+                Contract.MarkEntry.CONTENT_URI,
+                Contract.MARK_PROJECTION,
+                null, null, null);
+        SimpleCursorAdapter markAdapter = new SimpleCursorAdapter(
+                this,
+                android.R.layout.simple_spinner_item,
+                markCursor,
+                Contract.MARK_PROJECTION,
+                viewsId,
+                0
+        );
+        markAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMark.setAdapter(markAdapter);
+        markId = getMarkIdToString(markCursor);
 
+        // Load models for chosen mark
         spinnerMark.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -115,11 +137,22 @@ public class TaskActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 ListView listView = ((AlertDialog)dialog).getListView();
-                long[] checkedItemIds = listView.getCheckedItemIds();
+                SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
                 ListAdapter adapter = listView.getAdapter();
-                for (int i = 0; i < checkedItemIds.length; i++) {
-                    Cursor chosenJob = (Cursor) adapter.getItem(i);
-                    //TODO Get list of chosen jobs
+                chosenJobs.clear();
+                tvWorkList.setText("");
+                for (int i = 0; i < checkedItems.size(); i++) {
+                    int key = checkedItems.keyAt(i);
+                    if (checkedItems.get(key)) {
+                        Cursor cursor = (Cursor) adapter.getItem(key);
+                        int id = cursor.getInt(cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_JOB_ID));
+                        String name = cursor.getString(cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_JOB_NAME));
+                        int price = cursor.getInt(cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_PRICE));
+                        chosenJobs.add(new Job(id, price, name));
+                    }
+                }
+                for (Job job: chosenJobs) {
+                    tvWorkList.append(job.getName().concat("\n"));
                 }
             }
         });
@@ -132,23 +165,6 @@ public class TaskActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
-    }
-
-    // Load info for marks and jobs spinners
-    private void loadSpinnerInfo(Uri uri, String[] projection, Spinner spinner) {
-        Cursor cursor = contentResolver.query(uri, projection, null, null, null);
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(
-                this,
-                android.R.layout.simple_spinner_item,
-                cursor,
-                projection,
-                viewsId,
-                0
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        if (uri == Contract.MarkEntry.CONTENT_URI)
-            markId = getMarkIdToString(cursor);
     }
 
     // Get mark ID for chosen mark

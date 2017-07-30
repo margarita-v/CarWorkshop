@@ -123,6 +123,7 @@
             android:textSize="16sp"
             app:layout_gravity="fill" />
 
+        <!-- Add work option -->
         <Button
             android:id="@+id/btnAddWork"
             android:layout_width="wrap_content"
@@ -132,21 +133,13 @@
 
         <TextView
             android:id="@+id/tvWorkList"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:enabled="false"
-            android:maxLines="5"
+            android:layout_weight="1"
+            android:maxLines="9"
             android:minLines="1"
             android:textColor="@android:color/black"
-            app:layout_gravity="fill" />
-
-        <!-- Add work option -->
-
-        <Spinner
-            android:id="@+id/spinnerWorks"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:spinnerMode="dialog"
+            app:layout_columnSpan="2"
             app:layout_gravity="fill" />
 
         <!-- Save task -->

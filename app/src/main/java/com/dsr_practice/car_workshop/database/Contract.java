@@ -31,6 +31,7 @@ public class Contract {
     public static final String[] JOB_PROJECTION = new String[] {
             JobEntry.COLUMN_NAME_JOB_NAME,
             JobEntry.COLUMN_NAME_PRICE,
+            JobEntry.COLUMN_NAME_JOB_ID,
             JobEntry._ID
     };
 
