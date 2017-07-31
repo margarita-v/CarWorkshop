@@ -6,18 +6,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.util.ArraySet;
 import android.support.v7.app.AppCompatActivity;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
@@ -32,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -43,15 +43,16 @@ public class TaskActivity extends AppCompatActivity
 
     EditText etVIN, etNumber;
     Spinner spinnerMark, spinnerModel;
-    Button btnAddWork, btnSaveTask;
-    TextView tvWorkList;
+    Button btnSaveTask;
     ListView lvJobs;
 
     private ContentResolver contentResolver;
     private int[] viewsId = {android.R.id.text1};
     private int[] jobIds = {R.id.cbName, R.id.tvPrice};
     private AlertDialog dialog;
+    private Set<Integer> jobsPositions;
     private List<Job> chosenJobs;
+    private SimpleCursorAdapter jobAdapter;
     private SimpleDateFormat dateFormat;
     private static ApiInterface apiInterface;
 
@@ -68,7 +69,7 @@ public class TaskActivity extends AppCompatActivity
         apiInterface = ApiClient.getApi();
         dateFormat = new SimpleDateFormat(getString(R.string.date_format));
 
-        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View listHeader = inflater.inflate(R.layout.task_header, null);
         View listFooter = inflater.inflate(R.layout.task_footer, null);
 
@@ -76,17 +77,15 @@ public class TaskActivity extends AppCompatActivity
         etNumber = (EditText) listHeader.findViewById(R.id.etNumber);
         spinnerMark = (Spinner) listHeader.findViewById(R.id.spinnerMark);
         spinnerModel = (Spinner) listHeader.findViewById(R.id.spinnerModel);
-        btnAddWork = (Button) listHeader.findViewById(R.id.btnAddWork);
         btnSaveTask = (Button) listFooter.findViewById(R.id.btnSaveTask);
-        tvWorkList = (TextView) listHeader.findViewById(R.id.tvWorkList);
         lvJobs = (ListView) findViewById(R.id.lvJobs);
 
-        btnAddWork.setOnClickListener(this);
         btnSaveTask.setOnClickListener(this);
 
         // Load data for spinners from database
         contentResolver = getContentResolver();
         chosenJobs = new ArrayList<>();
+        jobsPositions = new ArraySet<>();
 
         // Load mark info
         Cursor markCursor = contentResolver.query(
@@ -140,7 +139,7 @@ public class TaskActivity extends AppCompatActivity
                 Contract.JOB_PROJECTION,
                 null, null, null);
 
-        SimpleCursorAdapter jobAdapter = new SimpleCursorAdapter(
+        jobAdapter = new SimpleCursorAdapter(
                 this,
                 R.layout.job_item,
                 jobCursor,
@@ -148,59 +147,40 @@ public class TaskActivity extends AppCompatActivity
                 jobIds,
                 0);
 
-        // Create dialog for job choice
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.add_work);
-        builder.setMultiChoiceItems(
-                jobCursor,
-                Contract.JobEntry.COLUMN_NAME_PRICE,
-                Contract.JobEntry.COLUMN_NAME_JOB_NAME,
-                new DialogInterface.OnMultiChoiceClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-
-                            }
-                        });
-        builder.setNegativeButton("Cancel", this);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                ListView listView = ((AlertDialog)dialog).getListView();
-                SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-                ListAdapter adapter = listView.getAdapter();
-                chosenJobs.clear();
-                tvWorkList.setText("");
-                for (int i = 0; i < checkedItems.size(); i++) {
-                    int key = checkedItems.keyAt(i);
-                    if (checkedItems.get(key)) {
-                        Cursor cursor = (Cursor) adapter.getItem(key);
-                        int id = cursor.getInt(cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_JOB_ID));
-                        String name = cursor.getString(cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_JOB_NAME));
-                        int price = cursor.getInt(cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_PRICE));
-                        chosenJobs.add(new Job(id, price, name));
-                    }
-                }
-                for (Job job: chosenJobs) {
-                    tvWorkList.append(job.getName().concat("\n"));
-                }
-            }
-        });
-        dialog = builder.create();
-
         lvJobs.addHeaderView(listHeader);
         lvJobs.addFooterView(listFooter);
         lvJobs.setAdapter(jobAdapter);
+        lvJobs.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        lvJobs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                CheckBox cbName = (CheckBox) view.findViewById(R.id.cbName);
+                boolean isChecked = !cbName.isChecked();
+                cbName.setChecked(isChecked);
+                position--;
+                if (isChecked)
+                    jobsPositions.add(position);
+                else
+                    jobsPositions.remove(position);
+            }
+        });
     }
 
     // Buttons OnClickListener
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btnAddWork:
-                dialog.show();
-                break;
             case R.id.btnSaveTask:
                 String vin = etVIN.getText().toString(), number = etNumber.getText().toString();
+                // Get chosen jobs
+                chosenJobs.clear();
+                for (int i: jobsPositions){
+                    Cursor cursor = (Cursor) jobAdapter.getItem(i);
+                    int id = cursor.getInt(cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_JOB_ID));
+                    String name = cursor.getString(cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_JOB_NAME));
+                    int price = cursor.getInt(cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_PRICE));
+                    chosenJobs.add(new Job(id, price, name));
+                }
                 if (checkInput(vin, number)) {
                     /*
                     Calendar calendar = Calendar.getInstance();

@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/image_button_height"
+    android:paddingLeft="@dimen/job_item_margin"
     android:paddingRight="@dimen/job_item_margin"
     android:descendantFocusability="blocksDescendants"
     android:orientation="horizontal">
@@ -10,8 +11,9 @@
         android:id="@+id/cbName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:layout_weight="3"
-        android:layout_gravity="center_vertical"/>
+        android:clickable="false"/>
 
     <TextView
         android:id="@+id/tvPrice"

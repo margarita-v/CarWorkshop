@@ -28,6 +28,10 @@
     <string name="date">Дата</string>
     <string name="status">Статус</string>
 
+    <!-- TextView's hints -->
+    <string name="hint_vin">Введите VIN</string>
+    <string name="hint_number">Введите гос. номер</string>
+
     <!-- Image button's content descriptions -->
     <string name="btn_close_task">Закрыть задачу</string>
     <string name="btn_close_job">Закрыть работу</string>
