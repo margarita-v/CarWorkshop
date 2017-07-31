@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                 "Change color"
         };
         int[] priceArray = new int[] { 300, 1000, 200, 500 };
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        SimpleDateFormat format = new SimpleDateFormat(getString(R.string.date_format));
         List<Task> taskList = new ArrayList<>();
         List<JobStatus> jobs = new ArrayList<>();
         for (int i = 0; i < 4; i++) {

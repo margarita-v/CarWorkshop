@@ -26,10 +26,15 @@ import com.dsr_practice.car_workshop.models.post.TaskPost;
 import com.dsr_practice.car_workshop.rest.ApiClient;
 import com.dsr_practice.car_workshop.rest.ApiInterface;
 
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class TaskActivity extends AppCompatActivity
         implements View.OnClickListener, DialogInterface.OnClickListener {
@@ -43,6 +48,7 @@ public class TaskActivity extends AppCompatActivity
     private int[] viewsId = {android.R.id.text1};
     private AlertDialog dialog;
     private List<Job> chosenJobs;
+    private SimpleDateFormat dateFormat;
     private static ApiInterface apiInterface;
 
     private static final int VIN_LENGTH = 17;
@@ -56,6 +62,7 @@ public class TaskActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
         apiInterface = ApiClient.getApi();
+        dateFormat = new SimpleDateFormat(getString(R.string.date_format));
 
         etVIN = (EditText) findViewById(R.id.etVIN);
         etNumber = (EditText) findViewById(R.id.etNumber);
@@ -172,11 +179,24 @@ public class TaskActivity extends AppCompatActivity
                 dialog.show();
                 break;
             case R.id.btnSaveTask:
-                //TODO Get current date
-                //DateFormat dateFormat = DateFormat.getDateTimeInstance();
-                //Calendar calendar = Calendar.getInstance();
-                //trackName = dateFormat.format(calendar.getTime());
-                if (checkInput()) {
+                String vin = etVIN.getText().toString(), number = etNumber.getText().toString();
+                if (checkInput(vin, number)) {
+                    /*
+                    Calendar calendar = Calendar.getInstance();
+                    String date = dateFormat.format(calendar.getTime());
+                    apiInterface.createTask(new TaskPost(markId, modelId, date, vin, number, chosenJobs))
+                            .enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    Toast.makeText(TaskActivity.this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
+                                    TaskActivity.this.finish();
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    Toast.makeText(TaskActivity.this, R.string.toast_cant_create, Toast.LENGTH_SHORT).show();
+                                }
+                            });*/
                     Toast.makeText(this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
                     this.finish();
                 }
@@ -214,8 +234,7 @@ public class TaskActivity extends AppCompatActivity
     }
 
     // Check all task fields
-    private boolean checkInput() {
-        String vin = etVIN.getText().toString(), number = etNumber.getText().toString();
+    private boolean checkInput(String vin, String number) {
         if (vin.equals("") || number.equals("")) {
             createErrorDialog(R.string.empty_fields_title, R.string.empty_fields_message);
             return false;
