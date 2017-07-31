@@ -1,6 +1,6 @@
 <resources>
     <!-- App general -->
-    <string name="app_name">CarWorkshop</string>
+    <string name="app_name">Автомастерская</string>
     <string name="action_settings">Settings</string>
 
     <!-- Activity's titles -->
@@ -37,6 +37,7 @@
     <string name="toast_cant_close_task">Can\'t close task!</string>
     <string name="toast_cant_close_job">Can\'t close job!</string>
     <string name="all_jobs_are_closed">All jobs in this task are closed</string>
+    <string name="toast_create_task">Task was created</string>
 
     <!-- Dialogs -->
     <string name="close_task_title">Close task</string>

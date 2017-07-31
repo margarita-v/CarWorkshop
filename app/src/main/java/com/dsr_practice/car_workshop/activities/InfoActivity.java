@@ -26,7 +26,6 @@ public class InfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
-        setTitle(R.string.info_title);
 
         lvJobs = (ListView) findViewById(R.id.lvJobs);
         Task task = (Task) getIntent().getSerializableExtra(getString(R.string.task_intent));

@@ -50,11 +50,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // This will create a new account with the system for our application, register our
+        // SyncService with it, and establish a sync schedule
+        //AccountGeneral.createSyncAccount(this);
+
         ApiInterface apiInterface = ApiClient.getApi();
         apiInterface.getTasks().enqueue(new Callback<List<Task>>() {
             @Override
             public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
-                List<Task> listTasks = response.body();
+                /*
+                List<Task> taskList = response.body();
+                // Sort taskList by date
+                for (int i = 0; i < taskList.size(); i++)
+                    for (int j = 0; j < taskList.size(); j++) {
+                        Task iTask = taskList.get(i), jTask = taskList.get(j);
+                        if (iTask.getDate().before(jTask.getDate())) {
+                            taskList.set(i, jTask);
+                            taskList.set(j, iTask);
+                        }
+                    }
+                adapter = new TaskListAdapter(MainActivity.this, taskList);
+                elvCars.setAdapter(adapter);*/
             }
 
             @Override
@@ -118,8 +134,5 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        // This will create a new account with the system for our application, register our
-        // SyncService with it, and establish a sync schedule
-        //AccountGeneral.createSyncAccount(this);
     }
 }

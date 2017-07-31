@@ -10,17 +10,23 @@ public class TaskPost {
     @SerializedName("mark")
     private int markId;
 
-    @SerializedName("mark_name")
-    private String markName;
-
     @SerializedName("model")
     private int modelId;
 
-    private Date date;
+    private String date;
 
     private String vin;
 
     private String number;
 
     private List<Job> jobs;
+
+    public TaskPost(int markId, int modelId, String date, String vin, String number, List<Job> jobs) {
+        this.markId = markId;
+        this.modelId = modelId;
+        this.date = date;
+        this.vin = vin;
+        this.number = number;
+        this.jobs = jobs;
+    }
 }

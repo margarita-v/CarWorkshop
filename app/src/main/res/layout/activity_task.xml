@@ -32,8 +32,8 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/task_item_height"
             android:ems="10"
-            android:inputType="textCapCharacters"
-            android:maxEms="17"
+            android:inputType="text"
+            android:digits="wertyupasdfghjklzxcvbnm0123456789"
             android:maxLength="17"
             app:layout_columnWeight="1"
             app:layout_gravity="fill" />
@@ -97,7 +97,8 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/task_item_height"
             android:ems="10"
-            android:inputType="textCapCharacters"
+            android:inputType="text"
+            android:digits="укенхваросмт0123456789"
             android:maxLength="9"
             app:layout_columnWeight="1"
             app:layout_gravity="fill" />

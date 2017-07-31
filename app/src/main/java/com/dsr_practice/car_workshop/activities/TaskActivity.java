@@ -16,13 +16,19 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.database.Provider;
 import com.dsr_practice.car_workshop.models.common.Job;
+import com.dsr_practice.car_workshop.models.post.TaskPost;
+import com.dsr_practice.car_workshop.rest.ApiClient;
+import com.dsr_practice.car_workshop.rest.ApiInterface;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class TaskActivity extends AppCompatActivity implements View.OnClickListener {
@@ -36,6 +42,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     private int[] viewsId = {android.R.id.text1};
     private AlertDialog dialog;
     private List<Job> chosenJobs;
+    private static ApiInterface apiInterface;
 
     private int markId;
     private int modelId;
@@ -44,7 +51,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
-        setTitle(R.string.task_title);
+        apiInterface = ApiClient.getApi();
 
         etVIN = (EditText) findViewById(R.id.etVIN);
         etNumber = (EditText) findViewById(R.id.etNumber);
@@ -165,6 +172,12 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
                 dialog.show();
                 break;
             case R.id.btnSaveTask:
+                //TODO Get current date
+                //DateFormat dateFormat = DateFormat.getDateTimeInstance();
+                //Calendar calendar = Calendar.getInstance();
+                //trackName = dateFormat.format(calendar.getTime());
+                Toast.makeText(this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
+                this.finish();
                 break;
         }
     }

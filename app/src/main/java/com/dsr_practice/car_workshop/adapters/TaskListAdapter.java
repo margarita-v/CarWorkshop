@@ -34,7 +34,6 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
     private List<Task> taskList;
-    private static ApiInterface apiInterface;
 
     // Icons for buttons
     private static Drawable closedTaskIcon;
@@ -47,7 +46,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         this.context = context;
         this.taskList = taskList;
 
-        apiInterface = ApiClient.getApi();
+        ApiInterface apiInterface = ApiClient.getApi();
 
         // Set icons
         closedTaskIcon = IconsUtils.getIcon(
