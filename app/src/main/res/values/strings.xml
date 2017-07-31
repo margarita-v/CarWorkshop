@@ -50,4 +50,12 @@
     <string name="task_is_closed">Task is closed!</string>
     <string name="task_was_closed">This task was closed</string>
     <string name="task_full_price">Full price of jobs in this task: </string>
+    <string name="empty_fields_title">Empty fields</string>
+    <string name="empty_fields_message">Please, enter VIN and car number.</string>
+    <string name="invalid_vin_title">Invalid VIN</string>
+    <string name="invalid_vin_message">VIN length should be equal to 17!</string>
+    <string name="invalid_number_title">Invalid number</string>
+    <string name="invalid_number_message">Number length should be between 6 and 9!</string>
+    <string name="empty_jobs_title">Jobs wasn\'t chosen</string>
+    <string name="empty_jobs_message">Please, choose jobs for this task.</string>
 </resources>

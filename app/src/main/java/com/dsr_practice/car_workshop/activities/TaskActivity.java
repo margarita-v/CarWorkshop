@@ -31,7 +31,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class TaskActivity extends AppCompatActivity implements View.OnClickListener {
+public class TaskActivity extends AppCompatActivity
+        implements View.OnClickListener, DialogInterface.OnClickListener {
 
     EditText etVIN, etNumber;
     Spinner spinnerMark, spinnerModel;
@@ -43,6 +44,9 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     private AlertDialog dialog;
     private List<Job> chosenJobs;
     private static ApiInterface apiInterface;
+
+    private static final int VIN_LENGTH = 17;
+    private static final int NUMBER_LENGTH = 6;
 
     private int markId;
     private int modelId;
@@ -133,12 +137,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
 
                             }
                         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
+        builder.setNegativeButton("Cancel", this);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -165,6 +164,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         dialog = builder.create();
     }
 
+    // Buttons OnClickListener
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -176,10 +176,18 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
                 //DateFormat dateFormat = DateFormat.getDateTimeInstance();
                 //Calendar calendar = Calendar.getInstance();
                 //trackName = dateFormat.format(calendar.getTime());
-                Toast.makeText(this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
-                this.finish();
+                if (checkInput()) {
+                    Toast.makeText(this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
+                    this.finish();
+                }
                 break;
         }
+    }
+
+    // Dialog OnClickListener for dismiss dialogs
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        dialog.dismiss();
     }
 
     // Get ID for chosen mark or model
@@ -203,6 +211,37 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerModel.setAdapter(adapter);
+    }
+
+    // Check all task fields
+    private boolean checkInput() {
+        String vin = etVIN.getText().toString(), number = etNumber.getText().toString();
+        if (vin.equals("") || number.equals("")) {
+            createErrorDialog(R.string.empty_fields_title, R.string.empty_fields_message);
+            return false;
+        }
+        if (vin.length() < VIN_LENGTH) {
+            createErrorDialog(R.string.invalid_vin_title, R.string.invalid_vin_message);
+            return false;
+        }
+        if (number.length() < NUMBER_LENGTH) {
+            createErrorDialog(R.string.invalid_number_title, R.string.invalid_number_message);
+            return false;
+        }
+        if (chosenJobs.isEmpty()) {
+            createErrorDialog(R.string.empty_jobs_title, R.string.empty_jobs_message);
+            return false;
+        }
+        return true;
+    }
+
+    // Create error dialog for task validation
+    private void createErrorDialog(int titleId, int messageId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(titleId).setMessage(messageId)
+                .setPositiveButton(android.R.string.ok, this);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     /*
