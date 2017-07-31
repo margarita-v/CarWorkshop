@@ -2,11 +2,13 @@ package com.dsr_practice.car_workshop.activities;
 
 import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.SparseBooleanArray;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -43,9 +45,11 @@ public class TaskActivity extends AppCompatActivity
     Spinner spinnerMark, spinnerModel;
     Button btnAddWork, btnSaveTask;
     TextView tvWorkList;
+    ListView lvJobs;
 
     private ContentResolver contentResolver;
     private int[] viewsId = {android.R.id.text1};
+    private int[] jobIds = {R.id.cbName, R.id.tvPrice};
     private AlertDialog dialog;
     private List<Job> chosenJobs;
     private SimpleDateFormat dateFormat;
@@ -60,17 +64,22 @@ public class TaskActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_task);
+        setContentView(R.layout.activity_info);
         apiInterface = ApiClient.getApi();
         dateFormat = new SimpleDateFormat(getString(R.string.date_format));
 
-        etVIN = (EditText) findViewById(R.id.etVIN);
-        etNumber = (EditText) findViewById(R.id.etNumber);
-        spinnerMark = (Spinner) findViewById(R.id.spinnerMark);
-        spinnerModel = (Spinner) findViewById(R.id.spinnerModel);
-        btnAddWork = (Button) findViewById(R.id.btnAddWork);
-        btnSaveTask = (Button) findViewById(R.id.btnSaveTask);
-        tvWorkList = (TextView) findViewById(R.id.tvWorkList);
+        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View listHeader = inflater.inflate(R.layout.task_header, null);
+        View listFooter = inflater.inflate(R.layout.task_footer, null);
+
+        etVIN = (EditText) listHeader.findViewById(R.id.etVIN);
+        etNumber = (EditText) listHeader.findViewById(R.id.etNumber);
+        spinnerMark = (Spinner) listHeader.findViewById(R.id.spinnerMark);
+        spinnerModel = (Spinner) listHeader.findViewById(R.id.spinnerModel);
+        btnAddWork = (Button) listHeader.findViewById(R.id.btnAddWork);
+        btnSaveTask = (Button) listFooter.findViewById(R.id.btnSaveTask);
+        tvWorkList = (TextView) listHeader.findViewById(R.id.tvWorkList);
+        lvJobs = (ListView) findViewById(R.id.lvJobs);
 
         btnAddWork.setOnClickListener(this);
         btnSaveTask.setOnClickListener(this);
@@ -131,6 +140,14 @@ public class TaskActivity extends AppCompatActivity
                 Contract.JOB_PROJECTION,
                 null, null, null);
 
+        SimpleCursorAdapter jobAdapter = new SimpleCursorAdapter(
+                this,
+                R.layout.job_item,
+                jobCursor,
+                Contract.JOB_PROJECTION,
+                jobIds,
+                0);
+
         // Create dialog for job choice
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.add_work);
@@ -169,6 +186,10 @@ public class TaskActivity extends AppCompatActivity
             }
         });
         dialog = builder.create();
+
+        lvJobs.addHeaderView(listHeader);
+        lvJobs.addFooterView(listFooter);
+        lvJobs.setAdapter(jobAdapter);
     }
 
     // Buttons OnClickListener
