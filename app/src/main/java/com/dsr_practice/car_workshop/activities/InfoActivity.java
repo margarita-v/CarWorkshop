@@ -32,7 +32,7 @@ public class InfoActivity extends AppCompatActivity {
         adapter = new TaskInfoAdapter(this, task);
         lvJobs.setAdapter(adapter);
 
-        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View listHeader = inflater.inflate(R.layout.info_header, null);
         lvJobs.addHeaderView(listHeader);
 

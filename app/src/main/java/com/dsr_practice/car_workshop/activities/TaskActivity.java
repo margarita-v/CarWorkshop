@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.util.ArraySet;
 import android.support.v7.app.AppCompatActivity;
@@ -47,20 +48,27 @@ public class TaskActivity extends AppCompatActivity
     ListView lvJobs;
 
     private ContentResolver contentResolver;
-    private int[] viewsId = {android.R.id.text1};
-    private int[] jobIds = {R.id.cbName, R.id.tvPrice};
-    private AlertDialog dialog;
-    private Set<Integer> jobsPositions;
-    private List<Job> chosenJobs;
     private SimpleCursorAdapter jobAdapter;
     private SimpleDateFormat dateFormat;
     private static ApiInterface apiInterface;
 
+    // View's IDs for adapters
+    private int[] viewsId = {android.R.id.text1};
+    private int[] jobIds = {R.id.cbName, R.id.tvPrice};
+    private int spinnerItem = android.R.layout.simple_spinner_item;
+    private int spinnerDropDown = android.R.layout.simple_spinner_dropdown_item;
+
+    // Positions of chosen jobs
+    private Set<Integer> jobsPositions;
+    // Chosen jobs list
+    private List<Job> chosenJobs;
+    // Chosen mark ID
+    private int markId;
+    // Chosen model ID
+    private int modelId;
+
     private static final int VIN_LENGTH = 17;
     private static final int NUMBER_LENGTH = 6;
-
-    private int markId;
-    private int modelId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +77,7 @@ public class TaskActivity extends AppCompatActivity
         apiInterface = ApiClient.getApi();
         dateFormat = new SimpleDateFormat(getString(R.string.date_format));
 
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View listHeader = inflater.inflate(R.layout.task_header, null);
         View listFooter = inflater.inflate(R.layout.task_footer, null);
 
@@ -82,25 +90,19 @@ public class TaskActivity extends AppCompatActivity
 
         btnSaveTask.setOnClickListener(this);
 
-        // Load data for spinners from database
+        // Load data from database
         contentResolver = getContentResolver();
         chosenJobs = new ArrayList<>();
         jobsPositions = new ArraySet<>();
 
         // Load mark info
-        Cursor markCursor = contentResolver.query(
+        SimpleCursorAdapter markAdapter = getAdapter(
                 Contract.MarkEntry.CONTENT_URI,
                 Contract.MARK_PROJECTION,
-                null, null, null);
-        SimpleCursorAdapter markAdapter = new SimpleCursorAdapter(
-                this,
-                android.R.layout.simple_spinner_item,
-                markCursor,
-                Contract.MARK_PROJECTION,
-                viewsId,
-                0
-        );
-        markAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                null,
+                spinnerItem,
+                viewsId);
+        markAdapter.setDropDownViewResource(spinnerDropDown);
         spinnerMark.setAdapter(markAdapter);
 
         // Load models for chosen mark
@@ -110,7 +112,14 @@ public class TaskActivity extends AppCompatActivity
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 markId = getItemId(cursor, Contract.MarkEntry.COLUMN_NAME_MARK_ID);
-                loadModelsForMark();
+                SimpleCursorAdapter modelAdapter = getAdapter(
+                        Provider.URI_MODELS_FOR_MARK,
+                        Contract.MODEL_PROJECTION,
+                        new String[] {Integer.toString(markId)},
+                        spinnerItem,
+                        viewsId);
+                modelAdapter.setDropDownViewResource(spinnerDropDown);
+                spinnerModel.setAdapter(modelAdapter);
             }
 
             @Override
@@ -134,18 +143,12 @@ public class TaskActivity extends AppCompatActivity
         });
 
         // Get all jobs from database
-        final Cursor jobCursor = contentResolver.query(
+        jobAdapter = getAdapter(
                 Contract.JobEntry.CONTENT_URI,
                 Contract.JOB_PROJECTION,
-                null, null, null);
-
-        jobAdapter = new SimpleCursorAdapter(
-                this,
+                null,
                 R.layout.job_item,
-                jobCursor,
-                Contract.JOB_PROJECTION,
-                jobIds,
-                0);
+                jobIds);
 
         lvJobs.addHeaderView(listHeader);
         lvJobs.addFooterView(listFooter);
@@ -216,22 +219,10 @@ public class TaskActivity extends AppCompatActivity
         return cursor.getInt(cursor.getColumnIndex(columnName));
     }
 
-    // Load models for chosen mark
-    private void loadModelsForMark() {
-        Cursor cursor = contentResolver.query(
-                Provider.URI_MODELS_FOR_MARK,
-                Contract.MODEL_PROJECTION,
-                null, new String[] {Integer.toString(markId)}, null, null);
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(
-                this,
-                android.R.layout.simple_spinner_item,
-                cursor,
-                Contract.MODEL_PROJECTION,
-                viewsId,
-                0
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerModel.setAdapter(adapter);
+    // Get cursor adapter for database entities
+    private SimpleCursorAdapter getAdapter(Uri uri, String[] projection, String[] args, int layout, int[] views) {
+        Cursor cursor = contentResolver.query(uri, projection, null, args, null, null);
+        return new SimpleCursorAdapter(this, layout, cursor, projection, views, 0);
     }
 
     // Check all task fields
@@ -263,21 +254,4 @@ public class TaskActivity extends AppCompatActivity
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
-    /*
-    static class ItemLoader extends CursorLoader {
-        Uri uri;
-        String[] projection;
-
-        public ItemLoader(Context context, Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-            super(context, uri, projection, selection, selectionArgs, sortOrder);
-            this.uri = uri;
-            this.projection = projection;
-        }
-
-        @Override
-        public Cursor loadInBackground() {
-            return getContext().getContentResolver().query(uri, projection, null, null, null);
-        }
-    }*/
 }

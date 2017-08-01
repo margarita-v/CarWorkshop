@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     ExpandableListView elvCars;
     TaskListAdapter adapter;
+    private static ApiInterface apiInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,31 +54,7 @@ public class MainActivity extends AppCompatActivity {
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
         //AccountGeneral.createSyncAccount(this);
-
-        ApiInterface apiInterface = ApiClient.getApi();
-        apiInterface.getTasks().enqueue(new Callback<List<Task>>() {
-            @Override
-            public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
-                /*
-                List<Task> taskList = response.body();
-                // Sort taskList by date
-                for (int i = 0; i < taskList.size(); i++)
-                    for (int j = 0; j < taskList.size(); j++) {
-                        Task iTask = taskList.get(i), jTask = taskList.get(j);
-                        if (iTask.getDate().before(jTask.getDate())) {
-                            taskList.set(i, jTask);
-                            taskList.set(j, iTask);
-                        }
-                    }
-                adapter = new TaskListAdapter(MainActivity.this, taskList);
-                elvCars.setAdapter(adapter);*/
-            }
-
-            @Override
-            public void onFailure(Call<List<Task>> call, Throwable t) {
-                Toast.makeText(MainActivity.this, R.string.toast_cant_load, Toast.LENGTH_SHORT).show();
-            }
-        });
+        apiInterface = ApiClient.getApi();
 
         // Stub methods for testing the adapter
         String[] dateArray = new String[] {
@@ -132,6 +109,35 @@ public class MainActivity extends AppCompatActivity {
                 if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP)
                     adapter.onGroupLongClick(groupPosition);
                 return true;
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // TODO Get all task in onCreate() and get last task in onStart() after task creation
+        apiInterface.getTasks().enqueue(new Callback<List<Task>>() {
+            @Override
+            public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
+                /*
+                List<Task> taskList = response.body();
+                // Sort taskList by date
+                for (int i = 0; i < taskList.size(); i++)
+                    for (int j = 0; j < taskList.size(); j++) {
+                        Task iTask = taskList.get(i), jTask = taskList.get(j);
+                        if (iTask.getDate().before(jTask.getDate())) {
+                            taskList.set(i, jTask);
+                            taskList.set(j, iTask);
+                        }
+                    }
+                adapter = new TaskListAdapter(MainActivity.this, taskList);
+                elvCars.setAdapter(adapter);*/
+            }
+
+            @Override
+            public void onFailure(Call<List<Task>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, R.string.toast_cant_load, Toast.LENGTH_SHORT).show();
             }
         });
     }

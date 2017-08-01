@@ -51,7 +51,6 @@
             android:id="@+id/spinnerMark"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/task_item_height"
-            android:spinnerMode="dialog"
             app:layout_gravity="fill" />
 
         <!-- Model -->
@@ -70,7 +69,6 @@
             android:id="@+id/spinnerModel"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/task_item_height"
-            android:spinnerMode="dialog"
             android:visibility="visible"
             app:layout_gravity="fill" />
 

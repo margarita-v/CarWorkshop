@@ -30,9 +30,6 @@ public interface ApiInterface {
     @GET("tasks")
     Call<List<Task>> getTasks();
 
-    @GET("info/{task_id}")
-    Call<Task> getTaskInfo(@Path("task_id") Integer id);
-
     // POST requests
     @POST("task/create")
     Call<ResponseBody> createTask(@Body TaskPost taskPost);
