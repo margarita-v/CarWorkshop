@@ -17,12 +17,15 @@ public class CloseTaskDialog extends DialogFragment implements DialogInterface.O
     private Task task;
     private ImageButton imageButton;
     private Drawable icon;
+    private static CloseCallback closeCallback;
 
-    public static CloseTaskDialog newInstance(Task task, ImageButton imageButton, Drawable icon) {
+    public static CloseTaskDialog newInstance(Task task,
+                                              ImageButton imageButton, Drawable icon, CloseCallback callback) {
         CloseTaskDialog dialog = new CloseTaskDialog();
         dialog.task = task;
         dialog.imageButton = imageButton;
         dialog.icon = icon;
+        closeCallback = callback;
         return dialog;
     }
 
@@ -64,7 +67,7 @@ public class CloseTaskDialog extends DialogFragment implements DialogInterface.O
         for (JobStatus jobStatus: task.getJobs()) {
             jobStatus.setStatus(true);
         }
-        //TODO Callback to adapter
+        closeCallback.onJobClose(true, task);
         /*
         apiInterface.closeTask(task.getId()).enqueue(new Callback<ResponseBody>() {
             @Override
@@ -74,6 +77,7 @@ public class CloseTaskDialog extends DialogFragment implements DialogInterface.O
                 for (JobStatus jobStatus: task.getJobs()) {
                     jobStatus.setStatus(true);
                 }
+                closeCallback.onJobClose(true, task);
             }
 
             @Override

@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.activities.InfoActivity;
+import com.dsr_practice.car_workshop.dialogs.CloseCallback;
 import com.dsr_practice.car_workshop.dialogs.CloseJobDialog;
 import com.dsr_practice.car_workshop.dialogs.CloseTaskDialog;
 import com.dsr_practice.car_workshop.models.common.Job;
@@ -125,7 +126,8 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         imgBtnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CloseTaskDialog dialog = CloseTaskDialog.newInstance(task, imgBtnClose, closedTaskIcon);
+                CloseTaskDialog dialog = CloseTaskDialog.newInstance(task,
+                        imgBtnClose, closedTaskIcon, onJobClose);
                 dialog.show(fragmentManager, CLOSE_TASK_TAG);
             }
         });
@@ -158,7 +160,8 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         imgBtnCloseJob.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CloseJobDialog dialog = CloseJobDialog.newInstance(task, jobStatus, imgBtnCloseJob, closedIcon);
+                CloseJobDialog dialog = CloseJobDialog.newInstance(task, jobStatus,
+                        imgBtnCloseJob, closedIcon, onJobClose);
                 dialog.show(fragmentManager, CLOSE_JOB_TAG);
             }
         });
@@ -169,6 +172,16 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
     }
+
+    // Callback from CloseDialog for adapter
+    private CloseCallback onJobClose = new CloseCallback() {
+        @Override
+        public void onJobClose(boolean isTaskClosed, Task task) {
+            if (isTaskClosed)
+                closeTask(task);
+            notifyDataSetChanged();
+        }
+    };
 
     // Dialog OnClickListener for dismiss dialogs
     private static DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
