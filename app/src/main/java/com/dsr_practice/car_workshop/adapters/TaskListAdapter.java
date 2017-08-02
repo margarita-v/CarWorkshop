@@ -125,8 +125,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         imgBtnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CloseTaskDialog dialog = CloseTaskDialog.newInstance(task,
-                        imgBtnClose, closedTaskIcon, onClickListener);
+                CloseTaskDialog dialog = CloseTaskDialog.newInstance(task, imgBtnClose, closedTaskIcon);
                 dialog.show(fragmentManager, CLOSE_TASK_TAG);
             }
         });
@@ -159,8 +158,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         imgBtnCloseJob.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CloseJobDialog dialog = CloseJobDialog.newInstance(task, jobStatus,
-                        imgBtnCloseJob, closedIcon, onClickListener);
+                CloseJobDialog dialog = CloseJobDialog.newInstance(task, jobStatus, imgBtnCloseJob, closedIcon);
                 dialog.show(fragmentManager, CLOSE_JOB_TAG);
             }
         });
