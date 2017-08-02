@@ -16,7 +16,6 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activities.MainActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,13 +26,11 @@
         <activity
             android:name=".activities.TaskActivity"
             android:parentActivityName=".activities.MainActivity"
-            android:label="@string/task_title"
-            android:screenOrientation="portrait"/>
+            android:label="@string/task_title" />
         <activity
             android:name=".activities.InfoActivity"
             android:parentActivityName=".activities.MainActivity"
-            android:label="@string/info_title"
-            android:screenOrientation="portrait"/>
+            android:label="@string/info_title" />
 
         <!-- Content provider -->
         <provider
