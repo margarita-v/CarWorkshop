@@ -13,19 +13,24 @@ import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 
-public class CloseJobDialog extends DialogFragment implements DialogInterface.OnClickListener {
+public class CloseDialog extends DialogFragment implements DialogInterface.OnClickListener {
     private Task task;
     private JobStatus jobStatus;
+    private int titleId;
+    private int messageId;
     private ImageButton imageButton;
     private Drawable icon;
     private static CloseCallback closeCallback;
 
-    public static CloseJobDialog newInstance(Task task, JobStatus jobStatus,
-                                             ImageButton imageButton, Drawable icon,
-                                             CloseCallback callback) {
-        CloseJobDialog dialog = new CloseJobDialog();
+    public static CloseDialog newInstance(Task task, JobStatus jobStatus,
+                                          int titleId, int messageId,
+                                          ImageButton imageButton, Drawable icon,
+                                          CloseCallback callback) {
+        CloseDialog dialog = new CloseDialog();
         dialog.task = task;
         dialog.jobStatus = jobStatus;
+        dialog.titleId = titleId;
+        dialog.messageId = messageId;
         dialog.imageButton = imageButton;
         dialog.icon = icon;
         closeCallback = callback;
@@ -37,11 +42,25 @@ public class CloseJobDialog extends DialogFragment implements DialogInterface.On
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         setRetainInstance(true);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.close_job_title)
-                .setMessage(R.string.close_job_message)
+                .setTitle(titleId)
+                .setMessage(messageId)
                 .setPositiveButton(R.string.yes, this)
                 .setNegativeButton(R.string.no, this);
         return builder.create();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        switch (which) {
+            case Dialog.BUTTON_NEGATIVE:
+                dialog.dismiss();
+                break;
+            case Dialog.BUTTON_POSITIVE:
+                if (jobStatus != null)
+                    closeJob();
+                else
+                    closeTask();
+        }
     }
 
     @Override
@@ -52,19 +71,7 @@ public class CloseJobDialog extends DialogFragment implements DialogInterface.On
         super.onDestroyView();
     }
 
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        switch (which) {
-            case Dialog.BUTTON_NEGATIVE:
-                dialog.dismiss();
-                break;
-            case Dialog.BUTTON_POSITIVE:
-                closeTask();
-                break;
-        }
-    }
-
-    private void closeTask() {
+    private void closeJob() {
         imageButton.setImageDrawable(icon);
         jobStatus.setStatus(true);
         // Check if all jobs in task are closed
@@ -103,5 +110,31 @@ public class CloseJobDialog extends DialogFragment implements DialogInterface.On
                                 Toast.LENGTH_SHORT).show();
                     }
                 });*/
+    }
+
+    private void closeTask() {
+        imageButton.setImageDrawable(icon);
+        task.setStatus(true);
+        for (JobStatus jobStatus: task.getJobs()) {
+            jobStatus.setStatus(true);
+        }
+        closeCallback.onJobClose(true, task);
+        /*
+        apiInterface.closeTask(task.getId()).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                imageButton.setImageDrawable(icon);
+                task.setStatus(true);
+                for (JobStatus jobStatus: task.getJobs()) {
+                    jobStatus.setStatus(true);
+                }
+                closeCallback.onJobClose(true, task);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(context, R.string.toast_cant_close_task, Toast.LENGTH_SHORT).show();
+            }
+        });*/
     }
 }

@@ -16,8 +16,7 @@ import android.widget.TextView;
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.activities.InfoActivity;
 import com.dsr_practice.car_workshop.dialogs.CloseCallback;
-import com.dsr_practice.car_workshop.dialogs.CloseJobDialog;
-import com.dsr_practice.car_workshop.dialogs.CloseTaskDialog;
+import com.dsr_practice.car_workshop.dialogs.CloseDialog;
 import com.dsr_practice.car_workshop.models.common.Job;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
@@ -126,7 +125,8 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         imgBtnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CloseTaskDialog dialog = CloseTaskDialog.newInstance(task,
+                CloseDialog dialog = CloseDialog.newInstance(task, null,
+                        R.string.close_task_title, R.string.close_task_message,
                         imgBtnClose, closedTaskIcon, onJobClose);
                 dialog.show(fragmentManager, CLOSE_TASK_TAG);
             }
@@ -160,7 +160,8 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         imgBtnCloseJob.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CloseJobDialog dialog = CloseJobDialog.newInstance(task, jobStatus,
+                CloseDialog dialog = CloseDialog.newInstance(task, jobStatus,
+                        R.string.close_job_title, R.string.close_job_message,
                         imgBtnCloseJob, closedIcon, onJobClose);
                 dialog.show(fragmentManager, CLOSE_JOB_TAG);
             }
