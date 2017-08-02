@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                     taskList.set(j, iTask);
                 }
             }
-        adapter = new TaskListAdapter(this, taskList, getFragmentManager());
+        adapter = new TaskListAdapter(this, taskList, getSupportFragmentManager());
         elvCars.setAdapter(adapter);
         elvCars.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
