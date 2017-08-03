@@ -3,16 +3,12 @@ package com.dsr_practice.car_workshop.sync;
 import android.accounts.Account;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.accounts.AccountGeneral;
@@ -20,10 +16,12 @@ import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.models.common.Job;
 import com.dsr_practice.car_workshop.models.common.Mark;
 import com.dsr_practice.car_workshop.models.common.Model;
+import com.dsr_practice.car_workshop.models.lists.JobList;
+import com.dsr_practice.car_workshop.models.lists.MarkList;
+import com.dsr_practice.car_workshop.models.lists.ModelList;
 import com.dsr_practice.car_workshop.rest.ApiClient;
 import com.dsr_practice.car_workshop.rest.ApiInterface;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -36,34 +34,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     private static ApiInterface apiInterface;
 
-    //region Projections for queries
-    private static final String[] MARK_PROJECTION = new String[] {
-            Contract.MarkEntry._ID,
-            Contract.MarkEntry.COLUMN_NAME_MARK_ID,
-            Contract.MarkEntry.COLUMN_NAME_MARK_NAME
-    };
-    private static final String[] MODEL_PROJECTION = new String[] {
-            Contract.ModelEntry._ID,
-            Contract.ModelEntry.COLUMN_NAME_MODEL_ID,
-            Contract.ModelEntry.COLUMN_NAME_MODEL_NAME,
-            Contract.ModelEntry.COLUMN_NAME_FK_MARK_ID
-    };
-    private static final String[] JOB_PROJECTION = new String[] {
-            Contract.JobEntry._ID,
-            Contract.JobEntry.COLUMN_NAME_JOB_ID,
-            Contract.JobEntry.COLUMN_NAME_JOB_NAME,
-            Contract.JobEntry.COLUMN_NAME_PRICE
-    };
-    //endregion
-
     //region Constants representing column positions from every PROJECTION
-    private static final int COLUMN_ID = 0;
-    private static final int COLUMN_ENTRY_ID = 1;
-    private static final int COLUMN_ENTRY_NAME = 2;
-    private static final int COLUMN_OPTIONAL_FIELD = 3;
+    public static final int COLUMN_ID = 0;
+    public static final int COLUMN_ENTRY_ID = 1;
+    public static final int COLUMN_ENTRY_NAME = 2;
+    public static final int COLUMN_OPTIONAL_FIELD = 3;
     //endregion
 
-    public SyncAdapter(Context context, boolean autoInitialize) {
+    SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         contentResolver = context.getContentResolver();
         apiInterface = ApiClient.getApi();
@@ -91,7 +69,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             @Override
             public void onResponse(Call<List<Mark>> call, Response<List<Mark>> response) {
                 try {
-                    syncMarkList(response.body(), syncResult);
+                    new MarkList(response.body()).sync(contentResolver, syncResult);
                 } catch (RemoteException | OperationApplicationException e) {
                     syncResult.databaseError = true;
                 }
@@ -108,7 +86,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             @Override
             public void onResponse(Call<List<Model>> call, Response<List<Model>> response) {
                 try {
-                    syncModelList(response.body(), syncResult);
+                    new ModelList(response.body()).sync(contentResolver, syncResult);
                 } catch (RemoteException | OperationApplicationException e) {
                     syncResult.databaseError = true;
                 }
@@ -125,7 +103,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             @Override
             public void onResponse(Call<List<Job>> call, Response<List<Job>> response) {
                 try {
-                    syncJobList(response.body(), syncResult);
+                    new JobList(response.body()).sync(contentResolver, syncResult);
                 } catch (RemoteException | OperationApplicationException e) {
                     syncResult.databaseError = true;
                 }
@@ -138,6 +116,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         });
     }
 
+    /*
     //region Sync local database with server
     private void syncMarkList(List<Mark> newList, final SyncResult syncResult)
             throws RemoteException, OperationApplicationException {
@@ -334,6 +313,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 false);
     }
     //endregion
+    */
 
     // Manual force Android to perform a sync with SyncAdapter
     public static void performSync() {
