@@ -1,6 +1,5 @@
 package com.dsr_practice.car_workshop.activities;
 
-import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,6 +22,7 @@ import android.widget.Toast;
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.database.Provider;
+import com.dsr_practice.car_workshop.dialogs.MessageDialog;
 import com.dsr_practice.car_workshop.models.common.Job;
 import com.dsr_practice.car_workshop.models.post.TaskPost;
 import com.dsr_practice.car_workshop.rest.ApiClient;
@@ -51,6 +51,7 @@ public class TaskActivity extends AppCompatActivity
     private SimpleCursorAdapter jobAdapter;
     private SimpleDateFormat dateFormat;
     private static ApiInterface apiInterface;
+    private static final String DIALOG_TAG = "DIALOG";
 
     // View's IDs for adapters
     private int[] viewsId = {android.R.id.text1};
@@ -248,10 +249,7 @@ public class TaskActivity extends AppCompatActivity
 
     // Create error dialog for task validation
     private void createErrorDialog(int titleId, int messageId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(titleId).setMessage(messageId)
-                .setPositiveButton(android.R.string.ok, this);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        MessageDialog dialog = MessageDialog.newInstance(titleId, messageId);
+        dialog.show(getSupportFragmentManager(), DIALOG_TAG);
     }
 }

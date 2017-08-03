@@ -1,8 +1,6 @@
 package com.dsr_practice.car_workshop.adapters;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentManager;
@@ -17,6 +15,7 @@ import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.activities.InfoActivity;
 import com.dsr_practice.car_workshop.dialogs.CloseCallback;
 import com.dsr_practice.car_workshop.dialogs.CloseDialog;
+import com.dsr_practice.car_workshop.dialogs.MessageDialog;
 import com.dsr_practice.car_workshop.models.common.Job;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
@@ -34,6 +33,10 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
 
     private static final String CLOSE_TASK_TAG = "CLOSE_TASK_TAG";
     private static final String CLOSE_JOB_TAG  = "CLOSE_JOB_TAG";
+    private static final String DIALOG_TAG = "DIALOG";
+
+    private static String closeTaskTitle;
+    private static String closeTaskMessage;
 
     // Icons for buttons
     private static Drawable closedTaskIcon;
@@ -46,6 +49,9 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         this.context = context;
         this.taskList = taskList;
         this.fragmentManager = fragmentManager;
+
+        closeTaskTitle = this.context.getString(R.string.task_was_closed);
+        closeTaskMessage = this.context.getString(R.string.task_full_price);
 
         ApiInterface apiInterface = ApiClient.getApi();
 
@@ -184,14 +190,6 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         }
     };
 
-    // Dialog OnClickListener for dismiss dialogs
-    private static DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            dialog.dismiss();
-        }
-    };
-
     public void onGroupLongClick(int groupPosition) {
         // View task info
         Task task = (Task) getGroup(groupPosition);
@@ -202,15 +200,12 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
 
     // Dialog for closing task which shows full price of all jobs in task
     private void closeTask(Task task) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         int price = 0;
         for (JobStatus jobStatus: task.getJobs()) {
             price += jobStatus.getJob().getPrice();
         }
-        builder.setTitle(R.string.task_was_closed)
-                .setMessage(context.getString(R.string.task_full_price).concat(Integer.toString(price)))
-                .setPositiveButton(android.R.string.ok, onClickListener);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        MessageDialog dialog = MessageDialog.newInstance(
+                closeTaskTitle, closeTaskMessage + Integer.toString(price));
+        dialog.show(fragmentManager, DIALOG_TAG);
     }
 }

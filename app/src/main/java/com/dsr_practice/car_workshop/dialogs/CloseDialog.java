@@ -53,7 +53,7 @@ public class CloseDialog extends DialogFragment implements DialogInterface.OnCli
     public void onClick(DialogInterface dialog, int which) {
         switch (which) {
             case Dialog.BUTTON_NEGATIVE:
-                dialog.dismiss();
+                dismiss();
                 break;
             case Dialog.BUTTON_POSITIVE:
                 if (jobStatus != null)
@@ -63,13 +63,14 @@ public class CloseDialog extends DialogFragment implements DialogInterface.OnCli
         }
     }
 
+    /*
     @Override
     public void onDestroyView() {
         // Used because of a bug in the support library
         if (getDialog() != null && getRetainInstance())
             getDialog().setDismissMessage(null);
         super.onDestroyView();
-    }
+    }*/
 
     private void closeJob() {
         imageButton.setImageDrawable(icon);
