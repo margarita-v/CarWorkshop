@@ -1,11 +1,12 @@
 package com.dsr_practice.car_workshop.activities;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.util.ArraySet;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -24,40 +25,43 @@ import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.database.Provider;
 import com.dsr_practice.car_workshop.dialogs.MessageDialog;
 import com.dsr_practice.car_workshop.models.common.Job;
-import com.dsr_practice.car_workshop.models.post.TaskPost;
 import com.dsr_practice.car_workshop.rest.ApiClient;
 import com.dsr_practice.car_workshop.rest.ApiInterface;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-public class TaskActivity extends AppCompatActivity
-        implements View.OnClickListener, DialogInterface.OnClickListener {
+public class TaskActivity extends AppCompatActivity implements
+        View.OnClickListener,
+        DialogInterface.OnClickListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     EditText etVIN, etNumber;
     Spinner spinnerMark, spinnerModel;
     Button btnSaveTask;
     ListView lvJobs;
 
-    private ContentResolver contentResolver;
+    // Adapters for spinners and list view
+    private SimpleCursorAdapter markAdapter;
+    private SimpleCursorAdapter modelAdapter;
     private SimpleCursorAdapter jobAdapter;
+
     private SimpleDateFormat dateFormat;
     private static ApiInterface apiInterface;
     private static final String DIALOG_TAG = "DIALOG";
 
+    // IDs for loaders
+    private static final int MARK_LOADER_ID = 0;
+    private static final int MODEL_LOADER_ID = 1;
+    private static final int JOB_LOADER_ID = 2;
+
     // View's IDs for adapters
-    private int[] viewsId = {android.R.id.text1};
-    private int[] jobIds = {R.id.cbName, R.id.tvPrice};
-    private int spinnerItem = android.R.layout.simple_spinner_item;
-    private int spinnerDropDown = android.R.layout.simple_spinner_dropdown_item;
+    private static final int[] VIEWS_ID = {android.R.id.text1};
+    private static final int[] JOB_IDS = {R.id.cbName, R.id.tvPrice};
+    private static final int SPINNER_ITEM = android.R.layout.simple_spinner_item;
+    private static final int SPINNER_DROPDOWN_ITEM = android.R.layout.simple_spinner_dropdown_item;
 
     // Positions of chosen jobs
     private Set<Integer> jobsPositions;
@@ -91,36 +95,36 @@ public class TaskActivity extends AppCompatActivity
 
         btnSaveTask.setOnClickListener(this);
 
-        // Load data from database
-        contentResolver = getContentResolver();
         chosenJobs = new ArrayList<>();
         jobsPositions = new ArraySet<>();
 
-        // Load mark info
-        SimpleCursorAdapter markAdapter = getAdapter(
-                Contract.MarkEntry.CONTENT_URI,
-                Contract.MARK_PROJECTION,
-                null,
-                spinnerItem,
-                viewsId);
-        markAdapter.setDropDownViewResource(spinnerDropDown);
+        // Create mark adapter
+        markAdapter = new SimpleCursorAdapter(
+                this, SPINNER_ITEM, null, Contract.MARK_PROJECTION, VIEWS_ID, 0);
+        markAdapter.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
         spinnerMark.setAdapter(markAdapter);
+
+        // Create model adapter
+        modelAdapter = new SimpleCursorAdapter(
+                this, SPINNER_ITEM, null, Contract.MODEL_PROJECTION, VIEWS_ID, 0);
+        modelAdapter.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
+        spinnerModel.setAdapter(modelAdapter);
+
+        // Create job adapter
+        jobAdapter = new SimpleCursorAdapter(
+                this, R.layout.job_item, null, Contract.JOB_PROJECTION, JOB_IDS, 0);
+        jobAdapter.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
+
+        // Load info from database
+        getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, this);
+        getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, this);
 
         // Load models for chosen mark
         // Save ID of chosen mark
         spinnerMark.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                markId = getItemId(cursor, Contract.MarkEntry.COLUMN_NAME_MARK_ID);
-                SimpleCursorAdapter modelAdapter = getAdapter(
-                        Provider.URI_MODELS_FOR_MARK,
-                        Contract.MODEL_PROJECTION,
-                        new String[] {Integer.toString(markId)},
-                        spinnerItem,
-                        viewsId);
-                modelAdapter.setDropDownViewResource(spinnerDropDown);
-                spinnerModel.setAdapter(modelAdapter);
+                loadModels(position, true);
             }
 
             @Override
@@ -143,14 +147,7 @@ public class TaskActivity extends AppCompatActivity
             }
         });
 
-        // Get all jobs from database
-        jobAdapter = getAdapter(
-                Contract.JobEntry.CONTENT_URI,
-                Contract.JOB_PROJECTION,
-                null,
-                R.layout.job_item,
-                jobIds);
-
+        // Configure list view
         lvJobs.addHeaderView(listHeader);
         lvJobs.addFooterView(listFooter);
         lvJobs.setAdapter(jobAdapter);
@@ -220,12 +217,6 @@ public class TaskActivity extends AppCompatActivity
         return cursor.getInt(cursor.getColumnIndex(columnName));
     }
 
-    // Get cursor adapter for database entities
-    private SimpleCursorAdapter getAdapter(Uri uri, String[] projection, String[] args, int layout, int[] views) {
-        Cursor cursor = contentResolver.query(uri, projection, null, args, null, null);
-        return new SimpleCursorAdapter(this, layout, cursor, projection, views, 0);
-    }
-
     // Check all task fields
     private boolean checkInput(String vin, String number) {
         if (vin.equals("") || number.equals("")) {
@@ -251,5 +242,54 @@ public class TaskActivity extends AppCompatActivity
     private void createErrorDialog(int titleId, int messageId) {
         MessageDialog dialog = MessageDialog.newInstance(titleId, messageId);
         dialog.show(getSupportFragmentManager(), DIALOG_TAG);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        switch (id) {
+            case MARK_LOADER_ID:
+                return new CursorLoader(
+                        this, Contract.MarkEntry.CONTENT_URI, Contract.MARK_PROJECTION, null, null, null);
+            case MODEL_LOADER_ID:
+                return new CursorLoader(
+                        this, Provider.URI_MODELS_FOR_MARK, Contract.MODEL_PROJECTION, null,
+                        new String[] {Integer.toString(markId)}, null);
+            case JOB_LOADER_ID:
+                return new CursorLoader(
+                        this, Contract.JobEntry.CONTENT_URI, Contract.JOB_PROJECTION, null, null, null);
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case MARK_LOADER_ID:
+                markAdapter.swapCursor(data);
+                loadModels(0, false);
+                break;
+            case MODEL_LOADER_ID:
+                modelAdapter.swapCursor(data);
+                break;
+            case JOB_LOADER_ID:
+                jobAdapter.swapCursor(data);
+                break;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    // Load models for chosen mark
+    private void loadModels(int markPosition, boolean restart) {
+        Cursor cursor = (Cursor) spinnerMark.getItemAtPosition(markPosition);
+        markId = getItemId(cursor, Contract.MarkEntry.COLUMN_NAME_MARK_ID);
+        if (restart)
+            getSupportLoaderManager().restartLoader(MODEL_LOADER_ID, null, this);
+        else
+            getSupportLoaderManager().initLoader(MODEL_LOADER_ID, null, this);
     }
 }
