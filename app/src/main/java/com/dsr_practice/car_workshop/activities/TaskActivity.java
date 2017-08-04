@@ -47,6 +47,7 @@ public class TaskActivity extends AppCompatActivity implements
     private SimpleCursorAdapter markAdapter;
     private SimpleCursorAdapter modelAdapter;
     private SimpleCursorAdapter jobAdapter;
+    private boolean needLoad = false;
 
     private SimpleDateFormat dateFormat;
     private static ApiInterface apiInterface;
@@ -124,7 +125,10 @@ public class TaskActivity extends AppCompatActivity implements
         spinnerMark.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                loadModels(position, true);
+                if (needLoad)
+                    loadModels(position);
+                else
+                    needLoad = true;
             }
 
             @Override
@@ -267,7 +271,7 @@ public class TaskActivity extends AppCompatActivity implements
         switch (loader.getId()) {
             case MARK_LOADER_ID:
                 markAdapter.swapCursor(data);
-                loadModels(0, false);
+                loadModels(0);
                 break;
             case MODEL_LOADER_ID:
                 modelAdapter.swapCursor(data);
@@ -284,12 +288,9 @@ public class TaskActivity extends AppCompatActivity implements
     }
 
     // Load models for chosen mark
-    private void loadModels(int markPosition, boolean restart) {
+    private void loadModels(int markPosition) {
         Cursor cursor = (Cursor) spinnerMark.getItemAtPosition(markPosition);
         markId = getItemId(cursor, Contract.MarkEntry.COLUMN_NAME_MARK_ID);
-        if (restart)
-            getSupportLoaderManager().restartLoader(MODEL_LOADER_ID, null, this);
-        else
-            getSupportLoaderManager().initLoader(MODEL_LOADER_ID, null, this);
+        getSupportLoaderManager().restartLoader(MODEL_LOADER_ID, null, this);
     }
 }

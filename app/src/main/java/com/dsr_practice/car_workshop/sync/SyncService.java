@@ -3,7 +3,6 @@ package com.dsr_practice.car_workshop.sync;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 
 public class SyncService extends Service {
     private static final Object LOCK = new Object();
