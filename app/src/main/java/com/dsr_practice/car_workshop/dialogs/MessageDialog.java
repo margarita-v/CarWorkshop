@@ -11,42 +11,53 @@ public class MessageDialog extends DialogFragment implements DialogInterface.OnC
     private static final int PARAMS_ID = 1;
     private static final int PARAMS_STRING = 2;
 
-    private int dialogId;
-    private int titleId;
-    private int messageId;
-
-    private String title;
-    private String message;
+    private static final String DIALOG_KEY = "DIALOG_KEY";
+    private static final String TITLE_KEY = "TITLE_KEY";
+    private static final String MESSAGE_KEY = "MESSAGE_KEY";
 
     public static MessageDialog newInstance(int titleId, int messageId) {
+        Bundle args = new Bundle();
+        args.putInt(TITLE_KEY, titleId);
+        args.putInt(MESSAGE_KEY, messageId);
+        args.putInt(DIALOG_KEY, PARAMS_ID);
+
         MessageDialog dialog = new MessageDialog();
-        dialog.titleId = titleId;
-        dialog.messageId = messageId;
-        dialog.dialogId = PARAMS_ID;
+        dialog.setArguments(args);
         return dialog;
     }
 
     public static MessageDialog newInstance(String title, String message) {
+        Bundle args = new Bundle();
+        args.putString(TITLE_KEY, title);
+        args.putString(MESSAGE_KEY, message);
+        args.putInt(DIALOG_KEY, PARAMS_STRING);
+
         MessageDialog dialog = new MessageDialog();
-        dialog.title = title;
-        dialog.message = message;
-        dialog.dialogId = PARAMS_STRING;
+        dialog.setArguments(args);
         return dialog;
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        setRetainInstance(true);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setPositiveButton(android.R.string.ok, this);
-        switch (dialogId) {
-            case PARAMS_ID:
-                builder.setTitle(titleId).setMessage(messageId);
-                break;
-            case PARAMS_STRING:
-                builder.setTitle(title).setMessage(message);
-                break;
+
+        Bundle args = getArguments();
+        if (args != null) {
+            int dialogId = args.getInt(DIALOG_KEY);
+            switch (dialogId) {
+                case PARAMS_ID:
+                    int titleId = args.getInt(TITLE_KEY);
+                    int messageId = args.getInt(MESSAGE_KEY);
+                    builder.setTitle(titleId).setMessage(messageId);
+                    break;
+                case PARAMS_STRING:
+                    String title = args.getString(TITLE_KEY);
+                    String message = args.getString(MESSAGE_KEY);
+                    builder.setTitle(title).setMessage(message);
+                    break;
+            }
         }
         return builder.create();
     }
@@ -54,13 +65,5 @@ public class MessageDialog extends DialogFragment implements DialogInterface.OnC
     @Override
     public void onClick(DialogInterface dialog, int which) {
         dismiss();
-    }
-
-    @Override
-    public void onDestroyView() {
-        // Used because of a bug in the support library
-        if (getDialog() != null && getRetainInstance())
-            getDialog().setDismissMessage(null);
-        super.onDestroyView();
     }
 }
