@@ -38,40 +38,59 @@ public class TaskActivity extends AppCompatActivity implements
         DialogInterface.OnClickListener,
         LoaderManager.LoaderCallbacks<Cursor> {
 
+    //region Widgets
     EditText etVIN, etNumber;
     Spinner spinnerMark, spinnerModel;
     Button btnSaveTask;
     ListView lvJobs;
+    //endregion
 
-    // Adapters for spinners and list view
+    //region Adapters for spinners and list view
     private SimpleCursorAdapter markAdapter;
     private SimpleCursorAdapter modelAdapter;
     private SimpleCursorAdapter jobAdapter;
     private boolean needLoad = false;
+    //endregion
 
     private SimpleDateFormat dateFormat;
     private static ApiInterface apiInterface;
     private static final String DIALOG_TAG = "DIALOG";
 
-    // IDs for loaders
+    //region IDs for loaders
     private static final int MARK_LOADER_ID = 0;
     private static final int MODEL_LOADER_ID = 1;
     private static final int JOB_LOADER_ID = 2;
+    //endregion
 
-    // View's IDs for adapters
+    //region View's IDs for adapters
     private static final int[] VIEWS_ID = {android.R.id.text1};
     private static final int[] JOB_IDS = {R.id.cbName, R.id.tvPrice};
     private static final int SPINNER_ITEM = android.R.layout.simple_spinner_item;
     private static final int SPINNER_DROPDOWN_ITEM = android.R.layout.simple_spinner_dropdown_item;
+    //endregion
 
     // Positions of chosen jobs
     private Set<Integer> jobsPositions;
     // Chosen jobs list
     private List<Job> chosenJobs;
-    // Chosen mark ID
+
+    //region Task fields
     private int markId;
-    // Chosen model ID
     private int modelId;
+    private int markPosition;
+    private int modelPosition;
+    private String vin;
+    private String number;
+    //endregion
+
+    //region String keys for bundle
+    private static final String MARK_ID = "MARK_ID";
+    private static final String MODEL_ID = "MODEL_ID";
+    private static final String MARK_POSITION = "MARK_POSITION";
+    private static final String MODEL_POSITION = "MODEL_POSITION";
+    private static final String VIN = "VIN";
+    private static final String NUMBER = "NUMBER";
+    //endregion
 
     private static final int VIN_LENGTH = 17;
     private static final int NUMBER_LENGTH = 6;
@@ -83,21 +102,26 @@ public class TaskActivity extends AppCompatActivity implements
         apiInterface = ApiClient.getApi();
         dateFormat = new SimpleDateFormat(getString(R.string.date_format));
 
+        // Get header view and footer view for list view
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View listHeader = inflater.inflate(R.layout.task_header, null);
         View listFooter = inflater.inflate(R.layout.task_footer, null);
 
+        //region Find widgets by IDs
         etVIN = (EditText) listHeader.findViewById(R.id.etVIN);
         etNumber = (EditText) listHeader.findViewById(R.id.etNumber);
         spinnerMark = (Spinner) listHeader.findViewById(R.id.spinnerMark);
         spinnerModel = (Spinner) listHeader.findViewById(R.id.spinnerModel);
         btnSaveTask = (Button) listFooter.findViewById(R.id.btnSaveTask);
         lvJobs = (ListView) findViewById(R.id.lvJobs);
+        //endregion
 
         btnSaveTask.setOnClickListener(this);
 
         chosenJobs = new ArrayList<>();
         jobsPositions = new ArraySet<>();
+
+        //region Create adapters
 
         // Create mark adapter
         markAdapter = new SimpleCursorAdapter(
@@ -116,6 +140,20 @@ public class TaskActivity extends AppCompatActivity implements
                 this, R.layout.job_item, null, Contract.JOB_PROJECTION, JOB_IDS, 0);
         jobAdapter.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
 
+        //endregion
+
+        // Restore saved data
+        if (savedInstanceState != null) {
+            markId = savedInstanceState.getInt(MARK_ID);
+            modelId = savedInstanceState.getInt(MODEL_ID);
+            markPosition = savedInstanceState.getInt(MARK_POSITION);
+            modelPosition = savedInstanceState.getInt(MODEL_POSITION);
+            //spinnerMark.setSelection(markPosition);
+            //spinnerModel.setSelection(modelPosition);
+            etVIN.setText(savedInstanceState.getString(VIN));
+            etNumber.setText(savedInstanceState.getString(NUMBER));
+        }
+
         // Load info from database
         getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, this);
         getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, this);
@@ -125,8 +163,12 @@ public class TaskActivity extends AppCompatActivity implements
         spinnerMark.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (needLoad)
+                markPosition = position;
+                if (needLoad) {
                     loadModels(position);
+                    modelPosition = 0;
+                    spinnerModel.setSelection(0);
+                }
                 else
                     needLoad = true;
             }
@@ -143,6 +185,7 @@ public class TaskActivity extends AppCompatActivity implements
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 modelId = getItemId(cursor, Contract.ModelEntry.COLUMN_NAME_MODEL_ID);
+                modelPosition = position;
             }
 
             @Override
@@ -169,6 +212,17 @@ public class TaskActivity extends AppCompatActivity implements
                     jobsPositions.remove(position);
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(MARK_ID, markId);
+        outState.putInt(MODEL_ID, modelId);
+        outState.putInt(MARK_POSITION, markPosition);
+        outState.putInt(MODEL_POSITION, modelPosition);
+        outState.putString(VIN, etVIN.getText().toString());
+        outState.putString(NUMBER, etNumber.getText().toString());
     }
 
     // Buttons OnClickListener
@@ -271,10 +325,12 @@ public class TaskActivity extends AppCompatActivity implements
         switch (loader.getId()) {
             case MARK_LOADER_ID:
                 markAdapter.swapCursor(data);
-                loadModels(0);
+                spinnerMark.setSelection(markPosition);
+                loadModels(markPosition);
                 break;
             case MODEL_LOADER_ID:
                 modelAdapter.swapCursor(data);
+                spinnerModel.setSelection(modelPosition);
                 break;
             case JOB_LOADER_ID:
                 jobAdapter.swapCursor(data);
