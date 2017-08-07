@@ -79,8 +79,6 @@ public class TaskActivity extends AppCompatActivity implements
     private int modelId;
     private int markPosition;
     private int modelPosition;
-    private String vin;
-    private String number;
     //endregion
 
     //region String keys for bundle
@@ -90,6 +88,7 @@ public class TaskActivity extends AppCompatActivity implements
     private static final String MODEL_POSITION = "MODEL_POSITION";
     private static final String VIN = "VIN";
     private static final String NUMBER = "NUMBER";
+    private static final String JOBS = "JOBS";
     //endregion
 
     private static final int VIN_LENGTH = 17;
@@ -142,16 +141,37 @@ public class TaskActivity extends AppCompatActivity implements
 
         //endregion
 
+        // Configure list view
+        lvJobs.addHeaderView(listHeader);
+        lvJobs.addFooterView(listFooter);
+        lvJobs.setAdapter(jobAdapter);
+        lvJobs.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        lvJobs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                CheckBox cbName = (CheckBox) view.findViewById(R.id.cbName);
+                boolean isChecked = !cbName.isChecked();
+                cbName.setChecked(isChecked);
+                position--;
+                if (isChecked)
+                    jobsPositions.add(position);
+                else
+                    jobsPositions.remove(position);
+            }
+        });
+
         // Restore saved data
         if (savedInstanceState != null) {
             markId = savedInstanceState.getInt(MARK_ID);
             modelId = savedInstanceState.getInt(MODEL_ID);
             markPosition = savedInstanceState.getInt(MARK_POSITION);
             modelPosition = savedInstanceState.getInt(MODEL_POSITION);
-            //spinnerMark.setSelection(markPosition);
-            //spinnerModel.setSelection(modelPosition);
             etVIN.setText(savedInstanceState.getString(VIN));
             etNumber.setText(savedInstanceState.getString(NUMBER));
+            int[] positions = savedInstanceState.getIntArray(JOBS);
+            if (positions != null) {
+                for (int position : positions) jobsPositions.add(position);
+            }
         }
 
         // Load info from database
@@ -193,25 +213,6 @@ public class TaskActivity extends AppCompatActivity implements
 
             }
         });
-
-        // Configure list view
-        lvJobs.addHeaderView(listHeader);
-        lvJobs.addFooterView(listFooter);
-        lvJobs.setAdapter(jobAdapter);
-        lvJobs.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        lvJobs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CheckBox cbName = (CheckBox) view.findViewById(R.id.cbName);
-                boolean isChecked = !cbName.isChecked();
-                cbName.setChecked(isChecked);
-                position--;
-                if (isChecked)
-                    jobsPositions.add(position);
-                else
-                    jobsPositions.remove(position);
-            }
-        });
     }
 
     @Override
@@ -223,6 +224,13 @@ public class TaskActivity extends AppCompatActivity implements
         outState.putInt(MODEL_POSITION, modelPosition);
         outState.putString(VIN, etVIN.getText().toString());
         outState.putString(NUMBER, etNumber.getText().toString());
+        if (!jobsPositions.isEmpty()) {
+            int size = jobsPositions.size(), i = 0;
+            int[] jobs = new int[size];
+            for (int position: jobsPositions)
+                jobs[i++] = position;
+            outState.putIntArray(JOBS, jobs);
+        }
     }
 
     // Buttons OnClickListener
@@ -334,6 +342,16 @@ public class TaskActivity extends AppCompatActivity implements
                 break;
             case JOB_LOADER_ID:
                 jobAdapter.swapCursor(data);
+                if (!jobsPositions.isEmpty()) {
+                    LayoutInflater layoutInflater = LayoutInflater.from(this);
+                    View convertView = layoutInflater.inflate(R.layout.job_item, lvJobs, false);
+                    for (int position: jobsPositions) {
+                        View listItem = jobAdapter.getView(position, convertView, lvJobs);
+                        CheckBox cbName = (CheckBox) listItem.findViewById(R.id.cbName);
+                        cbName.setChecked(true);
+                    }
+                    jobAdapter.notifyDataSetChanged();
+                }
                 break;
         }
     }
