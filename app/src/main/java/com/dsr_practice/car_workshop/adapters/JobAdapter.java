@@ -13,28 +13,22 @@ import com.dsr_practice.car_workshop.R;
 
 public class JobAdapter extends SimpleCursorAdapter {
     private Context context;
-    private Cursor cursor;
     private boolean[] checkedPositions;
+    private int checkedCount;
 
     public JobAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
         super(context, layout, c, from, to, flags);
         this.context = context;
-        this.cursor = c;
-        int count = this.cursor != null ? this.cursor.getCount() : 0;
+        int count = c != null ? c.getCount() : 0;
         this.checkedPositions = new boolean[count];
+        this.checkedCount = 0;
     }
 
-    public JobAdapter(boolean[] checkedPositions,
-                      Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-        super(context, layout, c, from, to, flags);
-        this.context = context;
-        this.cursor = c;
-        this.checkedPositions = checkedPositions;
-    }
-
+    @NonNull
     @Override
-    public Cursor swapCursor(Cursor cursor) {
+    public Cursor swapCursor(@NonNull Cursor cursor) {
         this.checkedPositions = new boolean[cursor.getCount()];
+        checkedCount = 0;
         return super.swapCursor(cursor);
     }
 
@@ -50,12 +44,17 @@ public class JobAdapter extends SimpleCursorAdapter {
         return super.getView(position, convertView, parent);
     }
 
+    //region Getters and setters
+    public boolean isChecked(int position) {
+        return checkedPositions[position];
+    }
+
+    public int getSize() {
+        return checkedPositions.length;
+    }
+
     public int getCheckedCount() {
-        int result = 0;
-        for (boolean checkedPosition : checkedPositions)
-            if (checkedPosition)
-                result++;
-        return result;
+        return checkedCount;
     }
 
     public boolean[] getCheckedPositions() {
@@ -64,10 +63,22 @@ public class JobAdapter extends SimpleCursorAdapter {
 
     public void setCheckedPositions(boolean[] checkedPositions) {
         this.checkedPositions = checkedPositions;
+        checkedCount = 0;
+        for (boolean checked: checkedPositions) {
+            if (checked)
+                checkedCount++;
+        }
+        notifyDataSetChanged();
     }
+    //endregion
 
-    public void check(int position) {
+    public boolean check(int position) {
         boolean checked = !checkedPositions[position];
         checkedPositions[position] = checked;
+        if (checked)
+            checkedCount++;
+        else
+            checkedCount--;
+        return checked;
     }
 }
