@@ -21,6 +21,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
+import com.dsr_practice.car_workshop.adapters.JobAdapter;
 import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.database.Provider;
 import com.dsr_practice.car_workshop.dialogs.MessageDialog;
@@ -48,7 +49,7 @@ public class TaskActivity extends AppCompatActivity implements
     //region Adapters for spinners and list view
     private SimpleCursorAdapter markAdapter;
     private SimpleCursorAdapter modelAdapter;
-    private SimpleCursorAdapter jobAdapter;
+    private JobAdapter jobAdapter;
     private boolean needLoad = false;
     //endregion
 
@@ -73,6 +74,7 @@ public class TaskActivity extends AppCompatActivity implements
     private Set<Integer> jobsPositions;
     // Chosen jobs list
     private List<Job> chosenJobs;
+    private boolean[] checkedPositions;
 
     //region Task fields
     private int markId;
@@ -135,7 +137,7 @@ public class TaskActivity extends AppCompatActivity implements
         spinnerModel.setAdapter(modelAdapter);
 
         // Create job adapter
-        jobAdapter = new SimpleCursorAdapter(
+        jobAdapter = new JobAdapter(
                 this, R.layout.job_item, null, Contract.JOB_PROJECTION, JOB_IDS, 0);
         jobAdapter.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
 
@@ -149,14 +151,16 @@ public class TaskActivity extends AppCompatActivity implements
         lvJobs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                jobAdapter.check(--position);
                 CheckBox cbName = (CheckBox) view.findViewById(R.id.cbName);
                 boolean isChecked = !cbName.isChecked();
                 cbName.setChecked(isChecked);
+                /*
                 position--;
                 if (isChecked)
                     jobsPositions.add(position);
                 else
-                    jobsPositions.remove(position);
+                    jobsPositions.remove(position);*/
             }
         });
 
@@ -168,10 +172,7 @@ public class TaskActivity extends AppCompatActivity implements
             modelPosition = savedInstanceState.getInt(MODEL_POSITION);
             etVIN.setText(savedInstanceState.getString(VIN));
             etNumber.setText(savedInstanceState.getString(NUMBER));
-            int[] positions = savedInstanceState.getIntArray(JOBS);
-            if (positions != null) {
-                for (int position : positions) jobsPositions.add(position);
-            }
+            checkedPositions = savedInstanceState.getBooleanArray(JOBS);
         }
 
         // Load info from database
@@ -224,13 +225,16 @@ public class TaskActivity extends AppCompatActivity implements
         outState.putInt(MODEL_POSITION, modelPosition);
         outState.putString(VIN, etVIN.getText().toString());
         outState.putString(NUMBER, etNumber.getText().toString());
+        if (jobAdapter.getCheckedCount() > 0)
+            outState.putBooleanArray(JOBS, jobAdapter.getCheckedPositions());
+        /*
         if (!jobsPositions.isEmpty()) {
             int size = jobsPositions.size(), i = 0;
             int[] jobs = new int[size];
             for (int position: jobsPositions)
                 jobs[i++] = position;
             outState.putIntArray(JOBS, jobs);
-        }
+        }*/
     }
 
     // Buttons OnClickListener
@@ -342,15 +346,14 @@ public class TaskActivity extends AppCompatActivity implements
                 break;
             case JOB_LOADER_ID:
                 jobAdapter.swapCursor(data);
-                if (!jobsPositions.isEmpty()) {
+                if (checkedPositions != null)
+                    jobAdapter.setCheckedPositions(checkedPositions);
+                if (jobAdapter.getCheckedCount() > 0) {
                     LayoutInflater layoutInflater = LayoutInflater.from(this);
                     View convertView = layoutInflater.inflate(R.layout.job_item, lvJobs, false);
-                    for (int position: jobsPositions) {
-                        View listItem = jobAdapter.getView(position, convertView, lvJobs);
-                        CheckBox cbName = (CheckBox) listItem.findViewById(R.id.cbName);
-                        cbName.setChecked(true);
+                    for (int i = 0; i < jobAdapter.getCheckedCount(); i++) {
+                        jobAdapter.getView(i, convertView, lvJobs);
                     }
-                    jobAdapter.notifyDataSetChanged();
                 }
                 break;
         }
