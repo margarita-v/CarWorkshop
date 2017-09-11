@@ -2,7 +2,9 @@ package com.dsr_practice.car_workshop.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -28,9 +30,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     ExpandableListView elvCars;
+    SwipeRefreshLayout swipeRefreshLayout;
+
     TaskListAdapter adapter;
     private static ApiInterface apiInterface;
 
@@ -42,6 +46,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         setTitle(R.string.main_title);
 
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+        
         elvCars = (ExpandableListView) findViewById(R.id.elvCars);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -140,5 +148,15 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, R.string.toast_cant_load, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onRefresh() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        }, 4000);
     }
 }
