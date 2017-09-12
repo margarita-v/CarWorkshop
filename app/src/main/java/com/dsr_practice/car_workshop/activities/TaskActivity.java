@@ -32,10 +32,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskActivity extends AppCompatActivity implements
-        View.OnClickListener,
-        DialogInterface.OnClickListener,
-        LoaderManager.LoaderCallbacks<Cursor> {
+public class TaskActivity extends AppCompatActivity
+        implements View.OnClickListener, DialogInterface.OnClickListener {
 
     //region Widgets
     EditText etVIN, etNumber;
@@ -51,6 +49,7 @@ public class TaskActivity extends AppCompatActivity implements
     private boolean needLoad = false;
     //endregion
 
+    private LoaderManager.LoaderCallbacks<Cursor> entryLoader;
     private SimpleDateFormat dateFormat;
     private static ApiInterface apiInterface;
     private static final String DIALOG_TAG = "DIALOG";
@@ -161,8 +160,9 @@ public class TaskActivity extends AppCompatActivity implements
         }
 
         // Load info from database
-        getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, this);
-        getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, this);
+        entryLoader = new EntryLoader();
+        getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, entryLoader);
+        getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, entryLoader);
 
         // Load models for chosen mark
         // Save ID of chosen mark
@@ -293,53 +293,62 @@ public class TaskActivity extends AppCompatActivity implements
         dialog.show(getSupportFragmentManager(), DIALOG_TAG);
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            case MARK_LOADER_ID:
-                return new CursorLoader(
-                        this, Contract.MarkEntry.CONTENT_URI, Contract.MARK_PROJECTION, null, null, null);
-            case MODEL_LOADER_ID:
-                return new CursorLoader(
-                        this, Provider.URI_MODELS_FOR_MARK, Contract.MODEL_PROJECTION, null,
-                        new String[] {Integer.toString(markId)}, null);
-            case JOB_LOADER_ID:
-                return new CursorLoader(
-                        this, Contract.JobEntry.CONTENT_URI, Contract.JOB_PROJECTION, null, null, null);
-            default:
-                return null;
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()) {
-            case MARK_LOADER_ID:
-                markAdapter.swapCursor(data);
-                spinnerMark.setSelection(markPosition);
-                loadModels(markPosition);
-                break;
-            case MODEL_LOADER_ID:
-                modelAdapter.swapCursor(data);
-                spinnerModel.setSelection(modelPosition);
-                break;
-            case JOB_LOADER_ID:
-                jobAdapter.swapCursor(data);
-                if (checkedPositions != null)
-                    jobAdapter.setCheckedPositions(checkedPositions);
-                break;
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
-
     // Load models for chosen mark
     private void loadModels(int markPosition) {
         Cursor cursor = (Cursor) spinnerMark.getItemAtPosition(markPosition);
         markId = getItemId(cursor, Contract.MarkEntry.COLUMN_NAME_MARK_ID);
-        getSupportLoaderManager().restartLoader(MODEL_LOADER_ID, null, this);
+        getSupportLoaderManager().restartLoader(MODEL_LOADER_ID, null, entryLoader);
+    }
+
+    // Class for loading all entries from database using CursorLoader
+    private class EntryLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            switch (id) {
+                case MARK_LOADER_ID:
+                    return new CursorLoader(
+                            TaskActivity.this,
+                            Contract.MarkEntry.CONTENT_URI, Contract.MARK_PROJECTION,
+                            null, null, null);
+                case MODEL_LOADER_ID:
+                    return new CursorLoader(
+                            TaskActivity.this,
+                            Provider.URI_MODELS_FOR_MARK, Contract.MODEL_PROJECTION,
+                            null, new String[] {Integer.toString(markId)}, null);
+                case JOB_LOADER_ID:
+                    return new CursorLoader(
+                            TaskActivity.this,
+                            Contract.JobEntry.CONTENT_URI, Contract.JOB_PROJECTION,
+                            null, null, null);
+                default:
+                    return null;
+            }
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            switch (loader.getId()) {
+                case MARK_LOADER_ID:
+                    markAdapter.swapCursor(data);
+                    spinnerMark.setSelection(markPosition);
+                    loadModels(markPosition);
+                    break;
+                case MODEL_LOADER_ID:
+                    modelAdapter.swapCursor(data);
+                    spinnerModel.setSelection(modelPosition);
+                    break;
+                case JOB_LOADER_ID:
+                    jobAdapter.swapCursor(data);
+                    if (checkedPositions != null)
+                        jobAdapter.setCheckedPositions(checkedPositions);
+                    break;
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+
+        }
     }
 }
