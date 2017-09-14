@@ -20,8 +20,6 @@ import com.dsr_practice.car_workshop.loaders.TaskLoader;
 import com.dsr_practice.car_workshop.models.common.Job;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
-import com.dsr_practice.car_workshop.rest.ApiClient;
-import com.dsr_practice.car_workshop.rest.ApiInterface;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,19 +27,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
-    ExpandableListView elvCars;
-    SwipeRefreshLayout swipeRefreshLayout;
+    private ExpandableListView elvCars;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
-    TaskListAdapter adapter;
-    private TaskLoader taskLoader;
+    private TaskListAdapter adapter;
     private TaskLoaderCallbacks callbacks;
-    private static ApiInterface apiInterface;
+
     private static final int TASK_LOADER_ID = 1;
 
     @Override
@@ -68,8 +61,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
         //AccountGeneral.createSyncAccount(this);
-        apiInterface = ApiClient.getApi();
-        taskLoader = new TaskLoader(this);
         callbacks = new TaskLoaderCallbacks();
 
         // Stub methods for testing the adapter
@@ -103,15 +94,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 Toast.makeText(this, R.string.toast_invalid_date, Toast.LENGTH_SHORT).show();
             }
         }
-        // Sort taskList by date
-        for (int i = 0; i < taskList.size(); i++)
-            for (int j = 0; j < taskList.size(); j++) {
-                Task iTask = taskList.get(i), jTask = taskList.get(j);
-                if (iTask.getDate().before(jTask.getDate())) {
-                    taskList.set(i, jTask);
-                    taskList.set(j, iTask);
-                }
-            }
+        sort(taskList);
         adapter = new TaskListAdapter(this, taskList, getSupportFragmentManager());
         elvCars.setAdapter(adapter);
         elvCars.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -130,43 +113,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        // TODO Get all task in onCreate() and get last task in onStart() after task creation
-        apiInterface.getTasks().enqueue(new Callback<List<Task>>() {
-            @Override
-            public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
-                /*
-                List<Task> taskList = response.body();
-                // Sort taskList by date
-                for (int i = 0; i < taskList.size(); i++)
-                    for (int j = 0; j < taskList.size(); j++) {
-                        Task iTask = taskList.get(i), jTask = taskList.get(j);
-                        if (iTask.getDate().before(jTask.getDate())) {
-                            taskList.set(i, jTask);
-                            taskList.set(j, iTask);
-                        }
-                    }
-                adapter = new TaskListAdapter(MainActivity.this, taskList);
-                elvCars.setAdapter(adapter);*/
-            }
-
-            @Override
-            public void onFailure(Call<List<Task>> call, Throwable t) {
-                Toast.makeText(MainActivity.this, R.string.toast_cant_load, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    @Override
     public void onRefresh() {
-        new Handler().post(new Runnable() {
+        new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                loadTasks(true);
+                //loadTasks(true);
                 swipeRefreshLayout.setRefreshing(false);
             }
-        });
+        }, 2000);
     }
 
     /**
@@ -180,17 +134,37 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, callbacks);
     }
 
-    // Class for loading task list from server using Loader
+    /**
+     * Sort task list by date
+     * @param taskList List of tasks which will be sorted
+     */
+    private void sort(List<Task> taskList) {
+        for (int i = 0; i < taskList.size(); i++)
+            for (int j = 0; j < taskList.size(); j++) {
+                Task iTask = taskList.get(i), jTask = taskList.get(j);
+                if (iTask.getDate().before(jTask.getDate())) {
+                    taskList.set(i, jTask);
+                    taskList.set(j, iTask);
+                }
+            }
+    }
+
+    /**
+     * Class for loading task list from server using Loader
+     */
     private class TaskLoaderCallbacks implements LoaderManager.LoaderCallbacks<List<Task>> {
 
         @Override
         public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
-            return taskLoader;
+            return new TaskLoader(MainActivity.this);
         }
 
         @Override
         public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
-
+            // Sort task list by date and show it
+            sort(data);
+            adapter = new TaskListAdapter(MainActivity.this, data, getSupportFragmentManager());
+            elvCars.setAdapter(adapter);
         }
 
         @Override
