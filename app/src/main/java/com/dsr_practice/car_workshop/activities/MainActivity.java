@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.adapters.TaskListAdapter;
+import com.dsr_practice.car_workshop.loaders.TaskLoader;
 import com.dsr_practice.car_workshop.models.common.Job;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
@@ -36,7 +39,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     SwipeRefreshLayout swipeRefreshLayout;
 
     TaskListAdapter adapter;
+    private TaskLoader taskLoader;
+    private TaskLoaderCallbacks callbacks;
     private static ApiInterface apiInterface;
+    private static final int TASK_LOADER_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
-        
+
         elvCars = (ExpandableListView) findViewById(R.id.elvCars);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         // SyncService with it, and establish a sync schedule
         //AccountGeneral.createSyncAccount(this);
         apiInterface = ApiClient.getApi();
+        taskLoader = new TaskLoader(this);
+        callbacks = new TaskLoaderCallbacks();
 
         // Stub methods for testing the adapter
         String[] dateArray = new String[] {
@@ -152,11 +160,42 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void onRefresh() {
-        new Handler().postDelayed(new Runnable() {
+        new Handler().post(new Runnable() {
             @Override
             public void run() {
+                loadTasks(true);
                 swipeRefreshLayout.setRefreshing(false);
             }
-        }, 4000);
+        });
+    }
+
+    /**
+     * Load tasks from server
+     * @param restart If true, then we should restart loading, else we should init loader for a first usage
+     */
+    private void loadTasks(boolean restart) {
+        if (restart)
+            getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, callbacks);
+        else
+            getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, callbacks);
+    }
+
+    // Class for loading task list from server using Loader
+    private class TaskLoaderCallbacks implements LoaderManager.LoaderCallbacks<List<Task>> {
+
+        @Override
+        public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
+            return taskLoader;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
+
+        }
+
+        @Override
+        public void onLoaderReset(Loader<List<Task>> loader) {
+
+        }
     }
 }

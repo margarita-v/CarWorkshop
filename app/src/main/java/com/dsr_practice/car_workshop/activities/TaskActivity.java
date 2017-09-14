@@ -49,7 +49,7 @@ public class TaskActivity extends AppCompatActivity
     private boolean needLoad = false;
     //endregion
 
-    private LoaderManager.LoaderCallbacks<Cursor> entryLoader;
+    private CursorLoaderCallbacks callbacks;
     private SimpleDateFormat dateFormat;
     private static ApiInterface apiInterface;
     private static final String DIALOG_TAG = "DIALOG";
@@ -160,9 +160,9 @@ public class TaskActivity extends AppCompatActivity
         }
 
         // Load info from database
-        entryLoader = new EntryLoader();
-        getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, entryLoader);
-        getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, entryLoader);
+        callbacks = new CursorLoaderCallbacks();
+        getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, callbacks);
+        getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, callbacks);
 
         // Load models for chosen mark
         // Save ID of chosen mark
@@ -201,6 +201,7 @@ public class TaskActivity extends AppCompatActivity
         });
     }
 
+    // Save chosen task fields in Bundle
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -297,11 +298,11 @@ public class TaskActivity extends AppCompatActivity
     private void loadModels(int markPosition) {
         Cursor cursor = (Cursor) spinnerMark.getItemAtPosition(markPosition);
         markId = getItemId(cursor, Contract.MarkEntry.COLUMN_NAME_MARK_ID);
-        getSupportLoaderManager().restartLoader(MODEL_LOADER_ID, null, entryLoader);
+        getSupportLoaderManager().restartLoader(MODEL_LOADER_ID, null, callbacks);
     }
 
     // Class for loading all entries from database using CursorLoader
-    private class EntryLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+    private class CursorLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
