@@ -27,6 +27,7 @@
     <string name="close_job">Close Job</string>
     <string name="date">Дата</string>
     <string name="status">Статус</string>
+    <string name="empty_list">Список задач пуст</string>
 
     <!-- TextView's hints -->
     <string name="hint_vin">Введите VIN</string>
@@ -35,6 +36,10 @@
     <!-- Image button's content descriptions -->
     <string name="btn_close_task">Закрыть задачу</string>
     <string name="btn_close_job">Закрыть работу</string>
+    <string name="img_empty_list">Список задач пуст</string>
+
+    <!-- Buttons -->
+    <string name="btn_load">Загрузить задачи</string>
 
     <!-- Toast messages -->
     <string name="toast_cant_load">Can\'t load tasks!</string>
