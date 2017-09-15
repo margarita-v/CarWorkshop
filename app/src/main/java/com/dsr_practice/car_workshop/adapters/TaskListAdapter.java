@@ -19,8 +19,6 @@ import com.dsr_practice.car_workshop.dialogs.MessageDialog;
 import com.dsr_practice.car_workshop.models.common.Job;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
-import com.dsr_practice.car_workshop.rest.ApiClient;
-import com.dsr_practice.car_workshop.rest.ApiInterface;
 
 import java.text.DateFormat;
 import java.util.List;
@@ -53,8 +51,6 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         closeTaskTitle = this.context.getString(R.string.task_was_closed);
         closeTaskMessage = this.context.getString(R.string.task_full_price);
 
-        ApiInterface apiInterface = ApiClient.getApi();
-
         // Set icons
         closedTaskIcon = IconsUtils.getIcon(
                 this.context, R.drawable.ic_done_all_black_24dp, android.R.color.holo_green_light);
@@ -65,6 +61,11 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
 
         // Set resource
         resource = IconsUtils.getResource(this.context);
+    }
+
+    public void setTaskList(List<Task> taskList) {
+        this.taskList = taskList;
+        notifyDataSetChanged();
     }
 
     @Override

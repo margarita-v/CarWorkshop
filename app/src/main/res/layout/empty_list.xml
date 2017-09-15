@@ -16,9 +16,9 @@
         android:layout_gravity="center"
         android:layout_weight="6"
         android:adjustViewBounds="true"
+        android:contentDescription="@string/img_empty_list"
         android:cropToPadding="false"
-        app:srcCompat="@drawable/ic_assignment_late_black_24dp"
-        android:contentDescription="@string/img_empty_list" />
+        app:srcCompat="@drawable/ic_assignment_late_black_24dp" />
 
     <TextView
         android:id="@+id/tvEmpty"

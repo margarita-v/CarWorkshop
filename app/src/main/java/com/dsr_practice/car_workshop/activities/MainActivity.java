@@ -9,8 +9,10 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.Toolbar.LayoutParams;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
@@ -27,7 +29,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends AppCompatActivity
+        implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 
     private ExpandableListView elvCars;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -49,21 +52,68 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
 
+        // Find task list widget and set its empty view
         elvCars = (ExpandableListView) findViewById(R.id.elvCars);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        View emptyView = getLayoutInflater().inflate(R.layout.empty_list, null, false);
+        addContentView(emptyView, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        elvCars.setEmptyView(emptyView);
+
+        // Configure ExpandableListView
+        adapter = new TaskListAdapter(this, new ArrayList<Task>(), getSupportFragmentManager());
+        elvCars.setAdapter(adapter);
+        elvCars.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, TaskActivity.class));
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                long packedPosition = elvCars.getExpandableListPosition(position);
+
+                int itemType = ExpandableListView.getPackedPositionType(packedPosition);
+                int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
+
+                if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP)
+                    adapter.onGroupLongClick(groupPosition);
+                return true;
             }
         });
+
+        Button btnLoad = (Button) emptyView.findViewById(R.id.btnLoad);
+        btnLoad.setOnClickListener(this);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(this);
 
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
         //AccountGeneral.createSyncAccount(this);
         callbacks = new TaskLoaderCallbacks();
+    }
 
-        // Stub methods for testing the adapter
+    @Override
+    public void onRefresh() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // If adapter is not empty, then we should restart loader
+                //loadTasks(adapter.getGroupCount() > 0);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        }, 2000);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fab:
+                startActivity(new Intent(this, TaskActivity.class));
+                break;
+            case R.id.btnLoad:
+                //loadTasks(false);
+                loadTasksStub();
+                break;
+        }
+    }
+
+    // Stub method for testing adapter
+    private void loadTasksStub() {
         String[] dateArray = new String[] {
                 "2012-04-05T20:40:45Z",
                 "2014-04-05T20:40:45Z",
@@ -95,32 +145,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         }
         sort(taskList);
-        adapter = new TaskListAdapter(this, taskList, getSupportFragmentManager());
-        elvCars.setAdapter(adapter);
-        elvCars.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                long packedPosition = elvCars.getExpandableListPosition(position);
-
-                int itemType = ExpandableListView.getPackedPositionType(packedPosition);
-                int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
-
-                if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP)
-                    adapter.onGroupLongClick(groupPosition);
-                return true;
-            }
-        });
-    }
-
-    @Override
-    public void onRefresh() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //loadTasks(true);
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 2000);
+        adapter.setTaskList(taskList);
     }
 
     /**
