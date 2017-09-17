@@ -26,6 +26,8 @@ import com.dsr_practice.car_workshop.models.common.Task;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -85,6 +87,7 @@ public class MainActivity extends AppCompatActivity
         // SyncService with it, and establish a sync schedule
         //AccountGeneral.createSyncAccount(this);
         callbacks = new TaskLoaderCallbacks();
+        //loadTasks(false);
     }
 
     @Override
@@ -153,6 +156,7 @@ public class MainActivity extends AppCompatActivity
      * @param restart If true, then we should restart loading, else we should init loader for a first usage
      */
     private void loadTasks(boolean restart) {
+        //TODO Loading picture
         if (restart)
             getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, callbacks);
         else
@@ -164,14 +168,12 @@ public class MainActivity extends AppCompatActivity
      * @param taskList List of tasks which will be sorted
      */
     private void sort(List<Task> taskList) {
-        for (int i = 0; i < taskList.size(); i++)
-            for (int j = 0; j < taskList.size(); j++) {
-                Task iTask = taskList.get(i), jTask = taskList.get(j);
-                if (iTask.getDate().before(jTask.getDate())) {
-                    taskList.set(i, jTask);
-                    taskList.set(j, iTask);
-                }
+        Collections.sort(taskList, new Comparator<Task>() {
+            @Override
+            public int compare(Task task1, Task task2) {
+                return task1.getDate().compareTo(task2.getDate());
             }
+        });
     }
 
     /**
