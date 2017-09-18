@@ -108,7 +108,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         final Task task = (Task) getGroup(groupPosition);
         if (convertView == null) {
             LayoutInflater inflater= (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_group, null);
+            convertView = inflater.inflate(R.layout.list_group, parent, false);
         }
 
         TextView lblCarName = (TextView) convertView.findViewById(R.id.tvCarName);
@@ -147,7 +147,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         final Task task = (Task) getGroup(groupPosition);
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_item, null);
+            convertView = inflater.inflate(R.layout.list_item, parent, false);
         }
         final ImageButton imgBtnCloseJob = (ImageButton) convertView.findViewById(R.id.imgBtnCloseJob);
         TextView lblWork = (TextView) convertView.findViewById(R.id.tvWork);

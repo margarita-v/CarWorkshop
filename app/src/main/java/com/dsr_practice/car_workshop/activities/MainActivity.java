@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
 
+        /*
         // Find task list widget and set its empty view
         elvCars = (ExpandableListView) findViewById(R.id.elvCars);
         View emptyView = getLayoutInflater().inflate(R.layout.empty_list, null, false);
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity
         Button btnLoad = (Button) emptyView.findViewById(R.id.btnLoad);
         btnLoad.setOnClickListener(this);
 
+*/
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
 

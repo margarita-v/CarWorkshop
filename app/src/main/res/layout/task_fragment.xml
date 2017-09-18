@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.dsr_practice.car_workshop.activities.MainActivity"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <ExpandableListView
+        android:id="@id/android:list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ViewStub
+        android:id="@id/android:empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout="@layout/empty_list"/>
+</LinearLayout>
