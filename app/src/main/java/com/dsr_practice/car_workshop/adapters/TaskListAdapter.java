@@ -23,7 +23,7 @@ import com.dsr_practice.car_workshop.models.common.Task;
 import java.text.DateFormat;
 import java.util.List;
 
-public class TaskListAdapter extends BaseExpandableListAdapter {
+public class TaskListAdapter extends BaseExpandableListAdapter implements CloseCallback {
 
     private Context context;
     private List<Task> taskList;
@@ -134,7 +134,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
             public void onClick(View v) {
                 CloseDialog dialog = CloseDialog.newInstance(task, null,
                         R.string.close_task_title, R.string.close_task_message,
-                        imgBtnClose, closedTaskIcon, onJobClose);
+                        imgBtnClose, closedTaskIcon, TaskListAdapter.this);
                 dialog.show(fragmentManager, CLOSE_TASK_TAG);
             }
         });
@@ -169,7 +169,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
             public void onClick(View v) {
                 CloseDialog dialog = CloseDialog.newInstance(task, jobStatus,
                         R.string.close_job_title, R.string.close_job_message,
-                        imgBtnCloseJob, closedIcon, onJobClose);
+                        imgBtnCloseJob, closedIcon, TaskListAdapter.this);
                 dialog.show(fragmentManager, CLOSE_JOB_TAG);
             }
         });
@@ -182,14 +182,12 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
     }
 
     // Callback from CloseDialog for adapter
-    private CloseCallback onJobClose = new CloseCallback() {
-        @Override
-        public void onJobClose(boolean isTaskClosed, Task task) {
-            if (isTaskClosed)
-                closeTask(task);
-            notifyDataSetChanged();
-        }
-    };
+    @Override
+    public void onJobClose(boolean isTaskClosed, Task task) {
+        if (isTaskClosed)
+            closeTask(task);
+        notifyDataSetChanged();
+    }
 
     public void onGroupLongClick(int groupPosition) {
         // View task info
