@@ -46,6 +46,9 @@ public class MainActivity extends AppCompatActivity implements
         startLoading();
     }
 
+    /**
+     * Perform task loading
+     */
     private void startLoading() {
         if (!swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(true);

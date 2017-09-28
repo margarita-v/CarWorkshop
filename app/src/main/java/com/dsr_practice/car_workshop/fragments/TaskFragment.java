@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
@@ -31,8 +33,14 @@ import java.util.List;
 
 public class TaskFragment extends ListFragment {
 
+    // Widgets of an empty view
+    private TextView tvEmpty;
+    private ImageView imgEmpty;
+
+    // Task list widget and its adapter
     private ExpandableListView elvCars;
     private TaskListAdapter adapter;
+
     private TaskLoaderCallbacks callbacks;
     private TaskLoaderListener taskLoaderListener;
 
@@ -43,6 +51,9 @@ public class TaskFragment extends ListFragment {
         callbacks = new TaskLoaderCallbacks();
 
         View view = inflater.inflate(R.layout.task_fragment, container, false);
+        tvEmpty = (TextView) view.findViewById(R.id.tvEmpty);
+        imgEmpty = (ImageView) view.findViewById(R.id.imgEmpty);
+
         elvCars = (ExpandableListView) view.findViewById(android.R.id.list);
         adapter = new TaskListAdapter(getContext(), new ArrayList<Task>(), getActivity().getSupportFragmentManager());
         elvCars.setAdapter(adapter);
@@ -75,9 +86,28 @@ public class TaskFragment extends ListFragment {
         }
     }
 
+    /**
+     * Perform UI changes before and after task loading
+     * @param isLoadFinished If true, then function will applied after task loading
+     */
+    private void loadingActions(boolean isLoadFinished) {
+        elvCars.setEnabled(isLoadFinished);
+        if (isLoadFinished) {
+            if (adapter.getGroupCount() == 0) {
+                tvEmpty.setText(R.string.empty_list);
+                imgEmpty.setImageResource(R.drawable.ic_assignment_late_black_24dp);
+            }
+            taskLoaderListener.onLoadFinished();
+        }
+        else {
+            tvEmpty.setText(R.string.loading);
+            imgEmpty.setImageResource(R.drawable.ic_directions_car_black_24dp);
+        }
+    }
+
     // Stub method for testing adapter
     public void loadTasksStub() {
-        elvCars.setEnabled(false);
+        loadingActions(false);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -113,8 +143,7 @@ public class TaskFragment extends ListFragment {
                 }
                 sort(taskList);
                 adapter.setTaskList(taskList);
-                elvCars.setEnabled(true);
-                taskLoaderListener.onLoadFinished();
+                loadingActions(true);
             }
         }, 3000);
     }
@@ -123,7 +152,7 @@ public class TaskFragment extends ListFragment {
      * Load tasks from server
      */
     public void loadTasks() {
-        //TODO Change tvEmpty's text and imgEmpty's picture
+        loadingActions(false);
         if (adapter == null || adapter.getGroupCount() == 0)
             getActivity().getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, callbacks);
         else
@@ -156,13 +185,15 @@ public class TaskFragment extends ListFragment {
         @Override
         public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
             // Sort task list by date and show it
-            sort(data);
-            adapter = new TaskListAdapter(
-                    getActivity(),
-                    data,
-                    getActivity().getSupportFragmentManager());
-            elvCars.setAdapter(adapter);
-            // TODO Callback to activity: stop refreshing
+            if (data != null) {
+                sort(data);
+                adapter = new TaskListAdapter(
+                        getActivity(),
+                        data,
+                        getActivity().getSupportFragmentManager());
+                elvCars.setAdapter(adapter);
+            }
+            loadingActions(true);
         }
 
         @Override
