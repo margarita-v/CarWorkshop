@@ -138,4 +138,8 @@ public class CloseDialog extends DialogFragment implements DialogInterface.OnCli
             }
         });*/
     }
+
+    public interface CloseCallback {
+        void onJobClose(boolean isTaskClosed, Task task);
+    }
 }

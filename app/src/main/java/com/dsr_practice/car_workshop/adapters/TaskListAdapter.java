@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.activities.InfoActivity;
-import com.dsr_practice.car_workshop.dialogs.CloseCallback;
 import com.dsr_practice.car_workshop.dialogs.CloseDialog;
 import com.dsr_practice.car_workshop.dialogs.MessageDialog;
 import com.dsr_practice.car_workshop.models.common.Job;
@@ -23,7 +22,7 @@ import com.dsr_practice.car_workshop.models.common.Task;
 import java.text.DateFormat;
 import java.util.List;
 
-public class TaskListAdapter extends BaseExpandableListAdapter implements CloseCallback {
+public class TaskListAdapter extends BaseExpandableListAdapter implements CloseDialog.CloseCallback {
 
     private Context context;
     private List<Task> taskList;

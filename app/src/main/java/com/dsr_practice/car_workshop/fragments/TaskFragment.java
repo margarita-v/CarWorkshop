@@ -1,6 +1,9 @@
 package com.dsr_practice.car_workshop.fragments;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -31,6 +34,7 @@ public class TaskFragment extends ListFragment {
     private ExpandableListView elvCars;
     private TaskListAdapter adapter;
     private TaskLoaderCallbacks callbacks;
+    private TaskLoaderListener taskLoaderListener;
 
     private static final int TASK_LOADER_ID = 1;
 
@@ -58,47 +62,68 @@ public class TaskFragment extends ListFragment {
         return view;
     }
 
-    // Stub method for testing adapter
-    public void loadTasksStub() {
-        String[] dateArray = new String[] {
-                "2012-04-05T20:40:45Z",
-                "2014-04-05T20:40:45Z",
-                "2014-04-06T20:40:45Z",
-                "2012-04-05T20:41:45Z"
-        };
-        String[] jobsArray = new String[] {
-                "Car wash",
-                "Full repair",
-                "Cleaning",
-                "Change color"
-        };
-        int[] priceArray = new int[] { 300, 1000, 200, 500 };
-        SimpleDateFormat format = new SimpleDateFormat(getString(R.string.date_format));
-        List<Task> taskList = new ArrayList<>();
-        List<JobStatus> jobs = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            Job job = new Job(i, priceArray[i], jobsArray[i]);
-            jobs.add(new JobStatus(i, i, job, false));
-        }
-        for (int i = 0; i < dateArray.length; i++) {
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (context instanceof Activity){
             try {
-                Date newDate = format.parse(dateArray[i]);
-                Task task = new Task(i, newDate, 1, 2, "A001AA", "dfghj", "name", false);
-                task.setJobs(jobs);
-                taskList.add(task);
-            } catch (ParseException e) {
-                Toast.makeText(getContext(), R.string.toast_invalid_date, Toast.LENGTH_SHORT).show();
+                taskLoaderListener = (TaskLoaderListener) context;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(context.toString() + " must implement TaskLoaderListener");
             }
         }
-        sort(taskList);
-        adapter.setTaskList(taskList);
+    }
+
+    // Stub method for testing adapter
+    public void loadTasksStub() {
+        elvCars.setEnabled(false);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                String[] dateArray = new String[] {
+                        "2012-04-05T20:40:45Z",
+                        "2014-04-05T20:40:45Z",
+                        "2014-04-06T20:40:45Z",
+                        "2012-04-05T20:41:45Z"
+                };
+                String[] jobsArray = new String[] {
+                        "Car wash",
+                        "Full repair",
+                        "Cleaning",
+                        "Change color"
+                };
+                int[] priceArray = new int[] { 300, 1000, 200, 500 };
+                SimpleDateFormat format = new SimpleDateFormat(getString(R.string.date_format));
+                List<Task> taskList = new ArrayList<>();
+                List<JobStatus> jobs = new ArrayList<>();
+                for (int i = 0; i < 4; i++) {
+                    Job job = new Job(i, priceArray[i], jobsArray[i]);
+                    jobs.add(new JobStatus(i, i, job, false));
+                }
+                for (int i = 0; i < dateArray.length; i++) {
+                    try {
+                        Date newDate = format.parse(dateArray[i]);
+                        Task task = new Task(i, newDate, 1, 2, "A001AA", "dfghj", "name", false);
+                        task.setJobs(jobs);
+                        taskList.add(task);
+                    } catch (ParseException e) {
+                        Toast.makeText(getContext(), R.string.toast_invalid_date, Toast.LENGTH_SHORT).show();
+                    }
+                }
+                sort(taskList);
+                adapter.setTaskList(taskList);
+                elvCars.setEnabled(true);
+                taskLoaderListener.onLoadFinished();
+            }
+        }, 3000);
     }
 
     /**
      * Load tasks from server
      */
     public void loadTasks() {
-        //TODO Loading picture
+        //TODO Change tvEmpty's text and imgEmpty's picture
         if (adapter == null || adapter.getGroupCount() == 0)
             getActivity().getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, callbacks);
         else
@@ -137,11 +162,16 @@ public class TaskFragment extends ListFragment {
                     data,
                     getActivity().getSupportFragmentManager());
             elvCars.setAdapter(adapter);
+            // TODO Callback to activity: stop refreshing
         }
 
         @Override
         public void onLoaderReset(Loader<List<Task>> loader) {
 
         }
+    }
+
+    public interface TaskLoaderListener {
+        void onLoadFinished();
     }
 }

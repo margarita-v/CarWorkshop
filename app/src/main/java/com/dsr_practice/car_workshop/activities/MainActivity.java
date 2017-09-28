@@ -2,7 +2,6 @@ package com.dsr_practice.car_workshop.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +13,8 @@ import android.view.View;
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.fragments.TaskFragment;
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends AppCompatActivity implements
+        SwipeRefreshLayout.OnRefreshListener, TaskFragment.TaskLoaderListener {
 
     private TaskFragment fragment;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -43,17 +43,19 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         // SyncService with it, and establish a sync schedule
         //AccountGeneral.createSyncAccount(this);
         fragment = (TaskFragment) getSupportFragmentManager().findFragmentById(R.id.listFragment);
+        startLoading();
+    }
+
+    private void startLoading() {
+        if (!swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(true);
+            fragment.loadTasksStub();
+        }
     }
 
     @Override
     public void onRefresh() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                fragment.loadTasksStub();
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 2000);
+        fragment.loadTasksStub();
     }
 
     @Override
@@ -67,9 +69,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
      * @param item Menu item which was chosen
      */
     public void onRefreshItemClick(MenuItem item) {
-        if (!swipeRefreshLayout.isRefreshing()) {
-            swipeRefreshLayout.setRefreshing(true);
-            onRefresh();
-        }
+        startLoading();
+    }
+
+    @Override
+    public void onLoadFinished() {
+        swipeRefreshLayout.setRefreshing(false);
     }
 }
