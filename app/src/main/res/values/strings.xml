@@ -50,6 +50,9 @@
     <string name="all_jobs_are_closed">All jobs in this task are closed</string>
     <string name="toast_create_task">Task was created</string>
     <string name="toast_cant_create">Can\'\t create task!</string>
+    <string name="sync_error_jobs">Fail to sync job list with server</string>
+    <string name="sync_error_marks">Fail to sync mark list with server</string>
+    <string name="sync_error_models">Fail to sync model list with server</string>
 
     <!-- Dialogs -->
     <string name="close_task_title">Close task</string>

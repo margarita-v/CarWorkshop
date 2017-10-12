@@ -11,14 +11,13 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.widget.Toast;
 
+import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.accounts.AccountGeneral;
 import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.models.common.sync.Job;
 import com.dsr_practice.car_workshop.models.common.sync.Mark;
 import com.dsr_practice.car_workshop.models.common.sync.Model;
-import com.dsr_practice.car_workshop.models.lists.JobList;
-import com.dsr_practice.car_workshop.models.lists.MarkList;
-import com.dsr_practice.car_workshop.models.lists.ModelList;
+import com.dsr_practice.car_workshop.models.common.sync.SyncModel;
 import com.dsr_practice.car_workshop.rest.ApiClient;
 import com.dsr_practice.car_workshop.rest.ApiInterface;
 
@@ -36,15 +35,22 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     // Content resolver, for performing database operations
     private final ContentResolver contentResolver;
 
+    // Interface for REST usage
     private static ApiInterface apiInterface;
 
-    //region Constants representing column positions from every PROJECTION
-    public static final int COLUMN_ID = 0;
-    public static final int COLUMN_ENTRY_ID = 1;
-    public static final int COLUMN_ENTRY_NAME = 2;
-    public static final int COLUMN_OPTIONAL_FIELD = 3;
+    //region IDs of string resources for different errors messages
+    private static final int JOB_SYNC_ERROR = R.string.sync_error_jobs;
+    private static final int MARK_SYNC_ERROR = R.string.sync_error_marks;
+    private static final int MODEL_SYNC_ERROR = R.string.sync_error_models;
     //endregion
 
+    //region Variables for SyncCallback class usage
+    private int currentEntryId;
+    private SyncResult syncResult;
+    private int stringResourceId;
+    //endregion
+
+    //region Constructors
     SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         contentResolver = context.getContentResolver();
@@ -54,7 +60,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
         contentResolver = context.getContentResolver();
+        apiInterface = ApiClient.getApi();
     }
+    //endregion
 
     /* Merge strategy:
      * 1. Get cursor to all items
@@ -68,56 +76,47 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, final SyncResult syncResult) {
-        // Sync mark list
-        apiInterface.getMarks().enqueue(new Callback<List<Mark>>() {
-            @Override
-            public void onResponse(Call<List<Mark>> call, Response<List<Mark>> response) {
-                try {
-                    new MarkList(response.body()).sync(contentResolver, syncResult);
-                } catch (RemoteException | OperationApplicationException e) {
-                    syncResult.databaseError = true;
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Mark>> call, Throwable t) {
-                Toast.makeText(getContext(), "Fail to sync mark list with server", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Sync model list
-        apiInterface.getModels().enqueue(new Callback<List<Model>>() {
-            @Override
-            public void onResponse(Call<List<Model>> call, Response<List<Model>> response) {
-                try {
-                    new ModelList(response.body()).sync(contentResolver, syncResult);
-                } catch (RemoteException | OperationApplicationException e) {
-                    syncResult.databaseError = true;
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Model>> call, Throwable t) {
-                Toast.makeText(getContext(), "Fail to sync model list with server", Toast.LENGTH_SHORT).show();
-            }
-        });
+        this.syncResult = syncResult;
 
         // Sync job list
-        apiInterface.getJobs().enqueue(new Callback<List<Job>>() {
-            @Override
-            public void onResponse(Call<List<Job>> call, Response<List<Job>> response) {
-                try {
-                    new JobList(response.body()).sync(contentResolver, syncResult);
-                } catch (RemoteException | OperationApplicationException e) {
-                    syncResult.databaseError = true;
-                }
-            }
+        this.currentEntryId = Job.JOB_ID;
+        this.stringResourceId = JOB_SYNC_ERROR;
 
-            @Override
-            public void onFailure(Call<List<Job>> call, Throwable t) {
-                Toast.makeText(getContext(), "Fail to sync job list with server", Toast.LENGTH_SHORT).show();
+        apiInterface.getJobs().enqueue(new SyncCallback<Job>());
+
+        // Sync mark list
+        this.currentEntryId = Mark.MARK_ID;
+        this.stringResourceId = MARK_SYNC_ERROR;
+
+        apiInterface.getMarks().enqueue(new SyncCallback<Mark>());
+
+        // Sync model list
+        this.currentEntryId = Model.MODEL_ID;
+        this.stringResourceId = MODEL_SYNC_ERROR;
+
+        apiInterface.getModels().enqueue(new SyncCallback<Model>());
+    }
+
+    /**
+     * Generic class for implementing callbacks for data sync
+     * @param <T> Type of entry which will be loaded
+     */
+    private class SyncCallback<T extends SyncModel> implements Callback<List<T>> {
+
+        @Override
+        public void onResponse(Call<List<T>> call, Response<List<T>> response) {
+            try {
+                new SyncImplementation<>(response.body(), currentEntryId)
+                        .sync(contentResolver, syncResult);
+            } catch (RemoteException | OperationApplicationException e) {
+                e.printStackTrace();
             }
-        });
+        }
+
+        @Override
+        public void onFailure(Call<List<T>> call, Throwable t) {
+            Toast.makeText(getContext(), stringResourceId, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**

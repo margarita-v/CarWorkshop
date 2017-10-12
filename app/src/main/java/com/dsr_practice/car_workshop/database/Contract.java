@@ -33,6 +33,7 @@ public class Contract {
     public static final String[] MODEL_PROJECTION = new String[] {
             ModelEntry.COLUMN_NAME_MODEL_NAME,
             ModelEntry.COLUMN_NAME_FK_MARK_ID,
+            ModelEntry.COLUMN_NAME_MODEL_ID,
             ModelEntry._ID
     };
     public static final String[] JOB_PROJECTION = new String[] {
