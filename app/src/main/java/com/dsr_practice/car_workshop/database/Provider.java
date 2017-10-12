@@ -11,6 +11,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+/**
+ * This class implements all actions for database usage
+ */
 public class Provider extends ContentProvider {
     private DatabaseHelper databaseHelper;
     private static final String SLASH = "/";
@@ -60,7 +63,9 @@ public class Provider extends ContentProvider {
         return true;
     }
 
-    // Determine the mime type for entries returned by a given URI
+    /**
+     * Determine the mime type for entries returned by a given URI
+     */
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
@@ -87,14 +92,16 @@ public class Provider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
+                        @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         int uriMatch = sUriMatcher.match(uri);
         String id = uri.getLastPathSegment();
         Cursor cursor;
         switch (uriMatch) {
             case ROUTE_MARKS:
-                cursor = db.query(Contract.MarkEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                cursor = db.query(Contract.MarkEntry.TABLE_NAME, projection, selection,
+                        selectionArgs, null, null, sortOrder);
                 break;
             case ROUTE_MARKS_ID:
                 cursor = db.query(
@@ -110,7 +117,8 @@ public class Provider extends ContentProvider {
                 cursor = db.rawQuery(SQL_GET_MODELS_FOR_MARK, selectionArgs);
                 break;
             case ROUTE_MODELS:
-                cursor = db.query(Contract.ModelEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                cursor = db.query(Contract.ModelEntry.TABLE_NAME, projection, selection,
+                        selectionArgs, null, null, sortOrder);
                 break;
             case ROUTE_MODELS_ID:
                 cursor = db.query(
@@ -123,7 +131,8 @@ public class Provider extends ContentProvider {
                         sortOrder);
                 break;
             case ROUTE_JOBS:
-                cursor = db.query(Contract.JobEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                cursor = db.query(Contract.JobEntry.TABLE_NAME, projection, selection,
+                        selectionArgs, null, null, sortOrder);
                 break;
             case ROUTE_JOBS_ID:
                 cursor = db.query(
@@ -222,7 +231,8 @@ public class Provider extends ContentProvider {
     }
 
     @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
+    public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection,
+                      @Nullable String[] selectionArgs) {
         final SQLiteDatabase db = databaseHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         String id = uri.getLastPathSegment();

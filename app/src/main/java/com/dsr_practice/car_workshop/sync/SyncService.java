@@ -4,7 +4,11 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+/**
+ * Class for sync adapter control
+ */
 public class SyncService extends Service {
+
     private static final Object LOCK = new Object();
     private static SyncAdapter syncAdapter = null;
 

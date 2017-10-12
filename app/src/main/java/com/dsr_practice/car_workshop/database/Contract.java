@@ -4,10 +4,14 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-// This class describes all local entities for Provider class
+/**
+ * This class describes all local entities for Provider class
+ */
 public class Contract {
-    // To prevent someone from accidentally instantiating the contract class,
-    // give it an empty constructor.
+    /**
+     * To prevent someone from accidentally instantiating the contract class,
+     * give it an empty constructor.
+     */
     public Contract() {}
 
     public static final String CONTENT_AUTHORITY = "com.dsr_practice.car_workshop.database";
@@ -17,8 +21,10 @@ public class Contract {
     static final String PATH_JOBS   = "jobs";
     private static final String SEPARATOR   = "/";
 
-    // Projections for all items which will be stored in local database
-    // COLUMN_ITEM_NAME is first for cursor adapters
+    /**
+     *  Projections for all items which will be stored in local database.
+     *  COLUMN_ITEM_NAME is first for usage in cursor adapters
+     */
     public static final String[] MARK_PROJECTION = new String[] {
             MarkEntry.COLUMN_NAME_MARK_NAME,
             MarkEntry.COLUMN_NAME_MARK_ID,
@@ -36,9 +42,11 @@ public class Contract {
             JobEntry._ID
     };
 
-    // Columns supported by "marks" records
+    /**
+     * Columns supported by "marks" records
+     */
     public static class MarkEntry implements BaseColumns {
-        public static final String TABLE_NAME = "mark";
+        static final String TABLE_NAME = "mark";
         // Not to be confused with the database primary key, which is _ID
         public static final String COLUMN_NAME_MARK_ID = "mark_id";
         public static final String COLUMN_NAME_MARK_NAME = "mark_name";
@@ -47,16 +55,18 @@ public class Contract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_MARKS).build();
         // MIME type for lists of marks
-        public static final String CONTENT_TYPE =
+        static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + CONTENT_URI + SEPARATOR + PATH_MARKS;
         // MIME type for individual marks
-        public static final String CONTENT_ITEM_TYPE =
+        static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + CONTENT_URI + SEPARATOR + PATH_MARKS;
     }
 
-    // Columns supported by "models" records
+    /**
+     * Columns supported by "models" records
+     */
     public static class ModelEntry implements BaseColumns {
-        public static final String TABLE_NAME = "model";
+        static final String TABLE_NAME = "model";
         // Not to be confused with the database primary key, which is _ID
         public static final String COLUMN_NAME_MODEL_ID = "model_id";
         public static final String COLUMN_NAME_MODEL_NAME = "model_name";
@@ -66,16 +76,18 @@ public class Contract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_MODELS).build();
         // MIME type for lists of models
-        public static final String CONTENT_TYPE =
+        static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + CONTENT_URI + SEPARATOR + PATH_MODELS;
         // MIME type for individual models
-        public static final String CONTENT_ITEM_TYPE =
+        static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + CONTENT_URI + SEPARATOR + PATH_MODELS;
     }
 
-    // Columns supported by "jobs" records
+    /**
+     * Columns supported by "jobs" records
+     */
     public static class JobEntry implements BaseColumns {
-        public static final String TABLE_NAME = "job";
+        static final String TABLE_NAME = "job";
         // Not to be confused with the database primary key, which is _ID
         public static final String COLUMN_NAME_JOB_ID = "job_id";
         public static final String COLUMN_NAME_JOB_NAME = "job_name";
@@ -85,10 +97,10 @@ public class Contract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_JOBS).build();
         // MIME type for lists of jobs
-        public static final String CONTENT_TYPE =
+        static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + CONTENT_URI + SEPARATOR + PATH_JOBS;
         // MIME type for individual jobs
-        public static final String CONTENT_ITEM_TYPE =
+        static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + CONTENT_URI + SEPARATOR + PATH_JOBS;
     }
 }

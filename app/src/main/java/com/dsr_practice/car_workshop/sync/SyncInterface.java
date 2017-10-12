@@ -5,7 +5,11 @@ import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.os.RemoteException;
 
+/**
+ * Interface which declare a main method for sync
+ */
 public interface SyncInterface {
+
     void sync(ContentResolver contentResolver, final SyncResult syncResult)
             throws RemoteException, OperationApplicationException;
 }
