@@ -11,7 +11,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.dsr_practice.car_workshop.R;
-import com.dsr_practice.car_workshop.models.common.Job;
+import com.dsr_practice.car_workshop.models.common.sync.Job;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 

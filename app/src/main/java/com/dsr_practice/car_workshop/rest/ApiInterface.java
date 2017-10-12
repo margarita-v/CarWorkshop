@@ -1,9 +1,9 @@
 package com.dsr_practice.car_workshop.rest;
 
 import com.dsr_practice.car_workshop.models.post.CloseJobPost;
-import com.dsr_practice.car_workshop.models.common.Job;
-import com.dsr_practice.car_workshop.models.common.Mark;
-import com.dsr_practice.car_workshop.models.common.Model;
+import com.dsr_practice.car_workshop.models.common.sync.Job;
+import com.dsr_practice.car_workshop.models.common.sync.Mark;
+import com.dsr_practice.car_workshop.models.common.sync.Model;
 import com.dsr_practice.car_workshop.models.common.Task;
 import com.dsr_practice.car_workshop.models.post.TaskPost;
 
@@ -14,7 +14,6 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
 
 public interface ApiInterface {
     // GET requests

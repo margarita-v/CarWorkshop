@@ -52,18 +52,18 @@ public class InfoActivity extends AppCompatActivity {
                 .appendPath(Integer.toString(task.getModel())).build();
 
         tvVin.setText(task.getVin());
-        setNameFromDatabase(markUri, Contract.MARK_PROJECTION, tvMark);
-        setNameFromDatabase(modelUri, Contract.MODEL_PROJECTION, tvModel);
+        setNameFromDatabase(markUri, Contract.MARK_PROJECTION, Contract.MarkEntry.COLUMN_NAME_MARK_NAME, tvMark);
+        setNameFromDatabase(modelUri, Contract.MODEL_PROJECTION, Contract.ModelEntry.COLUMN_NAME_MODEL_NAME, tvModel);
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
         tvDate.setText(dateFormat.format(task.getDate()));
         tvNumber.setText(task.getNumber());
     }
 
-    private void setNameFromDatabase(Uri uri, String[] projection, TextView textView) {
+    private void setNameFromDatabase(Uri uri, String[] projection, String columnName, TextView textView) {
         Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
         assert cursor != null;
         if (cursor.moveToFirst()) {
-            String name = cursor.getString(0);
+            String name = cursor.getString(cursor.getColumnIndex(columnName));
             textView.setText(name);
         }
         cursor.close();

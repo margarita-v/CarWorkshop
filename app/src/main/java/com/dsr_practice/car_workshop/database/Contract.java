@@ -17,7 +17,8 @@ public class Contract {
     static final String PATH_JOBS   = "jobs";
     private static final String SEPARATOR   = "/";
 
-    // The most useful projections
+    // Projections for all items which will be stored in local database
+    // COLUMN_ITEM_NAME is first for cursor adapters
     public static final String[] MARK_PROJECTION = new String[] {
             MarkEntry.COLUMN_NAME_MARK_NAME,
             MarkEntry.COLUMN_NAME_MARK_ID,

@@ -10,7 +10,7 @@ import android.os.RemoteException;
 import android.util.SparseArray;
 
 import com.dsr_practice.car_workshop.database.Contract;
-import com.dsr_practice.car_workshop.models.common.Model;
+import com.dsr_practice.car_workshop.models.common.sync.Model;
 import com.dsr_practice.car_workshop.sync.SyncAdapter;
 import com.dsr_practice.car_workshop.sync.SyncInterface;
 

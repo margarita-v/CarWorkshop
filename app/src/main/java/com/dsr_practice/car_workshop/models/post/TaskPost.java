@@ -1,9 +1,8 @@
 package com.dsr_practice.car_workshop.models.post;
 
-import com.dsr_practice.car_workshop.models.common.Job;
+import com.dsr_practice.car_workshop.models.common.sync.Job;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Date;
 import java.util.List;
 
 public class TaskPost {

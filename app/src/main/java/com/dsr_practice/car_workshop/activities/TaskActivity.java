@@ -24,7 +24,7 @@ import com.dsr_practice.car_workshop.adapters.JobAdapter;
 import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.database.Provider;
 import com.dsr_practice.car_workshop.dialogs.MessageDialog;
-import com.dsr_practice.car_workshop.models.common.Job;
+import com.dsr_practice.car_workshop.models.common.sync.Job;
 import com.dsr_practice.car_workshop.rest.ApiClient;
 import com.dsr_practice.car_workshop.rest.ApiInterface;
 

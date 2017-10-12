@@ -1,5 +1,7 @@
 package com.dsr_practice.car_workshop.models.common;
 
+import com.dsr_practice.car_workshop.models.common.sync.Job;
+
 import java.io.Serializable;
 
 public class JobStatus implements Serializable {

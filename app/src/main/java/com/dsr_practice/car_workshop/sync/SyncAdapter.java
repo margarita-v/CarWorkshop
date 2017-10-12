@@ -13,9 +13,9 @@ import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.accounts.AccountGeneral;
 import com.dsr_practice.car_workshop.database.Contract;
-import com.dsr_practice.car_workshop.models.common.Job;
-import com.dsr_practice.car_workshop.models.common.Mark;
-import com.dsr_practice.car_workshop.models.common.Model;
+import com.dsr_practice.car_workshop.models.common.sync.Job;
+import com.dsr_practice.car_workshop.models.common.sync.Mark;
+import com.dsr_practice.car_workshop.models.common.sync.Model;
 import com.dsr_practice.car_workshop.models.lists.JobList;
 import com.dsr_practice.car_workshop.models.lists.MarkList;
 import com.dsr_practice.car_workshop.models.lists.ModelList;
