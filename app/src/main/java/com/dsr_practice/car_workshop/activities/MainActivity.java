@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private TaskFragment fragment;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private RecyclerView rvTasks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,9 @@ public class MainActivity extends AppCompatActivity implements
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
 
+        rvTasks = (RecyclerView) findViewById(R.id.rvTasks);
+        rvTasks.setLayoutManager(new LinearLayoutManager(this));
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
         //AccountGeneral.createSyncAccount(this);
-        fragment = (TaskFragment) getSupportFragmentManager().findFragmentById(R.id.listFragment);
+        //fragment = (TaskFragment) getSupportFragmentManager().findFragmentById(R.id.listFragment);
         startLoading();
     }
 
