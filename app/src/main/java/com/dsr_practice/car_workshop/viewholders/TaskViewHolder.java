@@ -1,6 +1,5 @@
 package com.dsr_practice.car_workshop.viewholders;
 
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
@@ -13,7 +12,7 @@ import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder;
 
 import static android.view.animation.Animation.RELATIVE_TO_SELF;
 
-public class TaskViewHolder extends GroupViewHolder {
+public class TaskViewHolder extends GroupViewHolder implements IconInterface {
 
     private ImageView imgArrow;
     private TextView tvCarName;
@@ -32,11 +31,12 @@ public class TaskViewHolder extends GroupViewHolder {
         this.imgBtnInfo = itemView.findViewById(R.id.imgBtnInfo);
     }
 
-    public void setItems(Task task, Drawable icon) {
+    public void setItems(Task task) {
         this.tvCarName.setText(task.getName());
         this.tvDate.setText(task.getDateToString());
         this.tvNumber.setText(task.getNumber());
-        this.imgBtnCloseTask.setImageDrawable(icon);
+        this.imgBtnCloseTask.setImageResource(task.getStatus()
+                ? TASK_CLOSED_IMAGE_ID : ITEM_OPENED_IMAGE_ID);
     }
 
     public ImageButton getBtnCloseTask() {

@@ -50,6 +50,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter implements CloseD
         closeTaskTitle = this.context.getString(R.string.task_was_closed);
         closeTaskMessage = this.context.getString(R.string.task_full_price);
 
+        /*
         // Set icons
         closedTaskIcon = IconsUtils.getIcon(
                 this.context, R.drawable.ic_done_all_black_24dp, android.R.color.holo_green_light);
@@ -59,7 +60,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter implements CloseD
                 this.context, R.drawable.ic_error_outline_black_24dp, android.R.color.holo_red_dark);
 
         // Set resource
-        resource = IconsUtils.getResource(this.context);
+        resource = IconsUtils.getResource(this.context); */
     }
 
     public void setTaskList(List<Task> taskList) {

@@ -40,7 +40,7 @@ public class InfoActivity extends AppCompatActivity {
                 Contract.ModelEntry.COLUMN_NAME_MODEL_NAME);
 
         // Create an adapter
-        TaskInfoAdapter adapter = new TaskInfoAdapter(task, mark, model, this);
+        TaskInfoAdapter adapter = new TaskInfoAdapter(task, mark, model);
         rvJobs.setAdapter(adapter);
     }
 

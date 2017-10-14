@@ -1,7 +1,5 @@
 package com.dsr_practice.car_workshop.adapters;
 
-import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,20 +19,10 @@ public class TaskInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private static final int JOB_ID = 0, HEADER_ID = 1;
 
-    // Icons for buttons
-    private static Drawable closedIcon;
-    private static Drawable openedIcon;
-
-    public TaskInfoAdapter(Task task, String mark, String model, Context context) {
+    public TaskInfoAdapter(Task task, String mark, String model) {
         this.task = task;
         this.mark = mark;
         this.model = model;
-
-        // Set icons
-        closedIcon = IconsUtils.getIcon(
-                context, R.drawable.ic_done_black_24dp, R.color.colorClosed);
-        openedIcon = IconsUtils.getIcon(
-                context, R.drawable.ic_error_outline_black_24dp, R.color.colorOpened);
     }
 
     @Override
@@ -85,7 +73,7 @@ public class TaskInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private void configureJobViewHolder(JobViewHolder holder, int position) {
         holder.getBtnCloseJob().setEnabled(false);
         JobStatus jobStatus = this.task.getJobs().get(position);
-        holder.setItems(jobStatus, jobStatus.getStatus() ? closedIcon : openedIcon);
+        holder.setItems(jobStatus);
     }
     //endregion
 }
