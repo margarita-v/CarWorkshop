@@ -1,6 +1,9 @@
 package com.dsr_practice.car_workshop.models.common.sync;
 
-public class Job extends SyncModel {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Job extends SyncModel implements Parcelable {
 
     public static final int JOB_ID = 0;
 
@@ -12,6 +15,12 @@ public class Job extends SyncModel {
         this.name = name;
     }
 
+    protected Job(Parcel in) {
+        id = in.readInt();
+        name = in.readString();
+        price = in.readInt();
+    }
+
     public int getPrice() {
         return price;
     }
@@ -19,4 +28,28 @@ public class Job extends SyncModel {
     public String getPriceToString() {
         return Integer.toString(price);
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
+        parcel.writeString(name);
+        parcel.writeInt(price);
+    }
+
+    public static final Creator<Job> CREATOR = new Creator<Job>() {
+        @Override
+        public Job createFromParcel(Parcel in) {
+            return new Job(in);
+        }
+
+        @Override
+        public Job[] newArray(int size) {
+            return new Job[size];
+        }
+    };
 }

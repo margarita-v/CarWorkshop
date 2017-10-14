@@ -1,10 +1,12 @@
 package com.dsr_practice.car_workshop.models.common;
 
-import java.io.Serializable;
+import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Task implements Serializable {
+public class Task extends ExpandableGroup<JobStatus> {
     private int id;
     private Date date;
     private int model;
@@ -15,7 +17,10 @@ public class Task implements Serializable {
     private boolean status;
     private List<JobStatus> jobs;
 
-    public Task(int id, Date date, int model, int mark, String number, String vin, String name, boolean status) {
+    public Task(int id, Date date, int model, int mark,
+                String number, String vin, String name,
+                boolean status, List<JobStatus> jobs) {
+        super(name, jobs);
         this.id = id;
         this.date = date;
         this.model = model;
@@ -24,6 +29,7 @@ public class Task implements Serializable {
         this.vin = vin;
         this.name = name;
         this.status = status;
+        this.jobs = new ArrayList<>(jobs);
     }
 
     public int getId() {
@@ -64,9 +70,5 @@ public class Task implements Serializable {
 
     public List<JobStatus> getJobs() {
         return jobs;
-    }
-
-    public void setJobs(List<JobStatus> jobs) {
-        this.jobs = jobs;
     }
 }

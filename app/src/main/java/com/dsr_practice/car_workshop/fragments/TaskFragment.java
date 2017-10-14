@@ -134,8 +134,7 @@ public class TaskFragment extends ListFragment {
                 for (int i = 0; i < dateArray.length; i++) {
                     try {
                         Date newDate = format.parse(dateArray[i]);
-                        Task task = new Task(i, newDate, 1, 2, "A001AA", "dfghj", "name", false);
-                        task.setJobs(jobs);
+                        Task task = new Task(i, newDate, 1, 2, "A001AA", "dfghj", "name", false, jobs);
                         taskList.add(task);
                     } catch (ParseException e) {
                         Toast.makeText(getContext(), R.string.toast_invalid_date, Toast.LENGTH_SHORT).show();
