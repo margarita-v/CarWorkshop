@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
+    android:paddingLeft="@dimen/image_button_width"
     android:paddingRight="@dimen/image_button_width"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

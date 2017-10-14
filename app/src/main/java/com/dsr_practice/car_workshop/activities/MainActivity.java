@@ -2,7 +2,10 @@ package com.dsr_practice.car_workshop.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,16 +14,30 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
+import com.dsr_practice.car_workshop.adapters.TaskAdapter;
 import com.dsr_practice.car_workshop.fragments.TaskFragment;
+import com.dsr_practice.car_workshop.loaders.TaskLoader;
+import com.dsr_practice.car_workshop.models.common.JobStatus;
+import com.dsr_practice.car_workshop.models.common.Task;
+import com.dsr_practice.car_workshop.models.common.sync.Job;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, TaskFragment.TaskLoaderListener {
 
-    private TaskFragment fragment;
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView rvTasks;
+    private TaskAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
         //AccountGeneral.createSyncAccount(this);
-        //fragment = (TaskFragment) getSupportFragmentManager().findFragmentById(R.id.listFragment);
         startLoading();
     }
 
@@ -58,13 +74,13 @@ public class MainActivity extends AppCompatActivity implements
     private void startLoading() {
         if (!swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(true);
-            fragment.loadTasksStub();
+            onRefresh();
         }
     }
 
     @Override
     public void onRefresh() {
-        fragment.loadTasksStub();
+        loadTasksStub();
     }
 
     @Override
@@ -84,5 +100,96 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLoadFinished() {
         swipeRefreshLayout.setRefreshing(false);
+    }
+
+    // Stub method for testing adapter
+    public void loadTasksStub() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                String[] dateArray = new String[] {
+                        "2012-04-05T20:40:45Z",
+                        "2014-04-05T20:40:45Z",
+                        "2014-04-06T20:40:45Z",
+                        "2012-04-05T20:41:45Z"
+                };
+                String[] jobsArray = new String[] {
+                        "Car wash",
+                        "Full repair",
+                        "Cleaning",
+                        "Change color"
+                };
+                int[] priceArray = new int[] { 300, 1000, 200, 500 };
+                SimpleDateFormat format = new SimpleDateFormat(getString(R.string.date_format));
+                List<Task> taskList = new ArrayList<>();
+                List<JobStatus> jobs = new ArrayList<>();
+                for (int i = 0; i < 4; i++) {
+                    Job job = new Job(i, priceArray[i], jobsArray[i]);
+                    jobs.add(new JobStatus(i, i, job, false));
+                }
+                for (int i = 0; i < dateArray.length; i++) {
+                    try {
+                        Date newDate = format.parse(dateArray[i]);
+                        Task task = new Task(i, newDate, 1, 2, "A001AA", "dfghj", "name", false, jobs);
+                        taskList.add(task);
+                    } catch (ParseException e) {
+                        Toast.makeText(MainActivity.this, R.string.toast_invalid_date, Toast.LENGTH_SHORT).show();
+                    }
+                }
+                sort(taskList);
+                adapter = new TaskAdapter(taskList);
+                rvTasks.setAdapter(adapter);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        }, 3000);
+    }
+
+    /**
+     * Load tasks from server
+     */
+    /*public void loadTasks() {
+        if (adapter == null || adapter.getItemCount() == 0)
+            getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, callbacks);
+        else
+            getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, callbacks);
+    }*/
+
+    /**
+     * Sort task list by date
+     * @param taskList List of tasks which will be sorted
+     */
+    private void sort(List<Task> taskList) {
+        Collections.sort(taskList, new Comparator<Task>() {
+            @Override
+            public int compare(Task task1, Task task2) {
+                return task1.getDate().compareTo(task2.getDate());
+            }
+        });
+    }
+
+    /**
+     * Class for loading task list from server using Loader
+     */
+    private class TaskLoaderCallbacks implements LoaderManager.LoaderCallbacks<List<Task>> {
+
+        @Override
+        public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
+            return new TaskLoader(MainActivity.this);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
+            // Sort task list by date and show it
+            if (data != null) {
+                sort(data);
+                adapter = new TaskAdapter(data);
+                rvTasks.setAdapter(adapter);
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<List<Task>> loader) {
+
+        }
     }
 }
