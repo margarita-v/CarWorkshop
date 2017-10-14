@@ -1,6 +1,5 @@
 package com.dsr_practice.car_workshop.activities;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -95,12 +94,12 @@ public class TaskActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_info);
+        setContentView(R.layout.activity_task);
         apiInterface = ApiClient.getApi();
         dateFormat = new SimpleDateFormat(getString(R.string.date_format));
 
         // Get header view and footer view for list view
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = LayoutInflater.from(this);
         View listHeader = inflater.inflate(R.layout.task_header, null);
         View listFooter = inflater.inflate(R.layout.task_footer, null);
 
@@ -110,7 +109,7 @@ public class TaskActivity extends AppCompatActivity
         spinnerMark = listHeader.findViewById(R.id.spinnerMark);
         spinnerModel = listHeader.findViewById(R.id.spinnerModel);
         btnSaveTask = listFooter.findViewById(R.id.btnSaveTask);
-        //lvJobs = (ListView) findViewById(R.id.lvJobs);
+        lvJobs = (ListView) findViewById(R.id.lvJobs);
         //endregion
 
         btnSaveTask.setOnClickListener(this);
@@ -119,22 +118,24 @@ public class TaskActivity extends AppCompatActivity
         //region Create adapters
 
         // Create mark adapter
-        markAdapter = new SimpleCursorAdapter(this, SPINNER_ITEM, null, Contract.MARK_PROJECTION, VIEWS_ID, 0);
+        markAdapter = new SimpleCursorAdapter(
+                this, SPINNER_ITEM, null, Contract.MARK_PROJECTION, VIEWS_ID, 0);
         markAdapter.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
         spinnerMark.setAdapter(markAdapter);
 
         // Create model adapter
-        modelAdapter = new SimpleCursorAdapter(this, SPINNER_ITEM, null, Contract.MODEL_PROJECTION, VIEWS_ID, 0);
+        modelAdapter = new SimpleCursorAdapter(
+                this, SPINNER_ITEM, null, Contract.MODEL_PROJECTION, VIEWS_ID, 0);
         modelAdapter.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
         spinnerModel.setAdapter(modelAdapter);
 
         // Create job adapter
-        jobAdapter = new JobAdapter(this, R.layout.job_item, null, Contract.JOB_PROJECTION, JOB_IDS, 0);
+        jobAdapter = new JobAdapter(
+                this, R.layout.job_item, null, Contract.JOB_PROJECTION, JOB_IDS, 0);
         jobAdapter.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
 
         //endregion
 
-        /*
         // Configure list view
         lvJobs.addHeaderView(listHeader);
         lvJobs.addFooterView(listFooter);
@@ -159,7 +160,6 @@ public class TaskActivity extends AppCompatActivity
             etNumber.setText(savedInstanceState.getString(NUMBER));
             checkedPositions = savedInstanceState.getBooleanArray(JOBS);
         }
-        */
 
         // Load info from database
         callbacks = new CursorLoaderCallbacks();
@@ -168,40 +168,42 @@ public class TaskActivity extends AppCompatActivity
 
         // Load models for chosen mark
         // Save ID of chosen mark
-        spinnerMark.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                markPosition = position;
-                if (needLoad) {
-                    loadModels(position);
-                    modelPosition = 0;
-                    spinnerModel.setSelection(0);
-                }
-                else
-                    needLoad = true;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
+        spinnerMark.setOnItemSelectedListener(onItemSelectedListener);
         // Save ID of chosen model
-        spinnerModel.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                modelId = getItemId(cursor, Contract.ModelEntry.COLUMN_NAME_MODEL_ID);
-                modelPosition = position;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        spinnerModel.setOnItemSelectedListener(onItemSelectedListener);
     }
+
+    /**
+     * Spinner item selection listener
+     */
+    private AdapterView.OnItemSelectedListener onItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            switch (parent.getId()) {
+                case R.id.spinnerMark: {
+                    markPosition = position;
+                    if (needLoad) {
+                        loadModels(position);
+                        modelPosition = 0;
+                        spinnerModel.setSelection(0);
+                    } else
+                        needLoad = true;
+                    break;
+                }
+                case R.id.spinnerModel: {
+                    Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                    modelId = getItemId(cursor, Contract.ModelEntry.COLUMN_NAME_MODEL_ID);
+                    modelPosition = position;
+                    break;
+                }
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+
+        }
+    };
 
     /**
      * Save chosen task fields in Bundle
