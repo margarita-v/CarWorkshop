@@ -5,9 +5,11 @@ import android.os.Parcelable;
 
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class Task extends ExpandableGroup<JobStatus> implements Parcelable {
     private int id;
@@ -19,6 +21,9 @@ public class Task extends ExpandableGroup<JobStatus> implements Parcelable {
     private String name;
     private boolean status;
     private List<JobStatus> jobs;
+
+    private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(
+            DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
 
     public Task(int id, Date date, int model, int mark,
                 String number, String vin, String name,
@@ -87,6 +92,10 @@ public class Task extends ExpandableGroup<JobStatus> implements Parcelable {
 
     public Date getDate() {
         return date;
+    }
+
+    public String getDateToString() {
+        return DATE_FORMAT.format(date);
     }
 
     public int getModel() {

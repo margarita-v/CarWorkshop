@@ -11,9 +11,6 @@ import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.models.common.Task;
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder;
 
-import java.text.DateFormat;
-import java.util.Locale;
-
 import static android.view.animation.Animation.RELATIVE_TO_SELF;
 
 public class TaskViewHolder extends GroupViewHolder {
@@ -24,7 +21,6 @@ public class TaskViewHolder extends GroupViewHolder {
     private TextView tvNumber;
     private ImageButton imgBtnCloseTask;
     private ImageButton imgBtnInfo;
-    private DateFormat dateFormat;
 
     public TaskViewHolder(View itemView) {
         super(itemView);
@@ -34,13 +30,11 @@ public class TaskViewHolder extends GroupViewHolder {
         this.tvNumber = itemView.findViewById(R.id.tvNumber);
         this.imgBtnCloseTask = itemView.findViewById(R.id.imgBtnClose);
         this.imgBtnInfo = itemView.findViewById(R.id.imgBtnInfo);
-        this.dateFormat = DateFormat.getDateTimeInstance(
-                DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
     }
 
     public void setItems(Task task, Drawable icon) {
         this.tvCarName.setText(task.getName());
-        this.tvDate.setText(dateFormat.format(task.getDate()));
+        this.tvDate.setText(task.getDateToString());
         this.tvNumber.setText(task.getNumber());
         this.imgBtnCloseTask.setImageDrawable(icon);
     }
@@ -53,6 +47,7 @@ public class TaskViewHolder extends GroupViewHolder {
         return this.imgBtnInfo;
     }
 
+    //region Animation for expand and collapse expandable list
     @Override
     public void expand() {
         animateExpand();
@@ -78,4 +73,5 @@ public class TaskViewHolder extends GroupViewHolder {
         rotate.setFillAfter(true);
         imgArrow.setAnimation(rotate);
     }
+    //endregion
 }

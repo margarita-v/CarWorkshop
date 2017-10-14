@@ -110,7 +110,7 @@ public class TaskActivity extends AppCompatActivity
         spinnerMark = listHeader.findViewById(R.id.spinnerMark);
         spinnerModel = listHeader.findViewById(R.id.spinnerModel);
         btnSaveTask = listFooter.findViewById(R.id.btnSaveTask);
-        lvJobs = (ListView) findViewById(R.id.lvJobs);
+        //lvJobs = (ListView) findViewById(R.id.lvJobs);
         //endregion
 
         btnSaveTask.setOnClickListener(this);
@@ -134,6 +134,7 @@ public class TaskActivity extends AppCompatActivity
 
         //endregion
 
+        /*
         // Configure list view
         lvJobs.addHeaderView(listHeader);
         lvJobs.addFooterView(listFooter);
@@ -158,6 +159,7 @@ public class TaskActivity extends AppCompatActivity
             etNumber.setText(savedInstanceState.getString(NUMBER));
             checkedPositions = savedInstanceState.getBooleanArray(JOBS);
         }
+        */
 
         // Load info from database
         callbacks = new CursorLoaderCallbacks();

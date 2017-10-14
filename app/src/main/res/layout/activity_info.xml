@@ -5,8 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ListView
-        android:id="@+id/lvJobs"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvJobs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>
