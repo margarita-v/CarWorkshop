@@ -15,6 +15,8 @@ import retrofit2.Response;
 
 public class TaskLoader extends Loader<List<Task>> {
 
+    public static final int TASK_LOADER_ID = 1;
+
     private Call<List<Task>> callTasks;
 
     @Nullable

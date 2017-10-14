@@ -105,11 +105,11 @@ public class TaskActivity extends AppCompatActivity
         View listFooter = inflater.inflate(R.layout.task_footer, null);
 
         //region Find widgets by IDs
-        etVIN = (EditText) listHeader.findViewById(R.id.etVIN);
-        etNumber = (EditText) listHeader.findViewById(R.id.etNumber);
-        spinnerMark = (Spinner) listHeader.findViewById(R.id.spinnerMark);
-        spinnerModel = (Spinner) listHeader.findViewById(R.id.spinnerModel);
-        btnSaveTask = (Button) listFooter.findViewById(R.id.btnSaveTask);
+        etVIN = listHeader.findViewById(R.id.etVIN);
+        etNumber = listHeader.findViewById(R.id.etNumber);
+        spinnerMark = listHeader.findViewById(R.id.spinnerMark);
+        spinnerModel = listHeader.findViewById(R.id.spinnerModel);
+        btnSaveTask = listFooter.findViewById(R.id.btnSaveTask);
         lvJobs = (ListView) findViewById(R.id.lvJobs);
         //endregion
 
@@ -143,7 +143,7 @@ public class TaskActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 boolean isChecked = jobAdapter.check(--position);
-                CheckBox cbName = (CheckBox) view.findViewById(R.id.cbName);
+                CheckBox cbName = view.findViewById(R.id.cbName);
                 cbName.setChecked(isChecked);
             }
         });
@@ -201,7 +201,10 @@ public class TaskActivity extends AppCompatActivity
         });
     }
 
-    // Save chosen task fields in Bundle
+    /**
+     * Save chosen task fields in Bundle
+     * @param outState Bundle which will contain chosen task fields
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -215,7 +218,10 @@ public class TaskActivity extends AppCompatActivity
             outState.putBooleanArray(JOBS, jobAdapter.getCheckedPositions());
     }
 
-    // Buttons OnClickListener
+    /**
+     * Button's OnClickListener
+     * @param v Button which was clicked
+     */
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -256,18 +262,32 @@ public class TaskActivity extends AppCompatActivity
         }
     }
 
-    // Dialog OnClickListener for dismiss dialogs
+    /**
+     * Dialog OnClickListener for dismiss dialogs
+     * @param dialog Dialog which was shown
+     * @param which ID of chosen dialog's button
+     */
     @Override
     public void onClick(DialogInterface dialog, int which) {
         dialog.dismiss();
     }
 
-    // Get ID for chosen mark or model
+    /**
+     * Get ID for chosen mark or model
+     * @param cursor Current cursor
+     * @param columnName Column name for ID
+     * @return Entity's ID
+     */
     private int getItemId(Cursor cursor, String columnName) {
         return cursor.getInt(cursor.getColumnIndex(columnName));
     }
 
-    // Check all task fields
+    /**
+     * Check all task fields
+     * @param vin VIN value
+     * @param number Car number
+     * @return True if all task fields are correct
+     */
     private boolean checkInput(String vin, String number) {
         if (vin.equals("") || number.equals("")) {
             createErrorDialog(R.string.empty_fields_title, R.string.empty_fields_message);
@@ -288,20 +308,29 @@ public class TaskActivity extends AppCompatActivity
         return true;
     }
 
-    // Create error dialog for task validation
+    /**
+     * Create error dialog for task validation
+     * @param titleId ID for title's string resource
+     * @param messageId ID for message's string resource
+     */
     private void createErrorDialog(int titleId, int messageId) {
         MessageDialog dialog = MessageDialog.newInstance(titleId, messageId);
         dialog.show(getSupportFragmentManager(), DIALOG_TAG);
     }
 
-    // Load models for chosen mark
+    /**
+     * Load models for chosen mark
+     * @param markPosition Position of chosen mark
+     */
     private void loadModels(int markPosition) {
         Cursor cursor = (Cursor) spinnerMark.getItemAtPosition(markPosition);
         markId = getItemId(cursor, Contract.MarkEntry.COLUMN_NAME_MARK_ID);
         getSupportLoaderManager().restartLoader(MODEL_LOADER_ID, null, callbacks);
     }
 
-    // Class for loading all entries from database using CursorLoader
+    /**
+     * Class for loading all entries from database using CursorLoader
+     */
     private class CursorLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
 
         @Override

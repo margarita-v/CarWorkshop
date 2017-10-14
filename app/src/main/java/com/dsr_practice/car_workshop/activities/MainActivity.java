@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.adapters.TaskAdapter;
-import com.dsr_practice.car_workshop.fragments.TaskFragment;
 import com.dsr_practice.car_workshop.loaders.TaskLoader;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
@@ -32,12 +31,13 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements
-        SwipeRefreshLayout.OnRefreshListener, TaskFragment.TaskLoaderListener {
+public class MainActivity extends AppCompatActivity
+        implements SwipeRefreshLayout.OnRefreshListener {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView rvTasks;
     private TaskAdapter adapter;
+    private TaskLoaderCallbacks callbacks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +65,20 @@ public class MainActivity extends AppCompatActivity implements
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
         //AccountGeneral.createSyncAccount(this);
+        callbacks = new TaskLoaderCallbacks();
         startLoading();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+
+    @Override
+    public void onRefresh() {
+        loadTasksStub();
     }
 
     /**
@@ -78,28 +91,12 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void onRefresh() {
-        loadTasksStub();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
     /**
      * Option item menu click
      * @param item Menu item which was chosen
      */
     public void onRefreshItemClick(MenuItem item) {
         startLoading();
-    }
-
-    @Override
-    public void onLoadFinished() {
-        swipeRefreshLayout.setRefreshing(false);
     }
 
     // Stub method for testing adapter
@@ -141,18 +138,18 @@ public class MainActivity extends AppCompatActivity implements
                 rvTasks.setAdapter(adapter);
                 swipeRefreshLayout.setRefreshing(false);
             }
-        }, 3000);
+        }, 2000);
     }
 
     /**
      * Load tasks from server
      */
-    /*public void loadTasks() {
+    public void loadTasks() {
         if (adapter == null || adapter.getItemCount() == 0)
-            getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, callbacks);
+            getSupportLoaderManager().initLoader(TaskLoader.TASK_LOADER_ID, null, callbacks);
         else
-            getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, callbacks);
-    }*/
+            getSupportLoaderManager().restartLoader(TaskLoader.TASK_LOADER_ID, null, callbacks);
+    }
 
     /**
      * Sort task list by date
