@@ -5,8 +5,6 @@ import android.os.Parcelable;
 
 import com.dsr_practice.car_workshop.models.common.sync.Job;
 
-import java.io.Serializable;
-
 public class JobStatus implements Parcelable {
     private int id;
     private int task;
@@ -20,12 +18,39 @@ public class JobStatus implements Parcelable {
         this.status = status;
     }
 
-    protected JobStatus(Parcel in) {
+    //region Parcelable implementation
+    private JobStatus(Parcel in) {
         id = in.readInt();
         task = in.readInt();
         job = in.readParcelable(Job.class.getClassLoader());
-        status = in.readInt() != 0;
+        status = in.readByte() != 0;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
+        parcel.writeInt(task);
+        parcel.writeParcelable(job, i);
+        parcel.writeByte((byte) (status ? 1 : 0));
+    }
+
+    public static final Creator<JobStatus> CREATOR = new Creator<JobStatus>() {
+        @Override
+        public JobStatus createFromParcel(Parcel in) {
+            return new JobStatus(in);
+        }
+
+        @Override
+        public JobStatus[] newArray(int size) {
+            return new JobStatus[size];
+        }
+    };
+    //endregion
 
     public int getId() {
         return id;
@@ -46,29 +71,4 @@ public class JobStatus implements Parcelable {
     public void setStatus(boolean status) {
         this.status = status;
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(id);
-        parcel.writeInt(task);
-        parcel.writeParcelable(job, i);
-        parcel.writeInt(status ? 1 : 0);
-    }
-
-    public static final Creator<JobStatus> CREATOR = new Creator<JobStatus>() {
-        @Override
-        public JobStatus createFromParcel(Parcel in) {
-            return new JobStatus(in);
-        }
-
-        @Override
-        public JobStatus[] newArray(int size) {
-            return new JobStatus[size];
-        }
-    };
 }

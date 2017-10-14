@@ -28,7 +28,7 @@ public class InfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_info);
 
         lvJobs = (ListView) findViewById(R.id.lvJobs);
-        Task task = (Task) getIntent().getSerializableExtra(getString(R.string.task_intent));
+        Task task = getIntent().getParcelableExtra(getString(R.string.task_intent));
         adapter = new TaskInfoAdapter(this, task);
         lvJobs.setAdapter(adapter);
 

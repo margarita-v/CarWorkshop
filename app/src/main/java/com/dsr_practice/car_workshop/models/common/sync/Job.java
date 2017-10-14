@@ -15,18 +15,11 @@ public class Job extends SyncModel implements Parcelable {
         this.name = name;
     }
 
+    //region Parcelable implementation
     protected Job(Parcel in) {
         id = in.readInt();
         name = in.readString();
         price = in.readInt();
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public String getPriceToString() {
-        return Integer.toString(price);
     }
 
     @Override
@@ -52,4 +45,13 @@ public class Job extends SyncModel implements Parcelable {
             return new Job[size];
         }
     };
+    //endregion
+
+    public int getPrice() {
+        return price;
+    }
+
+    public String getPriceToString() {
+        return Integer.toString(price);
+    }
 }

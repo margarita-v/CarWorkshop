@@ -37,6 +37,7 @@
     <!-- Image button's content descriptions -->
     <string name="btn_close_task">Закрыть задачу</string>
     <string name="btn_close_job">Закрыть работу</string>
+    <string name="btn_task_info">Get a task info</string>
     <string name="img_empty_list">Список задач пуст</string>
     <string name="img_arrow">Expand or collapse a task info</string>
 

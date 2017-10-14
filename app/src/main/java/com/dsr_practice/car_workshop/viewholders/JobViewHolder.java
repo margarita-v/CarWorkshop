@@ -1,5 +1,6 @@
 package com.dsr_practice.car_workshop.viewholders;
 
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -22,10 +23,11 @@ public class JobViewHolder extends ChildViewHolder {
         this.tvPrice = itemView.findViewById(R.id.tvPrice);
     }
 
-    public void setItems(JobStatus jobStatus) {
+    public void setItems(JobStatus jobStatus, Drawable icon) {
         Job job = jobStatus.getJob();
         this.tvJob.setText(job.getName());
         this.tvPrice.setText(job.getPriceToString());
+        this.imgBtnCloseJob.setImageDrawable(icon);
     }
 
     public ImageButton getBtnCloseJob() {

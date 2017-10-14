@@ -1,12 +1,15 @@
 package com.dsr_practice.car_workshop.models.common;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Task extends ExpandableGroup<JobStatus> {
+public class Task extends ExpandableGroup<JobStatus> implements Parcelable {
     private int id;
     private Date date;
     private int model;
@@ -31,6 +34,52 @@ public class Task extends ExpandableGroup<JobStatus> {
         this.status = status;
         this.jobs = new ArrayList<>(jobs);
     }
+
+    //region Parcelable implementation
+    protected Task(Parcel in) {
+        super(in);
+        id = in.readInt();
+        date = (Date) in.readSerializable();
+        model = in.readInt();
+        mark = in.readInt();
+        number = in.readString();
+        vin = in.readString();
+        name = in.readString();
+        status = in.readByte() != 0;
+        jobs = in.createTypedArrayList(JobStatus.CREATOR);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeInt(id);
+        dest.writeSerializable(date);
+        dest.writeInt(model);
+        dest.writeInt(mark);
+        dest.writeString(number);
+        dest.writeString(vin);
+        dest.writeString(name);
+        dest.writeByte((byte) (status ? 1 : 0));
+        dest.writeTypedList(jobs);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Task> CREATOR = new Creator<Task>() {
+        @Override
+        public Task createFromParcel(Parcel in) {
+            return new Task(in);
+        }
+
+        @Override
+        public Task[] newArray(int size) {
+            return new Task[size];
+        }
+    };
+    //endregion
 
     public int getId() {
         return id;

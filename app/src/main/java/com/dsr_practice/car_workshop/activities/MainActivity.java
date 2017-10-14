@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }
                 sort(taskList);
-                adapter = new TaskAdapter(taskList);
+                adapter = new TaskAdapter(taskList, MainActivity.this);
                 rvTasks.setAdapter(adapter);
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements
             // Sort task list by date and show it
             if (data != null) {
                 sort(data);
-                adapter = new TaskAdapter(data);
+                adapter = new TaskAdapter(data, MainActivity.this);
                 rvTasks.setAdapter(adapter);
             }
         }

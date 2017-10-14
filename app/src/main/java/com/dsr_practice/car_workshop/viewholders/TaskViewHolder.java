@@ -1,5 +1,6 @@
 package com.dsr_practice.car_workshop.viewholders;
 
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
@@ -11,6 +12,7 @@ import com.dsr_practice.car_workshop.models.common.Task;
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder;
 
 import java.text.DateFormat;
+import java.util.Locale;
 
 import static android.view.animation.Animation.RELATIVE_TO_SELF;
 
@@ -21,6 +23,7 @@ public class TaskViewHolder extends GroupViewHolder {
     private TextView tvDate;
     private TextView tvNumber;
     private ImageButton imgBtnCloseTask;
+    private ImageButton imgBtnInfo;
     private DateFormat dateFormat;
 
     public TaskViewHolder(View itemView) {
@@ -30,17 +33,24 @@ public class TaskViewHolder extends GroupViewHolder {
         this.tvDate = itemView.findViewById(R.id.tvDate);
         this.tvNumber = itemView.findViewById(R.id.tvNumber);
         this.imgBtnCloseTask = itemView.findViewById(R.id.imgBtnClose);
-        this.dateFormat = DateFormat.getDateTimeInstance();
+        this.imgBtnInfo = itemView.findViewById(R.id.imgBtnInfo);
+        this.dateFormat = DateFormat.getDateTimeInstance(
+                DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
     }
 
-    public void setItems(Task task) {
+    public void setItems(Task task, Drawable icon) {
         this.tvCarName.setText(task.getName());
         this.tvDate.setText(dateFormat.format(task.getDate()));
         this.tvNumber.setText(task.getNumber());
+        this.imgBtnCloseTask.setImageDrawable(icon);
     }
 
     public ImageButton getBtnCloseTask() {
         return this.imgBtnCloseTask;
+    }
+
+    public ImageButton getBtnTaskInfo() {
+        return this.imgBtnInfo;
     }
 
     @Override
