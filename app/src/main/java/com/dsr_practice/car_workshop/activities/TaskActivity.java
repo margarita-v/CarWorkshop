@@ -35,15 +35,12 @@ public class TaskActivity extends AppCompatActivity
         implements View.OnClickListener, DialogInterface.OnClickListener {
 
     //region Widgets
-    EditText etVIN, etNumber;
-    Spinner spinnerMark, spinnerModel;
-    Button btnSaveTask;
-    ListView lvJobs;
+    private EditText etVIN, etNumber;
+    private Spinner spinnerMark, spinnerModel;
     //endregion
 
     //region Adapters for spinners and list view
-    private SimpleCursorAdapter markAdapter;
-    private SimpleCursorAdapter modelAdapter;
+    private SimpleCursorAdapter markAdapter, modelAdapter;
     private JobAdapter jobAdapter;
     private boolean needLoad = false;
     //endregion
@@ -53,11 +50,8 @@ public class TaskActivity extends AppCompatActivity
     private static ApiInterface apiInterface;
     private static final String DIALOG_TAG = "DIALOG";
 
-    //region IDs for loaders
-    private static final int MARK_LOADER_ID = 0;
-    private static final int MODEL_LOADER_ID = 1;
-    private static final int JOB_LOADER_ID = 2;
-    //endregion
+    // IDs for loaders
+    private static final int MARK_LOADER_ID = 0, MODEL_LOADER_ID = 1, JOB_LOADER_ID = 2;
 
     //region View's IDs for adapters
     private static final int[] VIEWS_ID = {android.R.id.text1};
@@ -71,12 +65,11 @@ public class TaskActivity extends AppCompatActivity
     // Positions of chosen jobs
     private boolean[] checkedPositions;
 
-    //region Task fields
-    private int markId;
-    private int modelId;
-    private int markPosition;
-    private int modelPosition;
-    //endregion
+    // Task fields
+    private int markId, modelId, markPosition, modelPosition;
+
+    // Values for user input validation
+    private static final int VIN_MAX_LENGTH = 17, NUMBER_MAX_LENGTH = 9;
 
     //region String keys for bundle
     private static final String MARK_ID = "MARK_ID";
@@ -88,55 +81,43 @@ public class TaskActivity extends AppCompatActivity
     private static final String JOBS = "JOBS";
     //endregion
 
-    private static final int VIN_LENGTH = 17;
-    private static final int NUMBER_LENGTH = 6;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
         apiInterface = ApiClient.getApi();
         dateFormat = new SimpleDateFormat(getString(R.string.date_format));
+        chosenJobs = new ArrayList<>();
 
         // Get header view and footer view for list view
         LayoutInflater inflater = LayoutInflater.from(this);
         View listHeader = inflater.inflate(R.layout.task_header, null);
         View listFooter = inflater.inflate(R.layout.task_footer, null);
 
-        //region Find widgets by IDs
+        //region Find widgets by IDs and set listeners
         etVIN = listHeader.findViewById(R.id.etVIN);
         etNumber = listHeader.findViewById(R.id.etNumber);
         spinnerMark = listHeader.findViewById(R.id.spinnerMark);
         spinnerModel = listHeader.findViewById(R.id.spinnerModel);
-        btnSaveTask = listFooter.findViewById(R.id.btnSaveTask);
-        lvJobs = (ListView) findViewById(R.id.lvJobs);
-        //endregion
+        Button btnSaveTask = listFooter.findViewById(R.id.btnSaveTask);
 
         btnSaveTask.setOnClickListener(this);
-        chosenJobs = new ArrayList<>();
+        spinnerMark.setOnItemSelectedListener(onItemSelectedListener);
+        spinnerModel.setOnItemSelectedListener(onItemSelectedListener);
+        //endregion
 
         //region Create adapters
-
-        // Create mark adapter
-        markAdapter = new SimpleCursorAdapter(
-                this, SPINNER_ITEM, null, Contract.MARK_PROJECTION, VIEWS_ID, 0);
-        markAdapter.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
+        markAdapter = configureAdapter(Contract.MARK_PROJECTION, false);
         spinnerMark.setAdapter(markAdapter);
 
-        // Create model adapter
-        modelAdapter = new SimpleCursorAdapter(
-                this, SPINNER_ITEM, null, Contract.MODEL_PROJECTION, VIEWS_ID, 0);
-        modelAdapter.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
+        modelAdapter = configureAdapter(Contract.MODEL_PROJECTION, false);
         spinnerModel.setAdapter(modelAdapter);
 
-        // Create job adapter
-        jobAdapter = new JobAdapter(
-                this, R.layout.job_item, null, Contract.JOB_PROJECTION, JOB_IDS, 0);
-        jobAdapter.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
-
+        jobAdapter = (JobAdapter) configureAdapter(Contract.JOB_PROJECTION, true);
         //endregion
 
         // Configure list view
+        ListView lvJobs = (ListView) findViewById(R.id.lvJobs);
         lvJobs.addHeaderView(listHeader);
         lvJobs.addFooterView(listFooter);
         lvJobs.setAdapter(jobAdapter);
@@ -165,18 +146,27 @@ public class TaskActivity extends AppCompatActivity
         callbacks = new CursorLoaderCallbacks();
         getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, callbacks);
         getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, callbacks);
+    }
 
-        // Load models for chosen mark
-        // Save ID of chosen mark
-        spinnerMark.setOnItemSelectedListener(onItemSelectedListener);
-        // Save ID of chosen model
-        spinnerModel.setOnItemSelectedListener(onItemSelectedListener);
+    /**
+     * Configure cursor adapter
+     * @param projection Projection for query
+     * @param isJobs True if adapter will be used for list of jobs
+     * @return SimpleCursorAdapter for spinners OR JobAdapter for list of jobs
+     */
+    private SimpleCursorAdapter configureAdapter(String[] projection, boolean isJobs) {
+        SimpleCursorAdapter result = isJobs
+                ? new JobAdapter(this, R.layout.job_item, null, projection, JOB_IDS, 0)
+                : new SimpleCursorAdapter(this, SPINNER_ITEM, null, projection, VIEWS_ID, 0);
+        result.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
+        return result;
     }
 
     /**
      * Spinner item selection listener
      */
-    private AdapterView.OnItemSelectedListener onItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+    private AdapterView.OnItemSelectedListener onItemSelectedListener =
+            new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             switch (parent.getId()) {
@@ -297,11 +287,11 @@ public class TaskActivity extends AppCompatActivity
             createErrorDialog(R.string.empty_fields_title, R.string.empty_fields_message);
             return false;
         }
-        if (vin.length() < VIN_LENGTH) {
+        if (vin.length() < VIN_MAX_LENGTH) {
             createErrorDialog(R.string.invalid_vin_title, R.string.invalid_vin_message);
             return false;
         }
-        if (number.length() < NUMBER_LENGTH) {
+        if (number.length() < NUMBER_MAX_LENGTH) {
             createErrorDialog(R.string.invalid_number_title, R.string.invalid_number_message);
             return false;
         }

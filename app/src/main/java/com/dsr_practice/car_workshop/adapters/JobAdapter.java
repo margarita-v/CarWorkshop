@@ -12,13 +12,12 @@ import android.widget.SimpleCursorAdapter;
 import com.dsr_practice.car_workshop.R;
 
 public class JobAdapter extends SimpleCursorAdapter {
-    private Context context;
+
     private boolean[] checkedPositions;
     private int checkedCount;
 
     public JobAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
         super(context, layout, c, from, to, flags);
-        this.context = context;
         int count = c != null ? c.getCount() : 0;
         this.checkedPositions = new boolean[count];
         this.checkedCount = 0;
@@ -28,7 +27,7 @@ public class JobAdapter extends SimpleCursorAdapter {
     @Override
     public Cursor swapCursor(@NonNull Cursor cursor) {
         this.checkedPositions = new boolean[cursor.getCount()];
-        checkedCount = 0;
+        this.checkedCount = 0;
         return super.swapCursor(cursor);
     }
 
@@ -36,11 +35,11 @@ public class JobAdapter extends SimpleCursorAdapter {
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
-            LayoutInflater inflater= (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.job_item, null);
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            convertView = inflater.inflate(R.layout.job_item, parent, false);
         }
-        CheckBox cbName = (CheckBox) convertView.findViewById(R.id.cbName);
-        cbName.setChecked(checkedPositions[position]);
+        CheckBox cbName = convertView.findViewById(R.id.cbName);
+        cbName.setChecked(this.checkedPositions[position]);
         return super.getView(position, convertView, parent);
     }
 
