@@ -8,30 +8,40 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 
 public class MessageDialog extends DialogFragment implements DialogInterface.OnClickListener {
+
+    // IDs for dialog's arguments types
     private static final int PARAMS_ID = 1;
     private static final int PARAMS_STRING = 2;
 
+    // Keys for bundle
     private static final String DIALOG_KEY = "DIALOG_KEY";
     private static final String TITLE_KEY = "TITLE_KEY";
     private static final String MESSAGE_KEY = "MESSAGE_KEY";
 
+    // Constructor for title and message as string resources
     public static MessageDialog newInstance(int titleId, int messageId) {
         Bundle args = new Bundle();
         args.putInt(TITLE_KEY, titleId);
         args.putInt(MESSAGE_KEY, messageId);
         args.putInt(DIALOG_KEY, PARAMS_ID);
-
-        MessageDialog dialog = new MessageDialog();
-        dialog.setArguments(args);
-        return dialog;
+        return createDialog(args);
     }
 
+    // Constructor for title and message as Strings
     public static MessageDialog newInstance(String title, String message) {
         Bundle args = new Bundle();
         args.putString(TITLE_KEY, title);
         args.putString(MESSAGE_KEY, message);
         args.putInt(DIALOG_KEY, PARAMS_STRING);
+        return createDialog(args);
+    }
 
+    /**
+     * Create dialog and set its arguments
+     * @param args Dialog's arguments
+     * @return MessageDialog with saved arguments in bundle
+     */
+    private static MessageDialog createDialog(Bundle args) {
         MessageDialog dialog = new MessageDialog();
         dialog.setArguments(args);
         return dialog;

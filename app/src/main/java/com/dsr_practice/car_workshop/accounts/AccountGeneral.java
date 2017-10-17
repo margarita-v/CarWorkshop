@@ -13,7 +13,7 @@ public class AccountGeneral {
     private static final String ACCOUNT_TYPE = "com.dsr_practice.car_workshop.accounts";
     private static final String ACCOUNT_NAME = "Car workshop account";
     private static final String AUTHORITY = Contract.CONTENT_AUTHORITY;
-    private static final long   SYNC_FREQUENCY = 60 * 60 * 3;  // 3 hours (in seconds)
+    private static final long   SYNC_FREQUENCY = 60 * 60;  // 1 hour (in seconds)
 
     // Gets the standard sync account
     public static Account getAccount() {
