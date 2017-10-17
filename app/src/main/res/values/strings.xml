@@ -27,7 +27,6 @@
     <string name="close_job">Close Job</string>
     <string name="date">Дата</string>
     <string name="status">Статус</string>
-    <string name="loading">Загрузка текущих заданий…</string>
     <string name="empty_list">Не удалось загрузить данные.\nПроверьте подключение к Интернету</string>
 
     <!-- TextView's hints -->
