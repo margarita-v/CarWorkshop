@@ -15,11 +15,14 @@ import com.dsr_practice.car_workshop.models.common.Task;
 
 public class CloseDialog extends DialogFragment implements DialogInterface.OnClickListener {
 
+    // IDs of resources for dialog's title and message
     private int titleId, messageId;
 
+    // Dialog's objects
     private Task task;
     private JobStatus jobStatus;
 
+    // Callback to activity
     private CloseInterface closeActionListener;
 
     public static CloseDialog newInstance(int titleId, int messageId,
@@ -88,13 +91,4 @@ public class CloseDialog extends DialogFragment implements DialogInterface.OnCli
          */
         void onJobClose(JobStatus jobStatus, Task task);
     }
-
-    /*
-    @Override
-    public void onDestroyView() {
-        // Used because of a bug in the support library
-        if (getDialog() != null && getRetainInstance())
-            getDialog().setDismissMessage(null);
-        super.onDestroyView();
-    }*/
 }

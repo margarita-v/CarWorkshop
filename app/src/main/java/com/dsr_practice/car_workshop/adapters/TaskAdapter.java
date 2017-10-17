@@ -64,7 +64,7 @@ public class TaskAdapter extends ExpandableRecyclerViewAdapter<TaskViewHolder, J
         holder.getBtnCloseTask().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                configureConfirmDialog(R.string.close_task_title, R.string.close_task_message,
+                showConfirmDialog(R.string.close_task_title, R.string.close_task_message,
                         task, null);
             }
         });
@@ -79,21 +79,21 @@ public class TaskAdapter extends ExpandableRecyclerViewAdapter<TaskViewHolder, J
         holder.getBtnCloseJob().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                configureConfirmDialog(R.string.close_job_title, R.string.close_job_message,
+                showConfirmDialog(R.string.close_job_title, R.string.close_job_message,
                         task, jobStatus);
             }
         });
     }
 
     /**
-     * Configure dialog for close action confirmation
+     * Show dialog for close action confirmation
      * @param titleId ID of title' string resource
      * @param messageId ID of message's string resource
      * @param task Task which will be closed
      * @param jobStatus Job which will be closed
      */
-    private void configureConfirmDialog(int titleId, int messageId,
-                                        Task task, JobStatus jobStatus) {
+    private void showConfirmDialog(int titleId, int messageId,
+                                   Task task, JobStatus jobStatus) {
         CloseDialog.newInstance(titleId, messageId, task, jobStatus)
                 .show(fragmentManager, DIALOG_TAG);
     }
