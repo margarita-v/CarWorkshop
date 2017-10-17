@@ -164,16 +164,15 @@ public class MainActivity extends AppCompatActivity
                 int[] priceArray = new int[] { 300, 1000, 200, 500 };
                 SimpleDateFormat format = new SimpleDateFormat(getString(R.string.date_format));
                 List<Task> taskList = new ArrayList<>();
-                List<JobStatus> jobs = new ArrayList<>();
-                for (int i = 0; i < 4; i++) {
-                    Job job = new Job(i, priceArray[i], jobsArray[i]);
-                    jobs.add(new JobStatus(i, i, job, false));
-                }
                 for (int i = 0; i < dateArray.length; i++) {
                     try {
                         Date newDate = format.parse(dateArray[i]);
-                        Task task = new Task(i, newDate, 1, 2,
-                                "A001AA", "dfghj", "name", false, new ArrayList<JobStatus>(jobs));
+                        List<JobStatus> jobs = new ArrayList<>();
+                        for (int j = 0; j < 4; j++) {
+                            Job job = new Job(i, priceArray[i], jobsArray[i]);
+                            jobs.add(new JobStatus(i, i, job, false));
+                        }
+                        Task task = new Task(i, newDate, 1, 2, "A001AA", "dfghj", "name", false, jobs);
                         taskList.add(task);
                     } catch (ParseException e) {
                         Toast.makeText(MainActivity.this, R.string.toast_invalid_date, Toast.LENGTH_SHORT).show();

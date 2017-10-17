@@ -49,13 +49,13 @@ public class TaskAdapter extends ExpandableRecyclerViewAdapter<TaskViewHolder, J
 
     @Override
     public void onBindGroupViewHolder(TaskViewHolder holder, final int flatPosition,
-                                      ExpandableGroup group) {
+                                      final ExpandableGroup group) {
         final Task task = ((Task) group);
         holder.setItems(task);
         holder.getBtnTaskInfo().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Task task = (Task) getGroups().get(flatPosition);
+                Task task = (Task) group;
                 Intent intent = new Intent(context, InfoActivity.class);
                 intent.putExtra(context.getString(R.string.task_intent), task);
                 context.startActivity(intent);
