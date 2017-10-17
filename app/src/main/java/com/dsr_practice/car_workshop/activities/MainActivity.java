@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.adapters.TaskAdapter;
+import com.dsr_practice.car_workshop.dialogs.MessageDialog;
 import com.dsr_practice.car_workshop.loaders.TaskLoader;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
@@ -31,13 +32,16 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
-        implements SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends AppCompatActivity implements
+        SwipeRefreshLayout.OnRefreshListener, TaskAdapter.CloseInterface, MessageDialog.ConfirmClose {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView rvTasks;
     private TaskAdapter adapter;
     private TaskLoaderCallbacks callbacks;
+
+    // Tag for dialog usage
+    private static final String DIALOG_TAG = "DIALOG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +79,41 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-
     @Override
     public void onRefresh() {
         loadTasksStub();
+    }
+
+    @Override
+    public void onTaskClose(Task task) {
+        configureConfirmDialog(R.string.close_task_title, R.string.close_task_message);
+    }
+
+    @Override
+    public boolean onJobClose(JobStatus jobStatus, Task task) {
+        configureConfirmDialog(R.string.close_job_title, R.string.close_job_message);
+
+        //TODO If response is True
+        MessageDialog.newInstance(
+                getString(R.string.task_was_closed),
+                getString(R.string.task_full_price) + Integer.toString(task.getFullPrice()))
+                .show(getSupportFragmentManager(), DIALOG_TAG);
+        return false;
+    }
+
+    @Override
+    public void onCloseAction() {
+        // Close task or job...
+    }
+
+    /**
+     * Configure dialog for close action confirmation
+     * @param titleId ID of title' string resource
+     * @param messageId ID of message's string resource
+     */
+    private void configureConfirmDialog(int titleId, int messageId) {
+        MessageDialog.newInstance(titleId, messageId, true)
+                .show(getSupportFragmentManager(), DIALOG_TAG);
     }
 
     /**
@@ -134,7 +169,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
                 sort(taskList);
-                adapter = new TaskAdapter(taskList, MainActivity.this);
+                adapter = new TaskAdapter(taskList, MainActivity.this, MainActivity.this);
                 rvTasks.setAdapter(adapter);
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -179,7 +214,7 @@ public class MainActivity extends AppCompatActivity
             // Sort task list by date and show it
             if (data != null) {
                 sort(data);
-                adapter = new TaskAdapter(data, MainActivity.this);
+                adapter = new TaskAdapter(data, MainActivity.this, MainActivity.this);
                 rvTasks.setAdapter(adapter);
             }
         }

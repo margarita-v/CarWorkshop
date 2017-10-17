@@ -129,4 +129,12 @@ public class Task extends ExpandableGroup<JobStatus> implements Parcelable {
     public List<JobStatus> getJobs() {
         return jobs;
     }
+
+    public int getFullPrice() {
+        int price = 0;
+        for (JobStatus jobStatus: getJobs()) {
+            price += jobStatus.getJob().getPrice();
+        }
+        return price;
+    }
 }

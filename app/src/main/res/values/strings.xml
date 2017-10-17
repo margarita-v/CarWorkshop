@@ -3,6 +3,7 @@
     <string name="app_name">CarWorkshop</string>
     <string name="action_refresh">Refresh</string>
     <string name="date_format">yyyy-MM-dd\'T\'HH:mm:ss\'Z\'</string>
+    <string name="class_cast"> must implement ConfirmCloseListener</string>
 
     <!-- Activity's titles -->
     <string name="main_title">Список задач</string>

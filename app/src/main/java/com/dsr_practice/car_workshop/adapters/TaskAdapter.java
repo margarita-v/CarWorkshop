@@ -20,10 +20,14 @@ import java.util.List;
 public class TaskAdapter extends ExpandableRecyclerViewAdapter<TaskViewHolder, JobViewHolder> {
 
     private Context context;
+    private CloseInterface closeListener;
 
-    public TaskAdapter(List<? extends ExpandableGroup> groups, Context context) {
+    public TaskAdapter(List<? extends ExpandableGroup> groups,
+                       Context context,
+                       CloseInterface closeListener) {
         super(groups);
         this.context = context;
+        this.closeListener = closeListener;
     }
 
     @Override
@@ -41,7 +45,7 @@ public class TaskAdapter extends ExpandableRecyclerViewAdapter<TaskViewHolder, J
     @Override
     public void onBindGroupViewHolder(TaskViewHolder holder, final int flatPosition,
                                       ExpandableGroup group) {
-        Task task = ((Task) group);
+        final Task task = ((Task) group);
         holder.setItems(task);
         holder.getBtnTaskInfo().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,13 +56,46 @@ public class TaskAdapter extends ExpandableRecyclerViewAdapter<TaskViewHolder, J
                 context.startActivity(intent);
             }
         });
+        holder.getBtnCloseTask().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                closeListener.onTaskClose(task);
+            }
+        });
     }
 
     @Override
     public void onBindChildViewHolder(JobViewHolder holder, int flatPosition,
                                       ExpandableGroup group, int childIndex) {
-        Task task = ((Task) group);
-        JobStatus jobStatus = task.getJobs().get(childIndex);
+        final Task task = ((Task) group);
+        final JobStatus jobStatus = task.getJobs().get(childIndex);
         holder.setItems(jobStatus);
+        holder.getBtnCloseJob().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (closeListener.onJobClose(jobStatus, task))
+                    notifyDataSetChanged();
+            }
+        });
+    }
+
+    /**
+     * Interface for task and job closing
+     */
+    public interface CloseInterface {
+
+        /**
+         * Close task action
+         * @param task Task which will be closed
+         */
+        void onTaskClose(Task task);
+
+        /**
+         * Close job action
+         * @param jobStatus JobStatus of job in concrete task which will be closed
+         * @param task Task which associated with closing job
+         * @return True if task was closed
+         */
+        boolean onJobClose(JobStatus jobStatus, Task task);
     }
 }
