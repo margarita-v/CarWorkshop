@@ -2,12 +2,14 @@ package com.dsr_practice.car_workshop.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.activities.InfoActivity;
+import com.dsr_practice.car_workshop.dialogs.CloseDialog;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 import com.dsr_practice.car_workshop.viewholders.JobViewHolder;
@@ -20,14 +22,17 @@ import java.util.List;
 public class TaskAdapter extends ExpandableRecyclerViewAdapter<TaskViewHolder, JobViewHolder> {
 
     private Context context;
-    private CloseInterface closeListener;
+    private FragmentManager fragmentManager;
+
+    // Tag for dialog usage
+    private static final String DIALOG_TAG = "DIALOG";
 
     public TaskAdapter(List<? extends ExpandableGroup> groups,
                        Context context,
-                       CloseInterface closeListener) {
+                       FragmentManager fragmentManager) {
         super(groups);
         this.context = context;
-        this.closeListener = closeListener;
+        this.fragmentManager = fragmentManager;
     }
 
     @Override
@@ -59,7 +64,8 @@ public class TaskAdapter extends ExpandableRecyclerViewAdapter<TaskViewHolder, J
         holder.getBtnCloseTask().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                closeListener.onTaskClose(task);
+                configureConfirmDialog(R.string.close_task_title, R.string.close_task_message,
+                        task, null);
             }
         });
     }
@@ -73,29 +79,22 @@ public class TaskAdapter extends ExpandableRecyclerViewAdapter<TaskViewHolder, J
         holder.getBtnCloseJob().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (closeListener.onJobClose(jobStatus, task))
-                    notifyDataSetChanged();
+                configureConfirmDialog(R.string.close_job_title, R.string.close_job_message,
+                        task, jobStatus);
             }
         });
     }
 
     /**
-     * Interface for task and job closing
+     * Configure dialog for close action confirmation
+     * @param titleId ID of title' string resource
+     * @param messageId ID of message's string resource
+     * @param task Task which will be closed
+     * @param jobStatus Job which will be closed
      */
-    public interface CloseInterface {
-
-        /**
-         * Close task action
-         * @param task Task which will be closed
-         */
-        void onTaskClose(Task task);
-
-        /**
-         * Close job action
-         * @param jobStatus JobStatus of job in concrete task which will be closed
-         * @param task Task which associated with closing job
-         * @return True if task was closed
-         */
-        boolean onJobClose(JobStatus jobStatus, Task task);
+    private void configureConfirmDialog(int titleId, int messageId,
+                                        Task task, JobStatus jobStatus) {
+        CloseDialog.newInstance(titleId, messageId, task, jobStatus)
+                .show(fragmentManager, DIALOG_TAG);
     }
 }

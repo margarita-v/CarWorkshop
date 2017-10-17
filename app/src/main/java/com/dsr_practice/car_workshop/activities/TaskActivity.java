@@ -308,7 +308,7 @@ public class TaskActivity extends AppCompatActivity
      * @param messageId ID for message's string resource
      */
     private void createErrorDialog(int titleId, int messageId) {
-        MessageDialog.newInstance(titleId, messageId, false)
+        MessageDialog.newInstance(titleId, messageId)
                 .show(getSupportFragmentManager(), DIALOG_TAG);
     }
 

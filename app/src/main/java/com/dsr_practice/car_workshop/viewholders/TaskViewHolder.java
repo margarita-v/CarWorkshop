@@ -35,6 +35,7 @@ public class TaskViewHolder extends GroupViewHolder implements IconInterface {
         this.tvCarName.setText(task.getName());
         this.tvDate.setText(task.getDateToString());
         this.tvNumber.setText(task.getNumber());
+        this.imgBtnCloseTask.setEnabled(!task.getStatus());
         this.imgBtnCloseTask.setImageResource(task.getStatus()
                 ? TASK_CLOSED_IMAGE_ID : ITEM_OPENED_IMAGE_ID);
     }

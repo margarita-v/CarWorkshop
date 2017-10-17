@@ -26,6 +26,7 @@ public class JobViewHolder extends ChildViewHolder implements IconInterface {
         Job job = jobStatus.getJob();
         this.tvJob.setText(job.getName());
         this.tvPrice.setText(job.getPriceToString());
+        this.imgBtnCloseJob.setEnabled(!jobStatus.getStatus());
         this.imgBtnCloseJob.setImageResource(jobStatus.getStatus()
                 ? JOB_CLOSED_IMAGE_ID : ITEM_OPENED_IMAGE_ID);
     }
