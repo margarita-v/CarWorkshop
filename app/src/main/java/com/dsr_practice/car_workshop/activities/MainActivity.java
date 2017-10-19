@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity
         startLoading();
     }
 
+    //region Configure options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -81,10 +82,23 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                startLoading();
+                return true;
+            case R.id.action_sync:
+                //TODO
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    //endregion
+
+    @Override
     public void onRefresh() {
         loadTasksStub();
     }
-
 
     @Override
     public void onTaskClose(Task task) {
@@ -134,14 +148,6 @@ public class MainActivity extends AppCompatActivity
             swipeRefreshLayout.setRefreshing(true);
             onRefresh();
         }
-    }
-
-    /**
-     * Option item menu click
-     * @param item Menu item which was chosen
-     */
-    public void onRefreshItemClick(MenuItem item) {
-        startLoading();
     }
 
     // Stub method for testing adapter
