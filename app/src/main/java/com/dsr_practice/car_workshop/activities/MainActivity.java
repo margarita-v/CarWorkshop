@@ -1,6 +1,9 @@
 package com.dsr_practice.car_workshop.activities;
 
+import android.accounts.Account;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SyncStatusObserver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -17,7 +20,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
+import com.dsr_practice.car_workshop.accounts.AccountGeneral;
 import com.dsr_practice.car_workshop.adapters.TaskAdapter;
+import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.dialogs.CloseDialog;
 import com.dsr_practice.car_workshop.dialogs.MessageDialog;
 import com.dsr_practice.car_workshop.loaders.TaskLoader;
@@ -44,6 +49,21 @@ public class MainActivity extends AppCompatActivity
     // Tag for dialog usage
     private static final String DIALOG_TAG = "DIALOG";
 
+    /**
+     * Handle to a SyncObserver.
+     * The ProgressBar element is visible until the SyncObserver reports
+     * that the sync is complete.
+     *
+     * This allows us to delete our SyncObserver once the application is no longer in the
+     * foreground.
+     */
+    private Object syncObserverHandle;
+
+    /**
+     * Options menu used to populate ActionBar.
+     */
+    private Menu optionsMenu;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,14 +89,35 @@ public class MainActivity extends AppCompatActivity
 
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
-        //AccountGeneral.createSyncAccount(this);
+        //TODO AccountGeneral.createSyncAccount(this);
         callbacks = new TaskLoaderCallbacks();
         startLoading();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        syncStatusObserver.onStatusChanged(0);
+
+        // Watch for sync state changes
+        final int mask = ContentResolver.SYNC_OBSERVER_TYPE_PENDING |
+                ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE;
+        syncObserverHandle = ContentResolver.addStatusChangeListener(mask, syncStatusObserver);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (syncObserverHandle != null) {
+            ContentResolver.removeStatusChangeListener(syncObserverHandle);
+            syncObserverHandle = null;
+        }
     }
 
     //region Configure options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        optionsMenu = menu;
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -88,18 +129,79 @@ public class MainActivity extends AppCompatActivity
                 startLoading();
                 return true;
             case R.id.action_sync:
-                //TODO
+                //TODO SyncAdapter.performSync();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
     //endregion
 
+    /**
+     * Set the state of the Refresh button.
+     * If a sync is active, turn on the ProgressBar widget.
+     * Otherwise, turn it off.
+     *
+     * @param refreshing True if an active sync is occurring, false otherwise
+     */
+    public void setRefreshActionButtonState(boolean refreshing) {
+        if (optionsMenu == null) {
+            return;
+        }
+
+        final MenuItem refreshItem = optionsMenu.findItem(R.id.action_sync);
+        if (refreshItem != null) {
+            if (refreshing) {
+                refreshItem.setActionView(R.layout.actionbar);
+            } else {
+                refreshItem.setActionView(null);
+            }
+        }
+    }
+
+    /**
+     * Create a new anonymous SyncStatusObserver.
+     * It's attached to the app's ContentResolver in onResume(), and removed in onPause().
+     * If status changes, it sets the state of the Refresh button.
+     * If a sync is active or pending, the Refresh button is replaced by an indeterminate
+     * ProgressBar; otherwise, the button itself is displayed.
+     */
+    private SyncStatusObserver syncStatusObserver = new SyncStatusObserver() {
+        /**
+         * Callback invoked with the sync adapter status changes.
+         */
+        @Override
+        public void onStatusChanged(int which) {
+            runOnUiThread(new Runnable() {
+                /**
+                 * The SyncAdapter runs on a background thread.
+                 * To update the UI, onStatusChanged() runs on the UI thread.
+                 */
+                @Override
+                public void run() {
+                    // Create a handle to the account that was created by
+                    // AccountGeneral.createSyncAccount().
+                    // This will be used to query the system to see
+                    // how the sync status has changed.
+                    Account account = AccountGeneral.getAccount();
+
+                    // Test the ContentResolver to see if the sync adapter is active or pending.
+                    // Set the state of the refresh button accordingly.
+                    boolean syncActive = ContentResolver.isSyncActive(
+                            account, Contract.CONTENT_AUTHORITY);
+                    boolean syncPending = ContentResolver.isSyncPending(
+                            account, Contract.CONTENT_AUTHORITY);
+                    setRefreshActionButtonState(syncActive || syncPending);
+                }
+            });
+        }
+    };
+
     @Override
     public void onRefresh() {
         loadTasksStub();
     }
 
+    //region Callbacks from CloseDialog
     @Override
     public void onTaskClose(Task task) {
         task.setStatus(true);
@@ -128,6 +230,7 @@ public class MainActivity extends AppCompatActivity
         }
         adapter.notifyDataSetChanged();
     }
+    //endregion
 
     /**
      * Show message if task was closed
