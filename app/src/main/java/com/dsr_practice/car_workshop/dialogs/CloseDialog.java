@@ -25,6 +25,9 @@ public class CloseDialog extends DialogFragment implements DialogInterface.OnCli
     // Callback to activity
     private CloseInterface closeActionListener;
 
+    // Tag for dialog usage
+    public static final String TAG = "CLOSE_DIALOG";
+
     public static CloseDialog newInstance(int titleId, int messageId,
                                           Task task, JobStatus jobStatus) {
         CloseDialog dialog = new CloseDialog();

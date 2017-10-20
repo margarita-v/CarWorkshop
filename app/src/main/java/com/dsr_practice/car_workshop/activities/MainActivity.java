@@ -38,16 +38,13 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
-        implements SwipeRefreshLayout.OnRefreshListener, CloseDialog.CloseInterface {
+public class MainActivity extends AppCompatActivity implements
+        SwipeRefreshLayout.OnRefreshListener, CloseDialog.CloseInterface,
+        LoaderManager.LoaderCallbacks<List<Task>> {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView rvTasks;
     private TaskAdapter adapter;
-    private TaskLoaderCallbacks callbacks;
-
-    // Tag for dialog usage
-    private static final String DIALOG_TAG = "DIALOG";
 
     /**
      * Handle to a SyncObserver.
@@ -90,7 +87,6 @@ public class MainActivity extends AppCompatActivity
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
         //TODO AccountGeneral.createSyncAccount(this);
-        callbacks = new TaskLoaderCallbacks();
         startLoading();
     }
 
@@ -240,7 +236,7 @@ public class MainActivity extends AppCompatActivity
         MessageDialog.newInstance(
                 getString(R.string.task_was_closed),
                 getString(R.string.task_full_price) + Integer.toString(task.getFullPrice()))
-                .show(getSupportFragmentManager(), DIALOG_TAG);
+                .show(getSupportFragmentManager(), MessageDialog.TAG);
     }
 
     /**
@@ -300,9 +296,9 @@ public class MainActivity extends AppCompatActivity
      */
     public void loadTasks() {
         if (adapter == null || adapter.getItemCount() == 0)
-            getSupportLoaderManager().initLoader(TaskLoader.TASK_LOADER_ID, null, callbacks);
+            getSupportLoaderManager().initLoader(TaskLoader.TASK_LOADER_ID, null, this);
         else
-            getSupportLoaderManager().restartLoader(TaskLoader.TASK_LOADER_ID, null, callbacks);
+            getSupportLoaderManager().restartLoader(TaskLoader.TASK_LOADER_ID, null, this);
     }
 
     /**
@@ -318,29 +314,25 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    /**
-     * Class for loading task list from server using Loader
-     */
-    private class TaskLoaderCallbacks implements LoaderManager.LoaderCallbacks<List<Task>> {
+    //region Callbacks for loading task list from server using Loader
+    @Override
+    public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
+        return new TaskLoader(MainActivity.this);
+    }
 
-        @Override
-        public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
-            return new TaskLoader(MainActivity.this);
-        }
-
-        @Override
-        public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
-            // Sort task list by date and show it
-            if (data != null) {
-                sort(data);
-                adapter = new TaskAdapter(data, MainActivity.this, getSupportFragmentManager());
-                rvTasks.setAdapter(adapter);
-            }
-        }
-
-        @Override
-        public void onLoaderReset(Loader<List<Task>> loader) {
-
+    @Override
+    public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
+        // Sort task list by date and show it
+        if (data != null) {
+            sort(data);
+            adapter = new TaskAdapter(data, MainActivity.this, getSupportFragmentManager());
+            rvTasks.setAdapter(adapter);
         }
     }
+
+    @Override
+    public void onLoaderReset(Loader<List<Task>> loader) {
+
+    }
+    //endregion
 }

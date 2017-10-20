@@ -24,9 +24,6 @@ public class TaskAdapter extends ExpandableRecyclerViewAdapter<TaskViewHolder, J
     private Context context;
     private FragmentManager fragmentManager;
 
-    // Tag for dialog usage
-    private static final String DIALOG_TAG = "DIALOG";
-
     public TaskAdapter(List<? extends ExpandableGroup> groups,
                        Context context,
                        FragmentManager fragmentManager) {
@@ -95,6 +92,6 @@ public class TaskAdapter extends ExpandableRecyclerViewAdapter<TaskViewHolder, J
     private void showConfirmDialog(int titleId, int messageId,
                                    Task task, JobStatus jobStatus) {
         CloseDialog.newInstance(titleId, messageId, task, jobStatus)
-                .show(fragmentManager, DIALOG_TAG);
+                .show(fragmentManager, CloseDialog.TAG);
     }
 }

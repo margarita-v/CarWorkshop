@@ -7,7 +7,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -24,15 +23,13 @@ import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.database.Provider;
 import com.dsr_practice.car_workshop.dialogs.MessageDialog;
 import com.dsr_practice.car_workshop.models.common.sync.Job;
-import com.dsr_practice.car_workshop.rest.ApiClient;
-import com.dsr_practice.car_workshop.rest.ApiInterface;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskActivity extends AppCompatActivity
-        implements View.OnClickListener, DialogInterface.OnClickListener {
+public class TaskActivity extends AppCompatActivity implements
+        View.OnClickListener, DialogInterface.OnClickListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     //region Widgets
     private EditText etVIN, etNumber;
@@ -42,13 +39,10 @@ public class TaskActivity extends AppCompatActivity
     //region Adapters for spinners and list view
     private SimpleCursorAdapter markAdapter, modelAdapter;
     private JobAdapter jobAdapter;
+
+    // Flag which shows if we should load models for mark (used on restore instance state)
     private boolean needLoad = false;
     //endregion
-
-    private CursorLoaderCallbacks callbacks;
-    private SimpleDateFormat dateFormat;
-    private static ApiInterface apiInterface;
-    private static final String DIALOG_TAG = "DIALOG";
 
     // IDs for loaders
     private static final int MARK_LOADER_ID = 0, MODEL_LOADER_ID = 1, JOB_LOADER_ID = 2;
@@ -85,14 +79,11 @@ public class TaskActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
-        apiInterface = ApiClient.getApi();
-        dateFormat = new SimpleDateFormat(getString(R.string.date_format));
         chosenJobs = new ArrayList<>();
 
         // Get header view and footer view for list view
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View listHeader = inflater.inflate(R.layout.task_header, null);
-        View listFooter = inflater.inflate(R.layout.task_footer, null);
+        View listHeader = View.inflate(this, R.layout.task_header, null);
+        View listFooter = View.inflate(this, R.layout.task_footer, null);
 
         //region Find widgets by IDs and set listeners
         etVIN = listHeader.findViewById(R.id.etVIN);
@@ -125,6 +116,7 @@ public class TaskActivity extends AppCompatActivity
         lvJobs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Decrease position because list view has header
                 boolean isChecked = jobAdapter.check(--position);
                 CheckBox cbName = view.findViewById(R.id.cbName);
                 cbName.setChecked(isChecked);
@@ -143,9 +135,8 @@ public class TaskActivity extends AppCompatActivity
         }
 
         // Load info from database
-        callbacks = new CursorLoaderCallbacks();
-        getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, callbacks);
-        getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, callbacks);
+        getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, this);
+        getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, this);
     }
 
     /**
@@ -309,7 +300,7 @@ public class TaskActivity extends AppCompatActivity
      */
     private void createErrorDialog(int titleId, int messageId) {
         MessageDialog.newInstance(titleId, messageId)
-                .show(getSupportFragmentManager(), DIALOG_TAG);
+                .show(getSupportFragmentManager(), MessageDialog.TAG);
     }
 
     /**
@@ -319,60 +310,56 @@ public class TaskActivity extends AppCompatActivity
     private void loadModels(int markPosition) {
         Cursor cursor = (Cursor) spinnerMark.getItemAtPosition(markPosition);
         markId = getItemId(cursor, Contract.MarkEntry.COLUMN_NAME_MARK_ID);
-        getSupportLoaderManager().restartLoader(MODEL_LOADER_ID, null, callbacks);
+        getSupportLoaderManager().restartLoader(MODEL_LOADER_ID, null, this);
     }
 
-    /**
-     * Class for loading all entries from database using CursorLoader
-     */
-    private class CursorLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
-
-        @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            switch (id) {
-                case MARK_LOADER_ID:
-                    return new CursorLoader(
-                            TaskActivity.this,
-                            Contract.MarkEntry.CONTENT_URI, Contract.MARK_PROJECTION,
-                            null, null, null);
-                case MODEL_LOADER_ID:
-                    return new CursorLoader(
-                            TaskActivity.this,
-                            Provider.URI_MODELS_FOR_MARK, Contract.MODEL_PROJECTION,
-                            null, new String[] {Integer.toString(markId)}, null);
-                case JOB_LOADER_ID:
-                    return new CursorLoader(
-                            TaskActivity.this,
-                            Contract.JobEntry.CONTENT_URI, Contract.JOB_PROJECTION,
-                            null, null, null);
-                default:
-                    return null;
-            }
-        }
-
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            switch (loader.getId()) {
-                case MARK_LOADER_ID:
-                    markAdapter.swapCursor(data);
-                    spinnerMark.setSelection(markPosition);
-                    loadModels(markPosition);
-                    break;
-                case MODEL_LOADER_ID:
-                    modelAdapter.swapCursor(data);
-                    spinnerModel.setSelection(modelPosition);
-                    break;
-                case JOB_LOADER_ID:
-                    jobAdapter.swapCursor(data);
-                    if (checkedPositions != null)
-                        jobAdapter.setCheckedPositions(checkedPositions);
-                    break;
-            }
-        }
-
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-
+    //region Callbacks for loading all entries from database using CursorLoader
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        switch (id) {
+            case MARK_LOADER_ID:
+                return new CursorLoader(
+                        TaskActivity.this,
+                        Contract.MarkEntry.CONTENT_URI, Contract.MARK_PROJECTION,
+                        null, null, null);
+            case MODEL_LOADER_ID:
+                return new CursorLoader(
+                        TaskActivity.this,
+                        Provider.URI_MODELS_FOR_MARK, Contract.MODEL_PROJECTION,
+                        null, new String[] {Integer.toString(markId)}, null);
+            case JOB_LOADER_ID:
+                return new CursorLoader(
+                        TaskActivity.this,
+                        Contract.JobEntry.CONTENT_URI, Contract.JOB_PROJECTION,
+                        null, null, null);
+            default:
+                return null;
         }
     }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case MARK_LOADER_ID:
+                markAdapter.swapCursor(data);
+                spinnerMark.setSelection(markPosition);
+                loadModels(markPosition);
+                break;
+            case MODEL_LOADER_ID:
+                modelAdapter.swapCursor(data);
+                spinnerModel.setSelection(modelPosition);
+                break;
+            case JOB_LOADER_ID:
+                jobAdapter.swapCursor(data);
+                if (checkedPositions != null)
+                    jobAdapter.setCheckedPositions(checkedPositions);
+                break;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+    //endregion
 }

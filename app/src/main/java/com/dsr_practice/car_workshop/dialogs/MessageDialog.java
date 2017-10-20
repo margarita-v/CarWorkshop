@@ -18,6 +18,9 @@ public class MessageDialog extends DialogFragment implements DialogInterface.OnC
     private static final String TITLE_KEY = "TITLE_KEY";
     private static final String MESSAGE_KEY = "MESSAGE_KEY";
 
+    // Tag for dialog usage
+    public static final String TAG = "MESSAGE_DIALOG";
+
     // Constructor for title and message as string resources
     public static MessageDialog newInstance(int titleId, int messageId) {
         Bundle args = new Bundle();
