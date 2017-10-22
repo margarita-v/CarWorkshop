@@ -3,6 +3,7 @@ package com.dsr_practice.car_workshop.activities;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -23,9 +25,20 @@ import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.database.Provider;
 import com.dsr_practice.car_workshop.dialogs.MessageDialog;
 import com.dsr_practice.car_workshop.models.common.sync.Job;
+import com.dsr_practice.car_workshop.models.post.TaskPost;
+import com.dsr_practice.car_workshop.rest.ApiClient;
+import com.dsr_practice.car_workshop.rest.ApiInterface;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class TaskActivity extends AppCompatActivity implements
         View.OnClickListener, DialogInterface.OnClickListener,
@@ -34,6 +47,7 @@ public class TaskActivity extends AppCompatActivity implements
     //region Widgets
     private EditText etVIN, etNumber;
     private Spinner spinnerMark, spinnerModel;
+    private ProgressBar progressBar;
     //endregion
 
     //region Adapters for spinners and list view
@@ -75,11 +89,16 @@ public class TaskActivity extends AppCompatActivity implements
     private static final String JOBS = "JOBS";
     //endregion
 
+    private ApiInterface apiInterface;
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    private final DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
         chosenJobs = new ArrayList<>();
+        apiInterface = ApiClient.getApi();
 
         // Get header view and footer view for list view
         View listHeader = View.inflate(this, R.layout.task_header, null);
@@ -91,6 +110,7 @@ public class TaskActivity extends AppCompatActivity implements
         spinnerMark = listHeader.findViewById(R.id.spinnerMark);
         spinnerModel = listHeader.findViewById(R.id.spinnerModel);
         Button btnSaveTask = listFooter.findViewById(R.id.btnSaveTask);
+        progressBar = listFooter.findViewById(R.id.progressBar);
 
         btnSaveTask.setOnClickListener(this);
         spinnerMark.setOnItemSelectedListener(onItemSelectedListener);
@@ -107,7 +127,7 @@ public class TaskActivity extends AppCompatActivity implements
         jobAdapter = (JobAdapter) configureAdapter(Contract.JOB_PROJECTION, true);
         //endregion
 
-        // Configure list view
+        //region Configure list view
         ListView lvJobs = (ListView) findViewById(R.id.lvJobs);
         lvJobs.addHeaderView(listHeader);
         lvJobs.addFooterView(listFooter);
@@ -122,8 +142,9 @@ public class TaskActivity extends AppCompatActivity implements
                 cbName.setChecked(isChecked);
             }
         });
+        //endregion
 
-        // Restore saved data
+        //region Restore saved data
         if (savedInstanceState != null) {
             markId = savedInstanceState.getInt(MARK_ID);
             modelId = savedInstanceState.getInt(MODEL_ID);
@@ -133,10 +154,41 @@ public class TaskActivity extends AppCompatActivity implements
             etNumber.setText(savedInstanceState.getString(NUMBER));
             checkedPositions = savedInstanceState.getBooleanArray(JOBS);
         }
+        //endregion
 
         // Load info from database
         getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, this);
         getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, this);
+    }
+
+    /**
+     * Callback for task creation request
+     */
+    private Callback<ResponseBody> taskCreateCallback = new Callback<ResponseBody>() {
+        @Override
+        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            finishTaskCreation(true);
+        }
+
+        @Override
+        public void onFailure(Call<ResponseBody> call, Throwable t) {
+            finishTaskCreation(false);
+        }
+    };
+
+    /**
+     * Actions after task creation
+     * @param success True if task creation was finished successfully
+     */
+    private void finishTaskCreation(boolean success) {
+        if (success) {
+            Toast.makeText(this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        else
+            MessageDialog.newInstance(R.string.conn_error_title, R.string.conn_error_message)
+                    .show(getSupportFragmentManager(), MessageDialog.TAG);
+        progressBar.setVisibility(View.GONE);
     }
 
     /**
@@ -209,8 +261,10 @@ public class TaskActivity extends AppCompatActivity implements
      */
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnSaveTask:
+        final Calendar calendar = Calendar.getInstance();
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
                 String vin = etVIN.getText().toString(), number = etNumber.getText().toString();
                 // Get chosen jobs
                 chosenJobs.clear();
@@ -224,27 +278,22 @@ public class TaskActivity extends AppCompatActivity implements
                     }
                 }
                 if (checkInput(vin, number)) {
+                    progressBar.setVisibility(View.VISIBLE);
                     /*
-                    Calendar calendar = Calendar.getInstance();
-                    String date = dateFormat.format(calendar.getTime());
-                    apiInterface.createTask(new TaskPost(markId, modelId, date, vin, number, chosenJobs))
-                            .enqueue(new Callback<ResponseBody>() {
-                                @Override
-                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                    Toast.makeText(TaskActivity.this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
-                                    TaskActivity.this.finish();
-                                }
-
-                                @Override
-                                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                    Toast.makeText(TaskActivity.this, R.string.toast_cant_create, Toast.LENGTH_SHORT).show();
-                                }
-                            });*/
-                    Toast.makeText(this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
-                    this.finish();
-                }
-                break;
-        }
+                    apiInterface.createTask(
+                            new TaskPost(markId, modelId, dateFormat.format(calendar.getTime()),
+                                    vin, number, chosenJobs))
+                            .enqueue(taskCreateCallback); */
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(TaskActivity.this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
+                            TaskActivity.this.finish();
+                        }
+                    }, 1000);
+                } // if checkInput...
+            } //run()
+        });
     }
 
     /**
