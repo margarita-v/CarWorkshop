@@ -30,6 +30,9 @@ import com.dsr_practice.car_workshop.loaders.TaskLoader;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 import com.dsr_practice.car_workshop.models.common.sync.Job;
+import com.dsr_practice.car_workshop.models.post.CloseJobPost;
+import com.dsr_practice.car_workshop.rest.ApiClient;
+import com.dsr_practice.car_workshop.rest.ApiInterface;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,6 +42,11 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, CloseDialog.CloseInterface,
         LoaderManager.LoaderCallbacks<List<Task>> {
@@ -47,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView rvTasks;
     private TaskAdapter adapter;
+    private ApiInterface apiInterface;
 
     /**
      * Handle to a SyncObserver.
@@ -71,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         setSupportActionBar(toolbar);
         setTitle(R.string.main_title);
+        apiInterface = ApiClient.getApi();
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -202,8 +212,23 @@ public class MainActivity extends AppCompatActivity implements
 
     //region Callbacks from CloseDialog
     @Override
-    public void onTaskClose(Task task) {
+    public void onTaskClose(final Task task) {
         post();
+
+        /*
+        progressBar.setVisibility(View.VISIBLE);
+        apiInterface.closeTask(task.getId()).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                showTaskCloseMessage(task);
+                finishLoading(true);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                finishLoading(false);
+            }
+        });*/
 
         task.setStatus(true);
         for (JobStatus jobStatus: task.getJobs()) {
@@ -213,8 +238,25 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onJobClose(JobStatus jobStatus, Task task) {
+    public void onJobClose(JobStatus jobStatus, final Task task) {
         post();
+
+        /*
+        progressBar.setVisibility(View.VISIBLE);
+        apiInterface.closeJobInTask(new CloseJobPost(task.getId(), jobStatus.getJob().getId()))
+                .enqueue(new Callback<Boolean>() {
+                    @Override
+                    public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                        if (response.body())
+                            showTaskCloseMessage(task);
+                        finishLoading(true);
+                    }
+
+                    @Override
+                    public void onFailure(Call<Boolean> call, Throwable t) {
+                        finishLoading(false);
+                    }
+                });*/
 
         jobStatus.setStatus(true);
         // Check if all jobs in task are closed
@@ -253,6 +295,19 @@ public class MainActivity extends AppCompatActivity implements
                 getString(R.string.task_was_closed),
                 getString(R.string.task_full_price) + Integer.toString(task.getFullPrice()))
                 .show(getSupportFragmentManager(), MessageDialog.TAG);
+    }
+
+    /**
+     * Perform actions after loading
+     * @param success True if loading was finished successfully
+     */
+    private void finishLoading(boolean success) {
+        if (success)
+            adapter.notifyDataSetChanged();
+        else
+            MessageDialog.newInstance(R.string.conn_error_title, R.string.conn_error_message)
+                    .show(getSupportFragmentManager(), MessageDialog.TAG);
+        progressBar.setVisibility(View.GONE);
     }
 
     /**

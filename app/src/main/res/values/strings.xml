@@ -78,4 +78,6 @@
     <string name="invalid_number_message">Number length should be between 6 and 9!</string>
     <string name="empty_jobs_title">Jobs was\'nt chosen</string>
     <string name="empty_jobs_message">Please, choose jobs for this task.</string>
+    <string name="conn_error_title">Connection error</string>
+    <string name="conn_error_message">Can not connect to server.\nPlease, check the Internet connection.</string>
 </resources>
