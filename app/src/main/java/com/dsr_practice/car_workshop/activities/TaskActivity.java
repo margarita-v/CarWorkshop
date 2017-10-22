@@ -1,6 +1,5 @@
 package com.dsr_practice.car_workshop.activities;
 
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,7 +24,6 @@ import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.database.Provider;
 import com.dsr_practice.car_workshop.dialogs.MessageDialog;
 import com.dsr_practice.car_workshop.models.common.sync.Job;
-import com.dsr_practice.car_workshop.models.post.TaskPost;
 import com.dsr_practice.car_workshop.rest.ApiClient;
 import com.dsr_practice.car_workshop.rest.ApiInterface;
 
@@ -40,26 +38,24 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class TaskActivity extends AppCompatActivity implements
-        View.OnClickListener, DialogInterface.OnClickListener,
-        LoaderManager.LoaderCallbacks<Cursor> {
+public class TaskActivity extends AppCompatActivity
+        implements View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     //region Widgets
     private EditText etVIN, etNumber;
     private Spinner spinnerMark, spinnerModel;
+    private ListView lvJobs;
+    private Button btnSaveTask;
     private ProgressBar progressBar;
     //endregion
 
-    //region Adapters for spinners and list view
+    //region Adapters
     private SimpleCursorAdapter markAdapter, modelAdapter;
     private JobAdapter jobAdapter;
 
     // Flag which shows if we should load models for mark (used on restore instance state)
     private boolean needLoad = false;
     //endregion
-
-    // IDs for loaders
-    private static final int MARK_LOADER_ID = 0, MODEL_LOADER_ID = 1, JOB_LOADER_ID = 2;
 
     //region View's IDs for adapters
     private static final int[] VIEWS_ID = {android.R.id.text1};
@@ -68,16 +64,19 @@ public class TaskActivity extends AppCompatActivity implements
     private static final int SPINNER_DROPDOWN_ITEM = android.R.layout.simple_spinner_dropdown_item;
     //endregion
 
-    // Chosen jobs list
-    private List<Job> chosenJobs;
-    // Positions of chosen jobs
-    private boolean[] checkedPositions;
+    // IDs for loaders
+    private static final int MARK_LOADER_ID = 0, MODEL_LOADER_ID = 1, JOB_LOADER_ID = 2;
+
+    // Values for user input validation
+    private static final int VIN_MAX_LENGTH = 17, NUMBER_MIN_LENGTH = 6;
 
     // Task fields
     private int markId, modelId, markPosition, modelPosition;
 
-    // Values for user input validation
-    private static final int VIN_MAX_LENGTH = 17, NUMBER_MAX_LENGTH = 9;
+    // Chosen jobs list
+    private List<Job> chosenJobs;
+    // Positions of chosen jobs
+    private boolean[] checkedPositions;
 
     //region String keys for bundle
     private static final String MARK_ID = "MARK_ID";
@@ -100,16 +99,15 @@ public class TaskActivity extends AppCompatActivity implements
         chosenJobs = new ArrayList<>();
         apiInterface = ApiClient.getApi();
 
-        // Get header view and footer view for list view
+        //region Find widgets by IDs and set listeners
         View listHeader = View.inflate(this, R.layout.task_header, null);
         View listFooter = View.inflate(this, R.layout.task_footer, null);
 
-        //region Find widgets by IDs and set listeners
         etVIN = listHeader.findViewById(R.id.etVIN);
         etNumber = listHeader.findViewById(R.id.etNumber);
         spinnerMark = listHeader.findViewById(R.id.spinnerMark);
         spinnerModel = listHeader.findViewById(R.id.spinnerModel);
-        Button btnSaveTask = listFooter.findViewById(R.id.btnSaveTask);
+        btnSaveTask = listFooter.findViewById(R.id.btnSaveTask);
         progressBar = listFooter.findViewById(R.id.progressBar);
 
         btnSaveTask.setOnClickListener(this);
@@ -128,7 +126,7 @@ public class TaskActivity extends AppCompatActivity implements
         //endregion
 
         //region Configure list view
-        ListView lvJobs = (ListView) findViewById(R.id.lvJobs);
+        lvJobs = (ListView) findViewById(R.id.lvJobs);
         lvJobs.addHeaderView(listHeader);
         lvJobs.addFooterView(listFooter);
         lvJobs.setAdapter(jobAdapter);
@@ -185,24 +183,10 @@ public class TaskActivity extends AppCompatActivity implements
             Toast.makeText(this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
             finish();
         }
-        else
-            MessageDialog.newInstance(R.string.conn_error_title, R.string.conn_error_message)
-                    .show(getSupportFragmentManager(), MessageDialog.TAG);
-        progressBar.setVisibility(View.GONE);
-    }
-
-    /**
-     * Configure cursor adapter
-     * @param projection Projection for query
-     * @param isJobs True if adapter will be used for list of jobs
-     * @return SimpleCursorAdapter for spinners OR JobAdapter for list of jobs
-     */
-    private SimpleCursorAdapter configureAdapter(String[] projection, boolean isJobs) {
-        SimpleCursorAdapter result = isJobs
-                ? new JobAdapter(this, R.layout.job_item, null, projection, JOB_IDS, 0)
-                : new SimpleCursorAdapter(this, SPINNER_ITEM, null, projection, VIEWS_ID, 0);
-        result.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
-        return result;
+        else {
+            MessageDialog.showConnectionError(getSupportFragmentManager());
+            setViewsEnabled(true);
+        }
     }
 
     /**
@@ -278,7 +262,7 @@ public class TaskActivity extends AppCompatActivity implements
                     }
                 }
                 if (checkInput(vin, number)) {
-                    progressBar.setVisibility(View.VISIBLE);
+                    setViewsEnabled(false);
                     /*
                     apiInterface.createTask(
                             new TaskPost(markId, modelId, dateFormat.format(calendar.getTime()),
@@ -296,24 +280,28 @@ public class TaskActivity extends AppCompatActivity implements
         });
     }
 
+    //region Methods for UI
     /**
-     * Dialog OnClickListener for dismiss dialogs
-     * @param dialog Dialog which was shown
-     * @param which ID of chosen dialog's button
+     * Set views enabled state
+     * @param enabled True if views should be enabled for user interaction
      */
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        dialog.dismiss();
+    private void setViewsEnabled(boolean enabled) {
+        etVIN.setEnabled(enabled);
+        spinnerMark.setEnabled(enabled);
+        spinnerModel.setEnabled(enabled);
+        etNumber.setEnabled(enabled);
+        lvJobs.setEnabled(enabled);
+        btnSaveTask.setEnabled(enabled);
+        progressBar.setVisibility(enabled ? View.GONE : View.VISIBLE);
     }
 
     /**
-     * Get ID for chosen mark or model
-     * @param cursor Current cursor
-     * @param columnName Column name for ID
-     * @return Entity's ID
+     * Create error dialog for task validation
+     * @param titleId ID for title's string resource
+     * @param messageId ID for message's string resource
      */
-    private int getItemId(Cursor cursor, String columnName) {
-        return cursor.getInt(cursor.getColumnIndex(columnName));
+    private void createErrorDialog(int titleId, int messageId) {
+        MessageDialog.showDialog(titleId, messageId, getSupportFragmentManager());
     }
 
     /**
@@ -331,7 +319,7 @@ public class TaskActivity extends AppCompatActivity implements
             createErrorDialog(R.string.invalid_vin_title, R.string.invalid_vin_message);
             return false;
         }
-        if (number.length() < NUMBER_MAX_LENGTH) {
+        if (number.length() < NUMBER_MIN_LENGTH) {
             createErrorDialog(R.string.invalid_number_title, R.string.invalid_number_message);
             return false;
         }
@@ -342,14 +330,22 @@ public class TaskActivity extends AppCompatActivity implements
         return true;
     }
 
+    //endregion
+
+    //region Methods for database interaction
+
     /**
-     * Create error dialog for task validation
-     * @param titleId ID for title's string resource
-     * @param messageId ID for message's string resource
+     * Configure cursor adapter
+     * @param projection Projection for query
+     * @param isJobs True if adapter will be used for list of jobs
+     * @return SimpleCursorAdapter for spinners OR JobAdapter for list of jobs
      */
-    private void createErrorDialog(int titleId, int messageId) {
-        MessageDialog.newInstance(titleId, messageId)
-                .show(getSupportFragmentManager(), MessageDialog.TAG);
+    private SimpleCursorAdapter configureAdapter(String[] projection, boolean isJobs) {
+        SimpleCursorAdapter result = isJobs
+                ? new JobAdapter(this, R.layout.job_item, null, projection, JOB_IDS, 0)
+                : new SimpleCursorAdapter(this, SPINNER_ITEM, null, projection, VIEWS_ID, 0);
+        result.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
+        return result;
     }
 
     /**
@@ -361,6 +357,18 @@ public class TaskActivity extends AppCompatActivity implements
         markId = getItemId(cursor, Contract.MarkEntry.COLUMN_NAME_MARK_ID);
         getSupportLoaderManager().restartLoader(MODEL_LOADER_ID, null, this);
     }
+
+    /**
+     * Get ID for chosen mark or model
+     * @param cursor Current cursor
+     * @param columnName Column name for ID
+     * @return Entity's ID
+     */
+    private int getItemId(Cursor cursor, String columnName) {
+        return cursor.getInt(cursor.getColumnIndex(columnName));
+    }
+
+    //endregion
 
     //region Callbacks for loading all entries from database using CursorLoader
     @Override

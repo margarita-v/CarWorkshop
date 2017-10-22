@@ -30,7 +30,6 @@ import com.dsr_practice.car_workshop.loaders.TaskLoader;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 import com.dsr_practice.car_workshop.models.common.sync.Job;
-import com.dsr_practice.car_workshop.models.post.CloseJobPost;
 import com.dsr_practice.car_workshop.rest.ApiClient;
 import com.dsr_practice.car_workshop.rest.ApiInterface;
 
@@ -41,11 +40,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, CloseDialog.CloseInterface,
@@ -274,6 +268,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    // Stub test for actions after loading
     private void post() {
         progressBar.setVisibility(View.VISIBLE);
         progressBar.postDelayed(new Runnable() {
@@ -285,30 +280,6 @@ public class MainActivity extends AppCompatActivity implements
         }, 1000);
     }
     //endregion
-
-    /**
-     * Show message if task was closed
-     * @param task Task which was closed
-     */
-    private void showTaskCloseMessage(Task task) {
-        MessageDialog.newInstance(
-                getString(R.string.task_was_closed),
-                getString(R.string.task_full_price) + Integer.toString(task.getFullPrice()))
-                .show(getSupportFragmentManager(), MessageDialog.TAG);
-    }
-
-    /**
-     * Perform actions after loading
-     * @param success True if loading was finished successfully
-     */
-    private void finishLoading(boolean success) {
-        if (success)
-            adapter.notifyDataSetChanged();
-        else
-            MessageDialog.newInstance(R.string.conn_error_title, R.string.conn_error_message)
-                    .show(getSupportFragmentManager(), MessageDialog.TAG);
-        progressBar.setVisibility(View.GONE);
-    }
 
     /**
      * Perform task loading
@@ -383,6 +354,29 @@ public class MainActivity extends AppCompatActivity implements
                 return task1.getDate().compareTo(task2.getDate());
             }
         });
+    }
+
+    /**
+     * Perform actions after loading
+     * @param success True if loading was finished successfully
+     */
+    private void finishLoading(boolean success) {
+        if (success)
+            adapter.notifyDataSetChanged();
+        else
+            MessageDialog.showConnectionError(getSupportFragmentManager());
+        progressBar.setVisibility(View.GONE);
+    }
+
+    /**
+     * Show message if task was closed
+     * @param task Task which was closed
+     */
+    private void showTaskCloseMessage(Task task) {
+        MessageDialog.showDialog(
+                getString(R.string.task_was_closed),
+                getString(R.string.task_full_price) + Integer.toString(task.getFullPrice()),
+                getSupportFragmentManager());
     }
 
     //region Callbacks for loading task list from server using Loader

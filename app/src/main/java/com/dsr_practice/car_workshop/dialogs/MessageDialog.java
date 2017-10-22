@@ -6,6 +6,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+
+import com.dsr_practice.car_workshop.R;
 
 public class MessageDialog extends DialogFragment implements DialogInterface.OnClickListener {
 
@@ -19,10 +22,10 @@ public class MessageDialog extends DialogFragment implements DialogInterface.OnC
     private static final String MESSAGE_KEY = "MESSAGE_KEY";
 
     // Tag for dialog usage
-    public static final String TAG = "MESSAGE_DIALOG";
+    private static final String TAG = "MESSAGE_DIALOG";
 
     // Constructor for title and message as string resources
-    public static MessageDialog newInstance(int titleId, int messageId) {
+    private static MessageDialog newInstance(int titleId, int messageId) {
         Bundle args = new Bundle();
         args.putInt(TITLE_KEY, titleId);
         args.putInt(MESSAGE_KEY, messageId);
@@ -31,13 +34,28 @@ public class MessageDialog extends DialogFragment implements DialogInterface.OnC
     }
 
     // Constructor for title and message as Strings
-    public static MessageDialog newInstance(String title, String message) {
+    private static MessageDialog newInstance(String title, String message) {
         Bundle args = new Bundle();
         args.putString(TITLE_KEY, title);
         args.putString(MESSAGE_KEY, message);
         args.putInt(DIALOG_KEY, PARAMS_STRING);
         return createDialog(args);
     }
+
+    //region Show different dialogs
+    public static void showDialog(int titleId, int messageId, FragmentManager fragmentManager) {
+        newInstance(titleId, messageId).show(fragmentManager, TAG);
+    }
+
+    public static void showDialog(String title, String message, FragmentManager fragmentManager) {
+        newInstance(title, message).show(fragmentManager, TAG);
+    }
+
+    public static void showConnectionError(FragmentManager fragmentManager) {
+        newInstance(R.string.conn_error_title, R.string.conn_error_message)
+                .show(fragmentManager, TAG);
+    }
+    //endregion
 
     /**
      * Create dialog and set its arguments
