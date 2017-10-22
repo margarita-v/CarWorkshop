@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, CloseDialog.CloseInterface,
         LoaderManager.LoaderCallbacks<List<Task>> {
 
+    private ProgressBar progressBar;
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView rvTasks;
     private TaskAdapter adapter;
@@ -66,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         setSupportActionBar(toolbar);
         setTitle(R.string.main_title);
 
@@ -200,16 +203,19 @@ public class MainActivity extends AppCompatActivity implements
     //region Callbacks from CloseDialog
     @Override
     public void onTaskClose(Task task) {
+        post();
+
         task.setStatus(true);
         for (JobStatus jobStatus: task.getJobs()) {
             jobStatus.setStatus(true);
         }
         showTaskCloseMessage(task);
-        adapter.notifyDataSetChanged();
     }
 
     @Override
     public void onJobClose(JobStatus jobStatus, Task task) {
+        post();
+
         jobStatus.setStatus(true);
         // Check if all jobs in task are closed
         boolean allClosed = true;
@@ -224,7 +230,17 @@ public class MainActivity extends AppCompatActivity implements
             //TODO If response is True
             showTaskCloseMessage(task);
         }
-        adapter.notifyDataSetChanged();
+    }
+
+    private void post() {
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+                progressBar.setVisibility(View.GONE);
+            }
+        }, 1000);
     }
     //endregion
 
@@ -274,8 +290,8 @@ public class MainActivity extends AppCompatActivity implements
                         Date newDate = format.parse(dateArray[i]);
                         List<JobStatus> jobs = new ArrayList<>();
                         for (int j = 0; j < 4; j++) {
-                            Job job = new Job(i, priceArray[i], jobsArray[i]);
-                            jobs.add(new JobStatus(i, i, job, false));
+                            Job job = new Job(j, priceArray[j], jobsArray[j]);
+                            jobs.add(new JobStatus(j, j, job, false));
                         }
                         Task task = new Task(i, newDate, 1, 2, "A001AA", "dfghj", "name", false, jobs);
                         taskList.add(task);
