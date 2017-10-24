@@ -151,7 +151,6 @@ public class TaskActivity extends AppCompatActivity
 
         // Load info from database
         getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, this);
-        getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, this);
     }
 
     /**
@@ -228,18 +227,19 @@ public class TaskActivity extends AppCompatActivity
                 }
                 if (checkInput(vin, number)) {
                     setViewsEnabled(false);
-                    /*
+
                     TaskPost taskPostObject = new TaskPost(
                             markId, modelId, dateFormat.format(calendar.getTime()), vin, number, chosenJobs);
                     getSupportLoaderManager().restartLoader(CreateTaskLoader.CREATE_TASK_ID, null,
-                            new CreateTaskCallbacks(taskPostObject));*/
+                            new CreateTaskCallbacks(taskPostObject));
+                    /*
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(TaskActivity.this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
                             TaskActivity.this.finish();
                         }
-                    }, 1000);
+                    }, 1000);*/
                 } // if checkInput...
             } //run()
         });
@@ -403,21 +403,24 @@ public class TaskActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()) {
-            case MARK_LOADER_ID:
-                markAdapter.swapCursor(data);
-                spinnerMark.setSelection(markPosition);
-                loadModels(markPosition);
-                break;
-            case MODEL_LOADER_ID:
-                modelAdapter.swapCursor(data);
-                spinnerModel.setSelection(modelPosition);
-                break;
-            case JOB_LOADER_ID:
-                jobAdapter.swapCursor(data);
-                if (checkedPositions != null)
-                    jobAdapter.setCheckedPositions(checkedPositions);
-                break;
+        if (data.getCount() > 0) {
+            switch (loader.getId()) {
+                case MARK_LOADER_ID:
+                    markAdapter.swapCursor(data);
+                    spinnerMark.setSelection(markPosition);
+                    loadModels(markPosition);
+                    break;
+                case MODEL_LOADER_ID:
+                    modelAdapter.swapCursor(data);
+                    spinnerModel.setSelection(modelPosition);
+                    getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, this);
+                    break;
+                case JOB_LOADER_ID:
+                    jobAdapter.swapCursor(data);
+                    if (checkedPositions != null)
+                        jobAdapter.setCheckedPositions(checkedPositions);
+                    break;
+            }
         }
     }
 

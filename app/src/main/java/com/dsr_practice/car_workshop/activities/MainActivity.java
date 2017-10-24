@@ -32,6 +32,7 @@ import com.dsr_practice.car_workshop.loaders.TaskLoader;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 import com.dsr_practice.car_workshop.models.common.sync.Job;
+import com.dsr_practice.car_workshop.sync.SyncAdapter;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -93,8 +94,8 @@ public class MainActivity extends AppCompatActivity implements
 
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
-        //TODO AccountGeneral.createSyncAccount(this);
-        startLoading();
+        AccountGeneral.createSyncAccount(this);
+        //startLoading();
     }
 
     //region Activity lifecycle
@@ -134,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements
                 startLoading();
                 return true;
             case R.id.action_sync:
-                //TODO SyncAdapter.performSync();
+                SyncAdapter.performSync();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -205,27 +206,28 @@ public class MainActivity extends AppCompatActivity implements
     //region Callbacks from CloseDialog
     @Override
     public void onTaskClose(final Task task) {
-        post();
+        //post();
+
+        getSupportLoaderManager().restartLoader(CloseTaskLoader.CLOSE_TASK_ID, null,
+                new CloseTaskCallbacks(task));
 
         /*
-        getSupportLoaderManager().restartLoader(CloseTaskLoader.CLOSE_TASK_ID, null,
-                new CloseTaskCallbacks(task));*/
-
         task.setStatus(true);
         for (JobStatus jobStatus: task.getJobs()) {
             jobStatus.setStatus(true);
         }
-        showTaskCloseMessage(task);
+        showTaskCloseMessage(task);*/
     }
 
     @Override
     public void onJobClose(JobStatus jobStatus, final Task task) {
-        post();
+        //post();
+
+
+        getSupportLoaderManager().restartLoader(CloseJobLoader.CLOSE_JOB_ID, null,
+                new CloseJobCallbacks(task, jobStatus.getId()));
 
         /*
-        getSupportLoaderManager().restartLoader(CloseJobLoader.CLOSE_JOB_ID, null,
-                new CloseJobCallbacks(task, jobStatus.getId()));*/
-
         jobStatus.setStatus(true);
         // Check if all jobs in task are closed
         boolean allClosed = true;
@@ -236,10 +238,8 @@ public class MainActivity extends AppCompatActivity implements
         }
         if (allClosed) {
             task.setStatus(true);
-
-            //TODO If response is True
             showTaskCloseMessage(task);
-        }
+        }*/
     }
 
     /**
@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onRefresh() {
-        loadTasksStub();
+        loadTasks();
     }
 
     // Stub method for testing adapter
@@ -349,6 +349,7 @@ public class MainActivity extends AppCompatActivity implements
             adapter = new TaskAdapter(data, MainActivity.this, getSupportFragmentManager());
             rvTasks.setAdapter(adapter);
         }
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
