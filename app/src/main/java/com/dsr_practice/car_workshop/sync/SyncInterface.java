@@ -8,7 +8,7 @@ import android.os.RemoteException;
 /**
  * Interface which declare a main method for sync
  */
-public interface SyncInterface {
+interface SyncInterface {
 
     void sync(ContentResolver contentResolver, final SyncResult syncResult)
             throws RemoteException, OperationApplicationException;

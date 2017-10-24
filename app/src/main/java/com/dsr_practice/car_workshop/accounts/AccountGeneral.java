@@ -5,6 +5,7 @@ import android.accounts.AccountManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 
 import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.sync.SyncAdapter;
@@ -14,6 +15,7 @@ public class AccountGeneral {
     private static final String ACCOUNT_NAME = "Car workshop account";
     private static final String AUTHORITY = Contract.CONTENT_AUTHORITY;
     private static final long   SYNC_FREQUENCY = 60 * 60;  // 1 hour (in seconds)
+    private static final String PREF_SETUP_COMPLETE = "setup_complete";
 
     // Gets the standard sync account
     public static Account getAccount() {
@@ -24,6 +26,8 @@ public class AccountGeneral {
     public static void createSyncAccount(Context context) {
         // Flag to determine if this is a new account or not
         boolean created = false;
+        boolean setupComplete = PreferenceManager
+                .getDefaultSharedPreferences(context).getBoolean(PREF_SETUP_COMPLETE, false);
 
         // Get an account and the account manager
         Account account = getAccount();
@@ -45,9 +49,12 @@ public class AccountGeneral {
             created = true;
         }
 
-        // Force a sync if the account was just created
-        if (created) {
+        // Schedule an initial sync if we detect problems with either our account
+        // or our local data has been deleted
+        if (created || !setupComplete) {
             SyncAdapter.performSync();
+            PreferenceManager.getDefaultSharedPreferences(context).edit()
+                    .putBoolean(PREF_SETUP_COMPLETE, true).commit();
         }
     }
 }

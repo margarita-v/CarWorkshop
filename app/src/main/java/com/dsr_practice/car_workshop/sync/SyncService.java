@@ -25,6 +25,6 @@ public class SyncService extends Service {
     // Return our SyncAdapter's IBinder
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return syncAdapter.getSyncAdapterBinder();
     }
 }

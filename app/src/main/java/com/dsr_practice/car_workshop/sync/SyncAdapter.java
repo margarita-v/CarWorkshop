@@ -21,11 +21,10 @@ import com.dsr_practice.car_workshop.models.common.sync.SyncModel;
 import com.dsr_practice.car_workshop.rest.ApiClient;
 import com.dsr_practice.car_workshop.rest.ApiInterface;
 
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Class which will perform sync process
@@ -38,31 +37,21 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     // Interface for REST usage
     private static ApiInterface apiInterface;
 
-    //region IDs of string resources for different errors messages
-    private static final int JOB_SYNC_ERROR = R.string.sync_error_jobs;
-    private static final int MARK_SYNC_ERROR = R.string.sync_error_marks;
-    private static final int MODEL_SYNC_ERROR = R.string.sync_error_models;
+    //region Objects for sync of all items
+    private SyncJobs syncJobs;
+    private SyncMarks syncMarks;
+    private SyncModels syncModels;
     //endregion
 
-    //region Variables for SyncCallback class usage
-    private int currentEntryId;
-    private SyncResult syncResult;
-    private int stringResourceId;
-    //endregion
-
-    //region Constructors
     SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         contentResolver = context.getContentResolver();
         apiInterface = ApiClient.getApi();
-    }
 
-    public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
-        super(context, autoInitialize, allowParallelSyncs);
-        contentResolver = context.getContentResolver();
-        apiInterface = ApiClient.getApi();
+        syncJobs = new SyncJobs();
+        syncMarks = new SyncMarks();
+        syncModels = new SyncModels();
     }
-    //endregion
 
     /* Merge strategy:
      * 1. Get cursor to all items
@@ -74,50 +63,73 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      * 3. For any items remaining in incoming list, ADD to database
      */
     @Override
-    public void onPerformSync(Account account, Bundle extras, String authority,
+    public void onPerformSync(final Account account, Bundle extras, String authority,
                               ContentProviderClient provider, final SyncResult syncResult) {
-        this.syncResult = syncResult;
 
-        // Sync job list
-        this.currentEntryId = Job.JOB_ID;
-        this.stringResourceId = JOB_SYNC_ERROR;
-
-        apiInterface.getJobs().enqueue(new SyncCallback<Job>());
-
-        // Sync mark list
-        this.currentEntryId = Mark.MARK_ID;
-        this.stringResourceId = MARK_SYNC_ERROR;
-
-        apiInterface.getMarks().enqueue(new SyncCallback<Mark>());
-
-        // Sync model list
-        this.currentEntryId = Model.MODEL_ID;
-        this.stringResourceId = MODEL_SYNC_ERROR;
-
-        apiInterface.getModels().enqueue(new SyncCallback<Model>());
+        syncJobs.performSync(Job.JOB_ID, R.string.sync_error_jobs, syncResult);
+        syncMarks.performSync(Mark.MARK_ID, R.string.sync_error_marks, syncResult);
+        syncModels.performSync(Model.MODEL_ID, R.string.sync_error_models, syncResult);
     }
 
     /**
-     * Generic class for implementing callbacks for data sync
-     * @param <T> Type of entry which will be loaded
+     * Common class for sync of all entries
+     * @param <T> Type of entry which will be loaded from server
      */
-    private class SyncCallback<T extends SyncModel> implements Callback<List<T>> {
+    private abstract class EntrySync<T extends SyncModel> {
 
-        @Override
-        public void onResponse(Call<List<T>> call, Response<List<T>> response) {
+        /**
+         * Abstract method for response which depends on the entry's type
+         */
+        abstract Call<List<T>> getResponse() throws IOException;
+
+        /**
+         * Perform sync of concrete entry
+         * @param entryId ID of entry which will be synced
+         * @param stringResourceId String resource ID for error message
+         * @param syncResult SyncResult for counting of applied changes during the sync process
+         */
+        void performSync(int entryId, int stringResourceId, SyncResult syncResult) {
             try {
-                new SyncImplementation<>(response.body(), currentEntryId)
-                        .sync(contentResolver, syncResult);
-            } catch (RemoteException | OperationApplicationException e) {
+                //SyncAdapter will run in its own thread so we don't need to create
+                // another thread for requests to the server
+                List<T> responseBody = getResponse().execute().body();
+                if (responseBody != null) {
+                    new SyncImplementation<>(responseBody, entryId)
+                            .sync(contentResolver, syncResult);
+                }
+                else
+                    Toast.makeText(getContext(), stringResourceId, Toast.LENGTH_SHORT).show();
+            } catch (RemoteException | OperationApplicationException | IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    //region Classes for sync of concrete entries
+    private class SyncJobs extends EntrySync<Job> {
 
         @Override
-        public void onFailure(Call<List<T>> call, Throwable t) {
-            Toast.makeText(getContext(), stringResourceId, Toast.LENGTH_SHORT).show();
+        Call<List<Job>> getResponse() throws IOException {
+            return apiInterface.getJobs();
         }
     }
+
+    private class SyncMarks extends EntrySync<Mark> {
+
+        @Override
+        Call<List<Mark>> getResponse() throws IOException {
+            return apiInterface.getMarks();
+        }
+    }
+
+    private class SyncModels extends EntrySync<Model> {
+
+        @Override
+        Call<List<Model>> getResponse() throws IOException {
+            return apiInterface.getModels();
+        }
+    }
+    //endregion
 
     /**
      * Manual force Android to perform a sync with SyncAdapter

@@ -125,14 +125,15 @@ class SyncImplementation<T extends SyncModel> implements SyncInterface {
         assert cursor != null;
 
         // Cursor fields
-        int id, entryId, optional;
+        int id, entryId, optional = -1;
         String name;
         while (cursor.moveToNext()) {
             syncResult.stats.numEntries++;
             id = cursor.getInt(COLUMN_ID);
             entryId = cursor.getInt(COLUMN_ENTRY_ID);
             name = cursor.getString(COLUMN_ENTRY_NAME);
-            optional = cursor.getInt(COLUMN_OPTIONAL_FIELD);
+            if (itemId != Mark.MARK_ID)
+                optional = cursor.getInt(COLUMN_OPTIONAL_FIELD);
 
             SyncModel match = entryArray.get(entryId);
             if (match != null) {
