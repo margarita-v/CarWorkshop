@@ -26,12 +26,12 @@ import com.dsr_practice.car_workshop.adapters.TaskAdapter;
 import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.dialogs.CloseDialog;
 import com.dsr_practice.car_workshop.dialogs.MessageDialog;
+import com.dsr_practice.car_workshop.loaders.CloseJobLoader;
+import com.dsr_practice.car_workshop.loaders.CloseTaskLoader;
 import com.dsr_practice.car_workshop.loaders.TaskLoader;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 import com.dsr_practice.car_workshop.models.common.sync.Job;
-import com.dsr_practice.car_workshop.rest.ApiClient;
-import com.dsr_practice.car_workshop.rest.ApiInterface;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -41,6 +41,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import okhttp3.ResponseBody;
+
 public class MainActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, CloseDialog.CloseInterface,
         LoaderManager.LoaderCallbacks<List<Task>> {
@@ -49,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView rvTasks;
     private TaskAdapter adapter;
-    private ApiInterface apiInterface;
 
     /**
      * Handle to a SyncObserver.
@@ -74,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         setSupportActionBar(toolbar);
         setTitle(R.string.main_title);
-        apiInterface = ApiClient.getApi();
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -208,19 +208,8 @@ public class MainActivity extends AppCompatActivity implements
         post();
 
         /*
-        progressBar.setVisibility(View.VISIBLE);
-        apiInterface.closeTask(task.getId()).enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                showTaskCloseMessage(task);
-                finishLoading(true);
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                finishLoading(false);
-            }
-        });*/
+        getSupportLoaderManager().restartLoader(CloseTaskLoader.CLOSE_TASK_ID, null,
+                new CloseTaskCallbacks(task));*/
 
         task.setStatus(true);
         for (JobStatus jobStatus: task.getJobs()) {
@@ -234,21 +223,8 @@ public class MainActivity extends AppCompatActivity implements
         post();
 
         /*
-        progressBar.setVisibility(View.VISIBLE);
-        apiInterface.closeJobInTask(new CloseJobPost(task.getId(), jobStatus.getJob().getId()))
-                .enqueue(new Callback<Boolean>() {
-                    @Override
-                    public void onResponse(Call<Boolean> call, Response<Boolean> response) {
-                        if (response.body())
-                            showTaskCloseMessage(task);
-                        finishLoading(true);
-                    }
-
-                    @Override
-                    public void onFailure(Call<Boolean> call, Throwable t) {
-                        finishLoading(false);
-                    }
-                });*/
+        getSupportLoaderManager().restartLoader(CloseJobLoader.CLOSE_JOB_ID, null,
+                new CloseJobCallbacks(task, jobStatus.getId()));*/
 
         jobStatus.setStatus(true);
         // Check if all jobs in task are closed
@@ -357,18 +333,6 @@ public class MainActivity extends AppCompatActivity implements
         else
             getSupportLoaderManager().restartLoader(TaskLoader.TASK_LOADER_ID, null, this);
     }
-
-    /**
-     * Perform actions after loading
-     * @param success True if loading was finished successfully
-     */
-    private void finishLoading(boolean success) {
-        if (success)
-            adapter.notifyDataSetChanged();
-        else
-            MessageDialog.showConnectionError(getSupportFragmentManager());
-        progressBar.setVisibility(View.GONE);
-    }
     //endregion
 
     //region Callbacks for loading task list from server using Loader
@@ -405,4 +369,78 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
     //endregion
+
+    /**
+     * Callbacks for task closing
+     */
+    private class CloseTaskCallbacks implements LoaderManager.LoaderCallbacks<ResponseBody> {
+
+        private Task task;
+
+        CloseTaskCallbacks(Task task) {
+            this.task = task;
+        }
+
+        @Override
+        public Loader<ResponseBody> onCreateLoader(int id, Bundle args) {
+            return new CloseTaskLoader(MainActivity.this, this.task.getId());
+        }
+
+        @Override
+        public void onLoadFinished(Loader<ResponseBody> loader, ResponseBody data) {
+            boolean success = data != null;
+            if (success)
+                showTaskCloseMessage(this.task);
+            finishLoading(success);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<ResponseBody> loader) {
+
+        }
+    }
+
+    /**
+     * Callbacks for job closing
+     */
+    private class CloseJobCallbacks implements LoaderManager.LoaderCallbacks<Boolean> {
+
+        private Task task;
+        private int jobId;
+
+        CloseJobCallbacks(Task task, int jobId) {
+            this.task = task;
+            this.jobId = jobId;
+        }
+
+        @Override
+        public Loader<Boolean> onCreateLoader(int id, Bundle args) {
+            return new CloseJobLoader(MainActivity.this, task.getId(), this.jobId);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Boolean> loader, Boolean data) {
+            boolean success = data != null;
+            if (success && data)
+                showTaskCloseMessage(task);
+            finishLoading(success);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Boolean> loader) {
+
+        }
+    }
+
+    /**
+     * Perform actions after loading
+     * @param success True if loading was finished successfully
+     */
+    private void finishLoading(boolean success) {
+        if (success)
+            adapter.notifyDataSetChanged();
+        else
+            MessageDialog.showConnectionError(getSupportFragmentManager());
+        progressBar.setVisibility(View.GONE);
+    }
 }

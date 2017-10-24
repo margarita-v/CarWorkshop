@@ -23,9 +23,9 @@ import com.dsr_practice.car_workshop.adapters.JobAdapter;
 import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.database.Provider;
 import com.dsr_practice.car_workshop.dialogs.MessageDialog;
+import com.dsr_practice.car_workshop.loaders.CreateTaskLoader;
 import com.dsr_practice.car_workshop.models.common.sync.Job;
-import com.dsr_practice.car_workshop.rest.ApiClient;
-import com.dsr_practice.car_workshop.rest.ApiInterface;
+import com.dsr_practice.car_workshop.models.post.TaskPost;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -34,9 +34,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class TaskActivity extends AppCompatActivity
         implements View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
@@ -88,7 +85,6 @@ public class TaskActivity extends AppCompatActivity
     private static final String JOBS = "JOBS";
     //endregion
 
-    private ApiInterface apiInterface;
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private final DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
@@ -97,7 +93,6 @@ public class TaskActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
         chosenJobs = new ArrayList<>();
-        apiInterface = ApiClient.getApi();
 
         //region Find widgets by IDs and set listeners
         View listHeader = View.inflate(this, R.layout.task_header, null);
@@ -157,36 +152,6 @@ public class TaskActivity extends AppCompatActivity
         // Load info from database
         getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, this);
         getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, this);
-    }
-
-    /**
-     * Callback for task creation request
-     */
-    private Callback<ResponseBody> taskCreateCallback = new Callback<ResponseBody>() {
-        @Override
-        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-            finishTaskCreation(true);
-        }
-
-        @Override
-        public void onFailure(Call<ResponseBody> call, Throwable t) {
-            finishTaskCreation(false);
-        }
-    };
-
-    /**
-     * Actions after task creation
-     * @param success True if task creation was finished successfully
-     */
-    private void finishTaskCreation(boolean success) {
-        if (success) {
-            Toast.makeText(this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
-            finish();
-        }
-        else {
-            MessageDialog.showConnectionError(getSupportFragmentManager());
-            setViewsEnabled(true);
-        }
     }
 
     /**
@@ -264,10 +229,10 @@ public class TaskActivity extends AppCompatActivity
                 if (checkInput(vin, number)) {
                     setViewsEnabled(false);
                     /*
-                    apiInterface.createTask(
-                            new TaskPost(markId, modelId, dateFormat.format(calendar.getTime()),
-                                    vin, number, chosenJobs))
-                            .enqueue(taskCreateCallback); */
+                    TaskPost taskPostObject = new TaskPost(
+                            markId, modelId, dateFormat.format(calendar.getTime()), vin, number, chosenJobs);
+                    getSupportLoaderManager().restartLoader(CreateTaskLoader.CREATE_TASK_ID, null,
+                            new CreateTaskCallbacks(taskPostObject));*/
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -278,6 +243,48 @@ public class TaskActivity extends AppCompatActivity
                 } // if checkInput...
             } //run()
         });
+    }
+
+    /**
+     * Callbacks for task creation
+     */
+    private class CreateTaskCallbacks implements LoaderManager.LoaderCallbacks<ResponseBody> {
+
+        private TaskPost taskPostObject;
+
+        CreateTaskCallbacks(TaskPost taskPostObject) {
+            this.taskPostObject = taskPostObject;
+        }
+
+        @Override
+        public Loader<ResponseBody> onCreateLoader(int id, Bundle args) {
+            return new CreateTaskLoader(TaskActivity.this, taskPostObject);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<ResponseBody> loader, ResponseBody data) {
+            finishTaskCreation(data != null);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<ResponseBody> loader) {
+
+        }
+    }
+
+    /**
+     * Actions after task creation
+     * @param success True if task creation was finished successfully
+     */
+    private void finishTaskCreation(boolean success) {
+        if (success) {
+            Toast.makeText(this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        else {
+            MessageDialog.showConnectionError(getSupportFragmentManager());
+            setViewsEnabled(true);
+        }
     }
 
     //region Methods for UI
