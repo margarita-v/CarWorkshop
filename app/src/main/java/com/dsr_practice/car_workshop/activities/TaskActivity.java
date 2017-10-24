@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
@@ -44,6 +45,7 @@ public class TaskActivity extends AppCompatActivity
     private ListView lvJobs;
     private Button btnSaveTask;
     private ProgressBar progressBar;
+    private TextView tvEmpty;
     //endregion
 
     //region Adapters
@@ -104,6 +106,7 @@ public class TaskActivity extends AppCompatActivity
         spinnerModel = listHeader.findViewById(R.id.spinnerModel);
         btnSaveTask = listFooter.findViewById(R.id.btnSaveTask);
         progressBar = listFooter.findViewById(R.id.progressBar);
+        tvEmpty = (TextView) findViewById(R.id.tvEmpty);
 
         btnSaveTask.setOnClickListener(this);
         spinnerMark.setOnItemSelectedListener(onItemSelectedListener);
@@ -421,6 +424,10 @@ public class TaskActivity extends AppCompatActivity
                         jobAdapter.setCheckedPositions(checkedPositions);
                     break;
             }
+        }
+        else {
+            tvEmpty.setVisibility(View.VISIBLE);
+            lvJobs.setVisibility(View.GONE);
         }
     }
 

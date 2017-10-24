@@ -32,6 +32,7 @@
     <string name="date">Дата</string>
     <string name="status">Статус</string>
     <string name="empty_list">Не удалось загрузить данные.\nПроверьте подключение к Интернету</string>
+    <string name="empty_database">Can not load data\nPlease, sync local database with server</string>
 
     <!-- TextView's hints -->
     <string name="hint_vin">Введите VIN</string>
