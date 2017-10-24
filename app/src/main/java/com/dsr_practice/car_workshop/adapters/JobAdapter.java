@@ -11,9 +11,14 @@ import android.widget.SimpleCursorAdapter;
 
 import com.dsr_practice.car_workshop.R;
 
+import java.util.Arrays;
+
 public class JobAdapter extends SimpleCursorAdapter {
 
+    // All jobs positions
     private boolean[] checkedPositions;
+
+    // Count of checked jobs
     private int checkedCount;
 
     public JobAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
@@ -44,8 +49,8 @@ public class JobAdapter extends SimpleCursorAdapter {
     }
 
     //region Getters and setters
-    public boolean isChecked(int position) {
-        return checkedPositions[position];
+    public boolean[] getCheckedPositions() {
+        return checkedPositions;
     }
 
     public int getSize() {
@@ -56,12 +61,8 @@ public class JobAdapter extends SimpleCursorAdapter {
         return checkedCount;
     }
 
-    public boolean[] getCheckedPositions() {
-        return checkedPositions;
-    }
-
     public void setCheckedPositions(boolean[] checkedPositions) {
-        this.checkedPositions = checkedPositions;
+        this.checkedPositions = Arrays.copyOf(checkedPositions, checkedPositions.length);
         checkedCount = 0;
         for (boolean checked: checkedPositions) {
             if (checked)
@@ -71,6 +72,20 @@ public class JobAdapter extends SimpleCursorAdapter {
     }
     //endregion
 
+    /**
+     * Get a state of chosen job
+     * @param position Job position which state will be checked
+     * @return True if job is checked
+     */
+    public boolean isChecked(int position) {
+        return checkedPositions[position];
+    }
+
+    /**
+     * Check or uncheck job
+     * @param position Job position which state will be changed
+     * @return Job state: True if job is checked, False otherwise
+     */
     public boolean check(int position) {
         boolean checked = !checkedPositions[position];
         checkedPositions[position] = checked;

@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements
         startLoading();
     }
 
+    //region Activity lifecycle
     @Override
     public void onResume() {
         super.onResume();
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements
             syncObserverHandle = null;
         }
     }
+    //endregion
 
     //region Configure options menu
     @Override
@@ -139,28 +141,7 @@ public class MainActivity extends AppCompatActivity implements
     }
     //endregion
 
-    /**
-     * Set the state of the Refresh button.
-     * If a sync is active, turn on the ProgressBar widget.
-     * Otherwise, turn it off.
-     *
-     * @param refreshing True if an active sync is occurring, false otherwise
-     */
-    public void setRefreshActionButtonState(boolean refreshing) {
-        if (optionsMenu == null) {
-            return;
-        }
-
-        final MenuItem refreshItem = optionsMenu.findItem(R.id.action_sync);
-        if (refreshItem != null) {
-            if (refreshing) {
-                refreshItem.setActionView(R.layout.actionbar);
-            } else {
-                refreshItem.setActionView(null);
-            }
-        }
-    }
-
+    //region Configure sync observer
     /**
      * Create a new anonymous SyncStatusObserver.
      * It's attached to the app's ContentResolver in onResume(), and removed in onPause().
@@ -199,10 +180,27 @@ public class MainActivity extends AppCompatActivity implements
         }
     };
 
-    @Override
-    public void onRefresh() {
-        loadTasksStub();
+    /**
+     * Set the state of the Refresh button.
+     * If a sync is active, turn on the ProgressBar widget.
+     * Otherwise, turn it off.
+     *
+     * @param refreshing True if an active sync is occurring, false otherwise
+     */
+    public void setRefreshActionButtonState(boolean refreshing) {
+        if (optionsMenu == null) {
+            return;
+        }
+
+        final MenuItem refreshItem = optionsMenu.findItem(R.id.action_sync);
+        if (refreshItem != null) {
+            if (refreshing)
+                refreshItem.setActionView(R.layout.actionbar);
+            else
+                refreshItem.setActionView(null);
+        }
     }
+    //endregion
 
     //region Callbacks from CloseDialog
     @Override
@@ -268,6 +266,17 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Show message if task was closed
+     * @param task Task which was closed
+     */
+    private void showTaskCloseMessage(Task task) {
+        MessageDialog.showDialog(
+                getString(R.string.task_was_closed),
+                getString(R.string.task_full_price) + Integer.toString(task.getFullPrice()),
+                getSupportFragmentManager());
+    }
+
     // Stub test for actions after loading
     private void post() {
         progressBar.setVisibility(View.VISIBLE);
@@ -281,6 +290,7 @@ public class MainActivity extends AppCompatActivity implements
     }
     //endregion
 
+    //region Task loading
     /**
      * Perform task loading
      */
@@ -289,6 +299,11 @@ public class MainActivity extends AppCompatActivity implements
             swipeRefreshLayout.setRefreshing(true);
             onRefresh();
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        loadTasksStub();
     }
 
     // Stub method for testing adapter
@@ -344,19 +359,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Sort task list by date
-     * @param taskList List of tasks which will be sorted
-     */
-    private void sort(List<Task> taskList) {
-        Collections.sort(taskList, new Comparator<Task>() {
-            @Override
-            public int compare(Task task1, Task task2) {
-                return task1.getDate().compareTo(task2.getDate());
-            }
-        });
-    }
-
-    /**
      * Perform actions after loading
      * @param success True if loading was finished successfully
      */
@@ -367,17 +369,7 @@ public class MainActivity extends AppCompatActivity implements
             MessageDialog.showConnectionError(getSupportFragmentManager());
         progressBar.setVisibility(View.GONE);
     }
-
-    /**
-     * Show message if task was closed
-     * @param task Task which was closed
-     */
-    private void showTaskCloseMessage(Task task) {
-        MessageDialog.showDialog(
-                getString(R.string.task_was_closed),
-                getString(R.string.task_full_price) + Integer.toString(task.getFullPrice()),
-                getSupportFragmentManager());
-    }
+    //endregion
 
     //region Callbacks for loading task list from server using Loader
     @Override
@@ -398,6 +390,19 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLoaderReset(Loader<List<Task>> loader) {
 
+    }
+
+    /**
+     * Sort task list by date
+     * @param taskList List of tasks which will be sorted
+     */
+    private void sort(List<Task> taskList) {
+        Collections.sort(taskList, new Comparator<Task>() {
+            @Override
+            public int compare(Task task1, Task task2) {
+                return task2.getDate().compareTo(task1.getDate());
+            }
+        });
     }
     //endregion
 }
