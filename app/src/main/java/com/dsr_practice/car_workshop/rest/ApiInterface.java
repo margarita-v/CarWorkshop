@@ -30,12 +30,12 @@ public interface ApiInterface {
     Call<List<Task>> getTasks();
 
     // POST requests
-    @POST("task/create")
+    @POST("task/create/")
     Call<ResponseBody> createTask(@Body TaskPost taskPost);
 
-    @POST("task/close")
+    @POST("task/close/")
     Call<ResponseBody> closeTask(@Body Integer id);
 
-    @POST("job/close")
+    @POST("job/close/")
     Call<Boolean> closeJobInTask(@Body CloseJobPost closeJobPost);
 }

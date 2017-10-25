@@ -18,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.accounts.AccountGeneral;
@@ -31,15 +30,10 @@ import com.dsr_practice.car_workshop.loaders.CloseTaskLoader;
 import com.dsr_practice.car_workshop.loaders.TaskLoader;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
-import com.dsr_practice.car_workshop.models.common.sync.Job;
 import com.dsr_practice.car_workshop.sync.SyncAdapter;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -206,40 +200,16 @@ public class MainActivity extends AppCompatActivity implements
     //region Callbacks from CloseDialog
     @Override
     public void onTaskClose(final Task task) {
-        //post();
-
+        progressBar.setVisibility(View.VISIBLE);
         getSupportLoaderManager().restartLoader(CloseTaskLoader.CLOSE_TASK_ID, null,
                 new CloseTaskCallbacks(task));
-
-        /*
-        task.setStatus(true);
-        for (JobStatus jobStatus: task.getJobs()) {
-            jobStatus.setStatus(true);
-        }
-        showTaskCloseMessage(task);*/
     }
 
     @Override
     public void onJobClose(JobStatus jobStatus, final Task task) {
-        //post();
-
-
+        progressBar.setVisibility(View.VISIBLE);
         getSupportLoaderManager().restartLoader(CloseJobLoader.CLOSE_JOB_ID, null,
                 new CloseJobCallbacks(task, jobStatus.getId()));
-
-        /*
-        jobStatus.setStatus(true);
-        // Check if all jobs in task are closed
-        boolean allClosed = true;
-        for (JobStatus status: task.getJobs()) {
-            allClosed = status.getStatus();
-            if (!allClosed)
-                break;
-        }
-        if (allClosed) {
-            task.setStatus(true);
-            showTaskCloseMessage(task);
-        }*/
     }
 
     /**
@@ -280,48 +250,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onRefresh() {
         loadTasks();
-    }
-
-    // Stub method for testing adapter
-    public void loadTasksStub() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                String[] dateArray = new String[] {
-                        "2012-04-05T20:40:45Z",
-                        "2014-04-05T20:40:45Z",
-                        "2014-04-06T20:40:45Z",
-                        "2012-04-05T20:41:45Z"
-                };
-                String[] jobsArray = new String[] {
-                        "Car wash",
-                        "Full repair",
-                        "Cleaning",
-                        "Change color"
-                };
-                int[] priceArray = new int[] { 300, 1000, 200, 500 };
-                SimpleDateFormat format = new SimpleDateFormat(getString(R.string.date_format));
-                List<Task> taskList = new ArrayList<>();
-                for (int i = 0; i < dateArray.length; i++) {
-                    try {
-                        Date newDate = format.parse(dateArray[i]);
-                        List<JobStatus> jobs = new ArrayList<>();
-                        for (int j = 0; j < 4; j++) {
-                            Job job = new Job(j, priceArray[j], jobsArray[j]);
-                            jobs.add(new JobStatus(j, j, job, false));
-                        }
-                        Task task = new Task(i, newDate, 1, 2, "A001AA", "dfghj", "name", false, jobs);
-                        taskList.add(task);
-                    } catch (ParseException e) {
-                        Toast.makeText(MainActivity.this, R.string.toast_invalid_date, Toast.LENGTH_SHORT).show();
-                    }
-                }
-                sort(taskList);
-                adapter = new TaskAdapter(taskList, MainActivity.this, getSupportFragmentManager());
-                rvTasks.setAdapter(adapter);
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 2000);
     }
 
     /**
@@ -388,11 +316,16 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         @Override
-        public void onLoadFinished(Loader<ResponseBody> loader, ResponseBody data) {
-            boolean success = data != null;
-            if (success)
-                showTaskCloseMessage(this.task);
-            finishLoading(success);
+        public void onLoadFinished(Loader<ResponseBody> loader, final ResponseBody data) {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    boolean success = data != null;
+                    if (success)
+                        showTaskCloseMessage(task);
+                    finishLoading(success);
+                }
+            });
         }
 
         @Override
@@ -420,11 +353,16 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         @Override
-        public void onLoadFinished(Loader<Boolean> loader, Boolean data) {
-            boolean success = data != null;
-            if (success && data)
-                showTaskCloseMessage(task);
-            finishLoading(success);
+        public void onLoadFinished(Loader<Boolean> loader, final Boolean data) {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    boolean success = data != null;
+                    if (success && data)
+                        showTaskCloseMessage(task);
+                    finishLoading(success);
+                }
+            });
         }
 
         @Override

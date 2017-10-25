@@ -12,7 +12,8 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:text="@string/empty_database"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:visibility="gone"/>
 
     <ListView
         android:id="@+id/lvJobs"

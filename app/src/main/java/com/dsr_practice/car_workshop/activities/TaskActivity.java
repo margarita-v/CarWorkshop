@@ -265,8 +265,13 @@ public class TaskActivity extends AppCompatActivity
         }
 
         @Override
-        public void onLoadFinished(Loader<ResponseBody> loader, ResponseBody data) {
-            finishTaskCreation(data != null);
+        public void onLoadFinished(Loader<ResponseBody> loader, final ResponseBody data) {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    finishTaskCreation(data != null);
+                }
+            });
         }
 
         @Override
@@ -394,13 +399,11 @@ public class TaskActivity extends AppCompatActivity
                         TaskActivity.this,
                         Provider.URI_MODELS_FOR_MARK, Contract.MODEL_PROJECTION,
                         null, new String[] {Integer.toString(markId)}, null);
-            case JOB_LOADER_ID:
+            default:
                 return new CursorLoader(
                         TaskActivity.this,
                         Contract.JobEntry.CONTENT_URI, Contract.JOB_PROJECTION,
                         null, null, null);
-            default:
-                return null;
         }
     }
 
