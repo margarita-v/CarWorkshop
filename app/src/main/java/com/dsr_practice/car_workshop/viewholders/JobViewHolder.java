@@ -1,5 +1,6 @@
 package com.dsr_practice.car_workshop.viewholders;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -7,9 +8,8 @@ import android.widget.TextView;
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.sync.Job;
-import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
 
-public class JobViewHolder extends ChildViewHolder implements IconInterface {
+public class JobViewHolder extends RecyclerView.ViewHolder implements IconInterface {
 
     private ImageButton imgBtnCloseJob;
     private TextView tvJob;

@@ -3,15 +3,13 @@ package com.dsr_practice.car_workshop.models.common;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
-
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class Task extends ExpandableGroup<JobStatus> implements Parcelable {
+public class Task implements Parcelable {
     private int id;
     private Date date;
     private int model;
@@ -28,7 +26,6 @@ public class Task extends ExpandableGroup<JobStatus> implements Parcelable {
     public Task(int id, Date date, int model, int mark,
                 String number, String vin, String name,
                 boolean status, List<JobStatus> jobs) {
-        super(name, jobs);
         this.id = id;
         this.date = date;
         this.model = model;
@@ -42,7 +39,6 @@ public class Task extends ExpandableGroup<JobStatus> implements Parcelable {
 
     //region Parcelable implementation
     protected Task(Parcel in) {
-        super(in);
         id = in.readInt();
         date = (Date) in.readSerializable();
         model = in.readInt();
@@ -56,7 +52,6 @@ public class Task extends ExpandableGroup<JobStatus> implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
         dest.writeInt(id);
         dest.writeSerializable(date);
         dest.writeInt(model);

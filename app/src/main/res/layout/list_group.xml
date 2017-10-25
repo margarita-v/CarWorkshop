@@ -5,27 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
-    app:columnCount="5"
+    android:paddingLeft="@dimen/image_button_width"
+    app:columnCount="4"
     app:rowCount="2"
     app:useDefaultMargins="true">
-
-    <ImageView
-        android:id="@+id/imgArrow"
-        android:layout_width="@dimen/image_button_width"
-        android:layout_height="@dimen/image_button_height"
-        android:adjustViewBounds="false"
-        android:cropToPadding="false"
-        android:scaleType="center"
-        app:layout_column="0"
-        app:layout_rowSpan="2"
-        app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp"
-        android:contentDescription="@string/img_arrow" />
 
     <TextView
         android:id="@+id/tvCarName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_column="1"
+        app:layout_column="0"
         app:layout_row="0"
         app:layout_columnWeight="1"
         android:textColor="@android:color/black"
@@ -35,7 +24,7 @@
         android:id="@+id/tvDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_column="1"
+        app:layout_column="0"
         app:layout_row="1"
         app:layout_columnWeight="1" />
 
@@ -43,7 +32,7 @@
         android:id="@+id/tvNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_column="2"
+        app:layout_column="1"
         app:layout_row="0"
         app:layout_columnWeight="1.5"
         app:layout_rowSpan="2"
@@ -56,7 +45,7 @@
         android:id="@+id/imgBtnClose"
         android:layout_width="@dimen/image_button_width"
         android:layout_height="@dimen/image_button_height"
-        app:layout_column="3"
+        app:layout_column="2"
         app:layout_row="0"
         app:layout_rowSpan="2"
         app:layout_gravity="center_vertical"
@@ -67,7 +56,7 @@
         android:id="@+id/imgBtnInfo"
         android:layout_width="@dimen/image_button_width"
         android:layout_height="@dimen/image_button_height"
-        app:layout_column="4"
+        app:layout_column="3"
         app:layout_row="0"
         app:layout_rowSpan="2"
         app:layout_gravity="center_vertical"

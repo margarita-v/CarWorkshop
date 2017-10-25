@@ -11,12 +11,11 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 
 import com.dsr_practice.car_workshop.R;
@@ -44,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private ProgressBar progressBar;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private RecyclerView rvTasks;
+    private ExpandableListView elvTasks;
     private TaskAdapter adapter;
 
     /**
@@ -75,8 +74,7 @@ public class MainActivity extends AppCompatActivity implements
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
 
-        rvTasks = (RecyclerView) findViewById(R.id.rvTasks);
-        rvTasks.setLayoutManager(new LinearLayoutManager(this));
+        elvTasks = (ExpandableListView) findViewById(R.id.elvTasks);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -256,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements
      * Load tasks from server
      */
     public void loadTasks() {
-        if (adapter == null || adapter.getItemCount() == 0)
+        if (adapter == null || adapter.getGroupCount() == 0)
             getSupportLoaderManager().initLoader(TaskLoader.TASK_LOADER_ID, null, this);
         else
             getSupportLoaderManager().restartLoader(TaskLoader.TASK_LOADER_ID, null, this);
@@ -275,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements
         if (data != null) {
             sort(data);
             adapter = new TaskAdapter(data, MainActivity.this, getSupportFragmentManager());
-            rvTasks.setAdapter(adapter);
+            elvTasks.setAdapter(adapter);
         }
         swipeRefreshLayout.setRefreshing(false);
     }
