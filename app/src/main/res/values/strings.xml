@@ -3,6 +3,7 @@
     <string name="app_name">CarWorkshop</string>
     <string name="date_format">yyyy-MM-dd\'T\'HH:mm:ss\'Z\'</string>
     <string name="class_cast"> must implement ConfirmCloseListener</string>
+    <string name="sync_error">Server is unavailable\nPlease, try again later</string>
 
     <!-- Option items menu -->
     <string name="action_refresh">Refresh</string>
@@ -49,16 +50,8 @@
     <string name="btn_load">Загрузить задачи</string>
 
     <!-- Toast messages -->
-    <string name="toast_cant_load">Can\'t load tasks!</string>
     <string name="toast_invalid_date">Invalid date format!</string>
-    <string name="toast_cant_close_task">Can\'t close task!</string>
-    <string name="toast_cant_close_job">Can\'t close job!</string>
-    <string name="all_jobs_are_closed">All jobs in this task are closed</string>
     <string name="toast_create_task">Task was created</string>
-    <string name="toast_cant_create">Can\'\t create task!</string>
-    <string name="sync_error_jobs">Fail to sync job list with server</string>
-    <string name="sync_error_marks">Fail to sync mark list with server</string>
-    <string name="sync_error_models">Fail to sync model list with server</string>
 
     <!-- Dialogs -->
     <string name="close_task_title">Close task</string>

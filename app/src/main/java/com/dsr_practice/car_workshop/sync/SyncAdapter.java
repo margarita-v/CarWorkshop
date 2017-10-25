@@ -9,9 +9,7 @@ import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.widget.Toast;
 
-import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.accounts.AccountGeneral;
 import com.dsr_practice.car_workshop.database.Contract;
 import com.dsr_practice.car_workshop.models.common.sync.Job;
@@ -36,6 +34,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     // Interface for REST usage
     private static ApiInterface apiInterface;
+
+    // Flag for sync cancel
+    private boolean isSyncCanceled;
 
     //region Objects for sync of all items
     private SyncJobs syncJobs;
@@ -66,9 +67,18 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(final Account account, Bundle extras, String authority,
                               ContentProviderClient provider, final SyncResult syncResult) {
 
-        syncJobs.performSync(Job.JOB_ID, R.string.sync_error_jobs, syncResult);
-        syncMarks.performSync(Mark.MARK_ID, R.string.sync_error_marks, syncResult);
-        syncModels.performSync(Model.MODEL_ID, R.string.sync_error_models, syncResult);
+        syncJobs.performSync(Job.JOB_ID, syncResult);
+
+        if (!isSyncCanceled) {
+            syncMarks.performSync(Mark.MARK_ID, syncResult);
+
+            if (!isSyncCanceled)
+                syncModels.performSync(Model.MODEL_ID, syncResult);
+            else
+                ContentResolver.cancelSync(account, authority);
+        }
+        else
+            ContentResolver.cancelSync(account, authority);
     }
 
     /**
@@ -85,10 +95,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         /**
          * Perform sync of concrete entry
          * @param entryId ID of entry which will be synced
-         * @param stringResourceId String resource ID for error message
          * @param syncResult SyncResult for counting of applied changes during the sync process
          */
-        void performSync(int entryId, int stringResourceId, SyncResult syncResult) {
+        void performSync(int entryId, SyncResult syncResult) {
             try {
                 //SyncAdapter will run in its own thread so we don't need to create
                 // another thread for requests to the server
@@ -98,7 +107,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                             .sync(contentResolver, syncResult);
                 }
                 else
-                    Toast.makeText(getContext(), stringResourceId, Toast.LENGTH_SHORT).show();
+                    // Response is null; server is unavailable
+                    isSyncCanceled = true;
             } catch (RemoteException | OperationApplicationException | IOException e) {
                 e.printStackTrace();
             }
