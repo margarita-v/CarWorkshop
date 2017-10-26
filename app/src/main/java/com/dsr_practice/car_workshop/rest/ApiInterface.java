@@ -17,16 +17,16 @@ import retrofit2.http.POST;
 
 public interface ApiInterface {
     // GET requests
-    @GET("marks")
+    @GET("marks/")
     Call<List<Mark>> getMarks();
 
-    @GET("models")
+    @GET("models/")
     Call<List<Model>> getModels();
 
-    @GET("jobs")
+    @GET("jobs/")
     Call<List<Job>> getJobs();
 
-    @GET("tasks")
+    @GET("tasks/")
     Call<List<Task>> getTasks();
 
     // POST requests
