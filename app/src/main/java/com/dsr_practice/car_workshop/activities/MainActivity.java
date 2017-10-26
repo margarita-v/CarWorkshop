@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.accounts.AccountGeneral;
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
         AccountGeneral.createSyncAccount(this);
-        //startLoading();
+        startLoading();
     }
 
     //region Activity lifecycle
@@ -309,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         @Override
-        public void onLoadFinished(Loader<Task> loader, final Task data) {
+        public void onLoadFinished(final Loader<Task> loader, final Task data) {
             new Handler().post(new Runnable() {
                 @Override
                 public void run() {
@@ -331,8 +332,13 @@ public class MainActivity extends AppCompatActivity implements
      * @param task Response from server
      */
     private void finishLoading(Task task) {
-        if (task != null)
+        if (task != null) {
             adapter.setTask(task);
+            // If task is not close, then one job in task was closed
+            if (!task.getStatus())
+                Toast.makeText(this, R.string.toast_close_job,
+                        Toast.LENGTH_SHORT).show();
+        }
         else
             MessageDialog.showConnectionError(getSupportFragmentManager());
         progressBar.setVisibility(View.GONE);

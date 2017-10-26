@@ -235,14 +235,6 @@ public class TaskActivity extends AppCompatActivity
                             markId, modelId, dateFormat.format(calendar.getTime()), vin, number, chosenJobs);
                     getSupportLoaderManager().restartLoader(CreateTaskLoader.CREATE_TASK_ID, null,
                             new CreateTaskCallbacks(taskPostObject));
-                    /*
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(TaskActivity.this, R.string.toast_create_task, Toast.LENGTH_SHORT).show();
-                            TaskActivity.this.finish();
-                        }
-                    }, 1000);*/
                 } // if checkInput...
             } //run()
         });

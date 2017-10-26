@@ -52,6 +52,7 @@
     <!-- Toast messages -->
     <string name="toast_invalid_date">Invalid date format!</string>
     <string name="toast_create_task">Task was created</string>
+    <string name="toast_close_job">Job was closed</string>
 
     <!-- Dialogs -->
     <string name="close_task_title">Close task</string>
