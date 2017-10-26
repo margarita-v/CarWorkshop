@@ -10,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 
 import com.dsr_practice.car_workshop.R;
-import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 
 public class CloseDialog extends DialogFragment implements DialogInterface.OnClickListener {
@@ -20,7 +19,7 @@ public class CloseDialog extends DialogFragment implements DialogInterface.OnCli
 
     // Dialog's objects
     private Task task;
-    private JobStatus jobStatus;
+    private Integer jobId;
 
     // Callback to activity
     private CloseInterface closeActionListener;
@@ -29,10 +28,10 @@ public class CloseDialog extends DialogFragment implements DialogInterface.OnCli
     public static final String TAG = "CLOSE_DIALOG";
 
     public static CloseDialog newInstance(int titleId, int messageId,
-                                          Task task, JobStatus jobStatus) {
+                                          Task task, Integer jobId) {
         CloseDialog dialog = new CloseDialog();
         dialog.task = task;
-        dialog.jobStatus = jobStatus;
+        dialog.jobId = jobId;
         dialog.titleId = titleId;
         dialog.messageId = messageId;
         return dialog;
@@ -69,8 +68,8 @@ public class CloseDialog extends DialogFragment implements DialogInterface.OnCli
                 dismiss();
                 break;
             case Dialog.BUTTON_POSITIVE:
-                if (jobStatus != null)
-                    closeActionListener.onJobClose(jobStatus, task);
+                if (jobId != null)
+                    closeActionListener.onJobClose(jobId, task);
                 else
                     closeActionListener.onTaskClose(task);
         }
@@ -89,9 +88,9 @@ public class CloseDialog extends DialogFragment implements DialogInterface.OnCli
 
         /**
          * Close job action
-         * @param jobStatus JobStatus of job in concrete task which will be closed
+         * @param jobId ID of job in concrete task which will be closed
          * @param task Task which associated with closing job
          */
-        void onJobClose(JobStatus jobStatus, Task task);
+        void onJobClose(Integer jobId, Task task);
     }
 }

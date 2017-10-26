@@ -3,6 +3,7 @@ package com.dsr_practice.car_workshop.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.FragmentManager;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,25 +17,28 @@ import com.dsr_practice.car_workshop.models.common.Task;
 import com.dsr_practice.car_workshop.viewholders.JobViewHolder;
 import com.dsr_practice.car_workshop.viewholders.TaskViewHolder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TaskAdapter extends BaseExpandableListAdapter {
 
-    private List<Task> taskList;
+    private SparseArray<Task> taskSparseArray;
     private Context context;
     private FragmentManager fragmentManager;
 
     public TaskAdapter(List<Task> taskList,
                        Context context, FragmentManager fragmentManager) {
-        this.taskList = new ArrayList<>(taskList);
+
         this.context = context;
         this.fragmentManager = fragmentManager;
+        this.taskSparseArray = new SparseArray<>();
+        for (Task task: taskList) {
+            this.taskSparseArray.put(task.getId(), task);
+        }
     }
 
     @Override
     public int getGroupCount() {
-        return this.taskList.size();
+        return this.taskSparseArray.size();
     }
 
     @Override
@@ -44,7 +48,7 @@ public class TaskAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Task getGroup(int i) {
-        return this.taskList.get(i);
+        return this.taskSparseArray.valueAt(i);
     }
 
     @Override
@@ -122,7 +126,7 @@ public class TaskAdapter extends BaseExpandableListAdapter {
             @Override
             public void onClick(View view) {
                 showConfirmDialog(R.string.close_job_title, R.string.close_job_message,
-                        task, jobStatus);
+                        task, jobStatus.getJob().getId());
             }
         });
         return view;
@@ -134,15 +138,24 @@ public class TaskAdapter extends BaseExpandableListAdapter {
     }
 
     /**
+     * Change task by id after closing action
+     * @param task Response from server
+     */
+    public void setTask(Task task) {
+        this.taskSparseArray.put(task.getId(), task);
+        notifyDataSetChanged();
+    }
+
+    /**
      * Show dialog for close action confirmation
      * @param titleId ID of title' string resource
      * @param messageId ID of message's string resource
      * @param task Task which will be closed
-     * @param jobStatus Job which will be closed
+     * @param jobId ID of job which will be closed
      */
     private void showConfirmDialog(int titleId, int messageId,
-                                   Task task, JobStatus jobStatus) {
-        CloseDialog.newInstance(titleId, messageId, task, jobStatus)
+                                   Task task, Integer jobId) {
+        CloseDialog.newInstance(titleId, messageId, task, jobId)
                 .show(fragmentManager, CloseDialog.TAG);
     }
 }

@@ -27,7 +27,6 @@ import com.dsr_practice.car_workshop.dialogs.MessageDialog;
 import com.dsr_practice.car_workshop.loaders.CloseJobLoader;
 import com.dsr_practice.car_workshop.loaders.CloseTaskLoader;
 import com.dsr_practice.car_workshop.loaders.TaskLoader;
-import com.dsr_practice.car_workshop.models.common.JobStatus;
 import com.dsr_practice.car_workshop.models.common.Task;
 import com.dsr_practice.car_workshop.sync.SyncAdapter;
 
@@ -202,10 +201,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onJobClose(JobStatus jobStatus, final Task task) {
+    public void onJobClose(Integer jobId, final Task task) {
         progressBar.setVisibility(View.VISIBLE);
         getSupportLoaderManager().restartLoader(CloseJobLoader.CLOSE_JOB_ID, null,
-                new CloseActionCallbacks(task, jobStatus.getId()));
+                new CloseActionCallbacks(task, jobId));
     }
 
     /**
@@ -217,18 +216,6 @@ public class MainActivity extends AppCompatActivity implements
                 getString(R.string.task_was_closed),
                 getString(R.string.task_full_price) + Integer.toString(task.getFullPrice()),
                 getSupportFragmentManager());
-    }
-
-    // Stub test for actions after loading
-    private void post() {
-        progressBar.setVisibility(View.VISIBLE);
-        progressBar.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                adapter.notifyDataSetChanged();
-                progressBar.setVisibility(View.GONE);
-            }
-        }, 1000);
     }
     //endregion
 
@@ -295,6 +282,9 @@ public class MainActivity extends AppCompatActivity implements
     }
     //endregion
 
+    /**
+     * Callbacks for closing task and jobs
+     */
     private class CloseActionCallbacks implements LoaderManager.LoaderCallbacks<Task> {
 
         private Task task;
@@ -323,10 +313,9 @@ public class MainActivity extends AppCompatActivity implements
             new Handler().post(new Runnable() {
                 @Override
                 public void run() {
-                    boolean success = data != null;
-                    if (success && data.getStatus())
+                    if (data != null && data.getStatus())
                         showTaskCloseMessage(task);
-                    finishLoading(success);
+                    finishLoading(data);
                 }
             });
         }
@@ -338,12 +327,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Perform actions after loading
-     * @param success True if loading was finished successfully
+     * Actions after closing task of jobs
+     * @param task Response from server
      */
-    private void finishLoading(boolean success) {
-        if (success)
-            adapter.notifyDataSetChanged();
+    private void finishLoading(Task task) {
+        if (task != null)
+            adapter.setTask(task);
         else
             MessageDialog.showConnectionError(getSupportFragmentManager());
         progressBar.setVisibility(View.GONE);
