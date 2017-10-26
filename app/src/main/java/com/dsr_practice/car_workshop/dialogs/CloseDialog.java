@@ -12,14 +12,13 @@ import android.support.v4.app.DialogFragment;
 import com.dsr_practice.car_workshop.R;
 import com.dsr_practice.car_workshop.models.common.Task;
 
-public class CloseDialog extends DialogFragment implements DialogInterface.OnClickListener {
+public class CloseDialog extends DialogFragment {
 
-    // IDs of resources for dialog's title and message
-    private int titleId, messageId;
-
-    // Dialog's objects
-    private Task task;
-    private Integer jobId;
+    // Keys for bundle
+    private static final String TITLE_KEY = "TITLE_KEY";
+    private static final String MESSAGE_KEY = "MESSAGE_KEY";
+    private static final String TASK_KEY = "TASK_KEY";
+    private static final String JOB_KEY = "JOB_KEY";
 
     // Callback to activity
     private CloseInterface closeActionListener;
@@ -29,11 +28,15 @@ public class CloseDialog extends DialogFragment implements DialogInterface.OnCli
 
     public static CloseDialog newInstance(int titleId, int messageId,
                                           Task task, Integer jobId) {
+        Bundle args = new Bundle();
+        args.putInt(TITLE_KEY, titleId);
+        args.putInt(MESSAGE_KEY, messageId);
+        args.putParcelable(TASK_KEY, task);
+        if (jobId != null)
+            args.putInt(JOB_KEY, jobId);
+
         CloseDialog dialog = new CloseDialog();
-        dialog.task = task;
-        dialog.jobId = jobId;
-        dialog.titleId = titleId;
-        dialog.messageId = messageId;
+        dialog.setArguments(args);
         return dialog;
     }
 
@@ -52,27 +55,31 @@ public class CloseDialog extends DialogFragment implements DialogInterface.OnCli
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        setRetainInstance(true);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setTitle(titleId)
-                .setMessage(messageId)
-                .setPositiveButton(R.string.yes, this)
-                .setNegativeButton(R.string.no, this);
-        return builder.create();
-    }
-
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        switch (which) {
-            case Dialog.BUTTON_NEGATIVE:
-                dismiss();
-                break;
-            case Dialog.BUTTON_POSITIVE:
-                if (jobId != null)
-                    closeActionListener.onJobClose(jobId, task);
-                else
-                    closeActionListener.onTaskClose(task);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final Bundle args = getArguments();
+        if (args != null) {
+            final Task task = args.getParcelable(TASK_KEY);
+            DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    switch (i) {
+                        case Dialog.BUTTON_NEGATIVE:
+                            dismiss();
+                            break;
+                        case Dialog.BUTTON_POSITIVE:
+                            if (args.containsKey(JOB_KEY))
+                                closeActionListener.onJobClose(args.getInt(JOB_KEY), task);
+                            else
+                                closeActionListener.onTaskClose(task);
+                    }
+                }
+            };
+            builder.setTitle(args.getInt(TITLE_KEY))
+                .setMessage(args.getInt(MESSAGE_KEY))
+                .setPositiveButton(R.string.yes, onClickListener)
+                .setNegativeButton(R.string.no, onClickListener);
         }
+        return builder.create();
     }
 
     /**
