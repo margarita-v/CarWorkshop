@@ -117,10 +117,6 @@ public class Task implements Parcelable {
         return status;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
     public List<JobStatus> getJobs() {
         return jobs;
     }

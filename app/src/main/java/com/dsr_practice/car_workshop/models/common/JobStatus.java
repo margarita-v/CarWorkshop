@@ -11,13 +11,6 @@ public class JobStatus implements Parcelable {
     private Job job;
     private boolean status;
 
-    public JobStatus(int id, int task, Job job, boolean status) {
-        this.id = id;
-        this.task = task;
-        this.job = job;
-        this.status = status;
-    }
-
     //region Parcelable implementation
     private JobStatus(Parcel in) {
         id = in.readInt();
@@ -39,7 +32,7 @@ public class JobStatus implements Parcelable {
         parcel.writeByte((byte) (status ? 1 : 0));
     }
 
-    public static final Creator<JobStatus> CREATOR = new Creator<JobStatus>() {
+    static final Creator<JobStatus> CREATOR = new Creator<JobStatus>() {
         @Override
         public JobStatus createFromParcel(Parcel in) {
             return new JobStatus(in);
@@ -66,9 +59,5 @@ public class JobStatus implements Parcelable {
 
     public boolean getStatus() {
         return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
     }
 }

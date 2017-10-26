@@ -106,7 +106,7 @@ public class TaskActivity extends AppCompatActivity
         spinnerModel = listHeader.findViewById(R.id.spinnerModel);
         btnSaveTask = listFooter.findViewById(R.id.btnSaveTask);
         progressBar = listFooter.findViewById(R.id.progressBar);
-        tvEmpty = (TextView) findViewById(R.id.tvEmpty);
+        tvEmpty = findViewById(R.id.tvEmpty);
 
         btnSaveTask.setOnClickListener(this);
         spinnerMark.setOnItemSelectedListener(onItemSelectedListener);
@@ -124,7 +124,7 @@ public class TaskActivity extends AppCompatActivity
         //endregion
 
         //region Configure list view
-        lvJobs = (ListView) findViewById(R.id.lvJobs);
+        lvJobs = findViewById(R.id.lvJobs);
         lvJobs.addHeaderView(listHeader);
         lvJobs.addFooterView(listFooter);
         lvJobs.setAdapter(jobAdapter);

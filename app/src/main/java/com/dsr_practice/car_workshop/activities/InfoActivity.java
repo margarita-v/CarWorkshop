@@ -20,7 +20,7 @@ public class InfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        RecyclerView rvJobs = (RecyclerView) findViewById(R.id.rvJobs);
+        RecyclerView rvJobs = findViewById(R.id.rvJobs);
         rvJobs.setLayoutManager(new LinearLayoutManager(this));
 
         //Get task from intent
