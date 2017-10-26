@@ -35,8 +35,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import okhttp3.ResponseBody;
-
 public class MainActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, CloseDialog.CloseInterface,
         LoaderManager.LoaderCallbacks<List<Task>> {
@@ -200,14 +198,14 @@ public class MainActivity extends AppCompatActivity implements
     public void onTaskClose(final Task task) {
         progressBar.setVisibility(View.VISIBLE);
         getSupportLoaderManager().restartLoader(CloseTaskLoader.CLOSE_TASK_ID, null,
-                new CloseTaskCallbacks(task));
+                new CloseActionCallbacks(task));
     }
 
     @Override
     public void onJobClose(JobStatus jobStatus, final Task task) {
         progressBar.setVisibility(View.VISIBLE);
         getSupportLoaderManager().restartLoader(CloseJobLoader.CLOSE_JOB_ID, null,
-                new CloseJobCallbacks(task, jobStatus.getId()));
+                new CloseActionCallbacks(task, jobStatus.getId()));
     }
 
     /**
@@ -297,66 +295,36 @@ public class MainActivity extends AppCompatActivity implements
     }
     //endregion
 
-    /**
-     * Callbacks for task closing
-     */
-    private class CloseTaskCallbacks implements LoaderManager.LoaderCallbacks<ResponseBody> {
-
-        private Task task;
-
-        CloseTaskCallbacks(Task task) {
-            this.task = task;
-        }
-
-        @Override
-        public Loader<ResponseBody> onCreateLoader(int id, Bundle args) {
-            return new CloseTaskLoader(MainActivity.this, this.task.getId());
-        }
-
-        @Override
-        public void onLoadFinished(Loader<ResponseBody> loader, final ResponseBody data) {
-            new Handler().post(new Runnable() {
-                @Override
-                public void run() {
-                    boolean success = data != null;
-                    if (success)
-                        showTaskCloseMessage(task);
-                    finishLoading(success);
-                }
-            });
-        }
-
-        @Override
-        public void onLoaderReset(Loader<ResponseBody> loader) {
-
-        }
-    }
-
-    /**
-     * Callbacks for job closing
-     */
-    private class CloseJobCallbacks implements LoaderManager.LoaderCallbacks<Boolean> {
+    private class CloseActionCallbacks implements LoaderManager.LoaderCallbacks<Task> {
 
         private Task task;
         private int jobId;
 
-        CloseJobCallbacks(Task task, int jobId) {
+        // Constructor for task closing
+        CloseActionCallbacks(Task task) {
+            this.task = task;
+        }
+
+        // Constructor for job closing
+        CloseActionCallbacks(Task task, int jobId) {
             this.task = task;
             this.jobId = jobId;
         }
 
         @Override
-        public Loader<Boolean> onCreateLoader(int id, Bundle args) {
-            return new CloseJobLoader(MainActivity.this, task.getId(), this.jobId);
+        public Loader<Task> onCreateLoader(int id, Bundle args) {
+            return id == CloseJobLoader.CLOSE_JOB_ID
+                    ? new CloseJobLoader(MainActivity.this, task.getId(), jobId)
+                    : new CloseTaskLoader(MainActivity.this, task.getId());
         }
 
         @Override
-        public void onLoadFinished(Loader<Boolean> loader, final Boolean data) {
+        public void onLoadFinished(Loader<Task> loader, final Task data) {
             new Handler().post(new Runnable() {
                 @Override
                 public void run() {
                     boolean success = data != null;
-                    if (success && data)
+                    if (success && data.getStatus())
                         showTaskCloseMessage(task);
                     finishLoading(success);
                 }
@@ -364,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         @Override
-        public void onLoaderReset(Loader<Boolean> loader) {
+        public void onLoaderReset(Loader<Task> loader) {
 
         }
     }

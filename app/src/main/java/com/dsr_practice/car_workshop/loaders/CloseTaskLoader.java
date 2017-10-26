@@ -2,9 +2,11 @@ package com.dsr_practice.car_workshop.loaders;
 
 import android.content.Context;
 
+import com.dsr_practice.car_workshop.models.common.Task;
+
 import okhttp3.ResponseBody;
 
-public class CloseTaskLoader extends BaseLoader<ResponseBody> {
+public class CloseTaskLoader extends BaseLoader<Task> {
 
     public static final int CLOSE_TASK_ID = 2;
 

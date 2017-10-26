@@ -2,9 +2,10 @@ package com.dsr_practice.car_workshop.loaders;
 
 import android.content.Context;
 
+import com.dsr_practice.car_workshop.models.common.Task;
 import com.dsr_practice.car_workshop.models.post.CloseJobPost;
 
-public class CloseJobLoader extends BaseLoader<Boolean> {
+public class CloseJobLoader extends BaseLoader<Task> {
 
     public static final int CLOSE_JOB_ID = 3;
 

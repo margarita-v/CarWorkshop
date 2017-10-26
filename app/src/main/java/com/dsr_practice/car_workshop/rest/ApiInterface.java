@@ -34,8 +34,8 @@ public interface ApiInterface {
     Call<ResponseBody> createTask(@Body TaskPost taskPost);
 
     @POST("task/close/")
-    Call<ResponseBody> closeTask(@Body Integer id);
+    Call<Task> closeTask(@Body Integer id);
 
     @POST("job/close/")
-    Call<Boolean> closeJobInTask(@Body CloseJobPost closeJobPost);
+    Call<Task> closeJobInTask(@Body CloseJobPost closeJobPost);
 }
