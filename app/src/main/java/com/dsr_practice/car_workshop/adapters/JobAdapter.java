@@ -21,7 +21,8 @@ public class JobAdapter extends SimpleCursorAdapter {
     // Count of checked jobs
     private int checkedCount;
 
-    public JobAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
+    public JobAdapter(Context context, int layout, Cursor c,
+                      String[] from, int[] to, int flags) {
         super(context, layout, c, from, to, flags);
         int count = c != null ? c.getCount() : 0;
         this.checkedPositions = new boolean[count];

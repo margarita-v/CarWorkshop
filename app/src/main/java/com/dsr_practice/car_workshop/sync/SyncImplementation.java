@@ -121,7 +121,8 @@ class SyncImplementation<T extends SyncModel> implements SyncInterface {
         }
 
         // Get all entries in local database to compare with data from server
-        Cursor cursor = contentResolver.query(contentUri, projection, null, null, null);
+        Cursor cursor = contentResolver
+                .query(contentUri, projection, null, null, null);
         assert cursor != null;
 
         // Cursor fields

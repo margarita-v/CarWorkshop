@@ -54,7 +54,8 @@ public class InfoActivity extends AppCompatActivity {
     private String getNameFromDatabase(Uri baseUri, int id,
                                        String[] projection, String columnName) {
         Uri uri = baseUri.buildUpon().appendPath(Integer.toString(id)).build();
-        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        Cursor cursor = getContentResolver()
+                .query(uri, projection, null, null, null);
         assert cursor != null;
         if (cursor.moveToFirst()) {
             String name = cursor.getString(cursor.getColumnIndex(columnName));

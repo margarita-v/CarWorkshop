@@ -222,25 +222,30 @@ public class TaskActivity extends AppCompatActivity
         new Handler().post(new Runnable() {
             @Override
             public void run() {
-                String vin = etVIN.getText().toString(), number = etNumber.getText().toString();
+                String vin = etVIN.getText().toString(),
+                        number = etNumber.getText().toString();
                 // Get chosen jobs
                 chosenJobs.clear();
                 for (int i = 0; i < jobAdapter.getSize(); i++) {
                     if (jobAdapter.isChecked(i)) {
                         Cursor cursor = (Cursor) jobAdapter.getItem(i);
-                        int id = cursor.getInt(cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_JOB_ID));
-                        String name = cursor.getString(cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_JOB_NAME));
-                        int price = cursor.getInt(cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_PRICE));
+                        int id = cursor.getInt(
+                                cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_JOB_ID));
+                        String name = cursor.getString(
+                                cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_JOB_NAME));
+                        int price = cursor.getInt(
+                                cursor.getColumnIndex(Contract.JobEntry.COLUMN_NAME_PRICE));
                         chosenJobs.add(new Job(id, price, name));
                     }
                 }
                 if (checkInput(vin, number)) {
                     setViewsEnabled(false);
 
-                    TaskPost taskPostObject = new TaskPost(
-                            markId, modelId, dateFormat.format(calendar.getTime()), vin, number, chosenJobs);
-                    getSupportLoaderManager().restartLoader(CreateTaskLoader.CREATE_TASK_ID, null,
-                            new CreateTaskCallbacks(taskPostObject));
+                    TaskPost taskPostObject = new TaskPost(markId, modelId,
+                            dateFormat.format(calendar.getTime()), vin, number, chosenJobs);
+                    getSupportLoaderManager()
+                            .restartLoader(CreateTaskLoader.CREATE_TASK_ID, null,
+                                    new CreateTaskCallbacks(taskPostObject));
                 } // if checkInput...
             } //run()
         });
@@ -355,8 +360,10 @@ public class TaskActivity extends AppCompatActivity
      */
     private SimpleCursorAdapter configureAdapter(String[] projection, boolean isJobs) {
         SimpleCursorAdapter result = isJobs
-                ? new JobAdapter(this, R.layout.job_item, null, projection, JOB_IDS, 0)
-                : new SimpleCursorAdapter(this, SPINNER_ITEM, null, projection, VIEWS_ID, 0);
+                ? new JobAdapter(this, R.layout.job_item, null,
+                    projection, JOB_IDS, 0)
+                : new SimpleCursorAdapter(this, SPINNER_ITEM, null,
+                    projection, VIEWS_ID, 0);
         result.setDropDownViewResource(SPINNER_DROPDOWN_ITEM);
         return result;
     }
@@ -417,7 +424,8 @@ public class TaskActivity extends AppCompatActivity
                 case MODEL_LOADER_ID:
                     modelAdapter.swapCursor(data);
                     spinnerModel.setSelection(modelPosition);
-                    getSupportLoaderManager().initLoader(JOB_LOADER_ID, null, this);
+                    getSupportLoaderManager()
+                            .initLoader(JOB_LOADER_ID, null, this);
                     break;
                 case JOB_LOADER_ID:
                     jobAdapter.swapCursor(data);

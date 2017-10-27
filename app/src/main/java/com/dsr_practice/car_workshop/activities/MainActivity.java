@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements
     private SwipeRefreshLayout swipeRefreshLayout;
     private ExpandableListView elvTasks;
     private TaskAdapter adapter;
+    private LinearLayout layoutEmpty;
 
     /**
      * Handle to a SyncObserver.
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         progressBar = findViewById(R.id.progressBar);
+        layoutEmpty = findViewById(R.id.layoutEmpty);
         setSupportActionBar(toolbar);
         setTitle(R.string.main_title);
 
@@ -76,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
         AccountGeneral.createSyncAccount(this);
-        startLoading();
+        startLoading(false);
     }
 
     //region Activity lifecycle
@@ -88,7 +91,8 @@ public class MainActivity extends AppCompatActivity implements
         // Watch for sync state changes
         final int mask = ContentResolver.SYNC_OBSERVER_TYPE_PENDING |
                 ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE;
-        syncObserverHandle = ContentResolver.addStatusChangeListener(mask, syncStatusObserver);
+        syncObserverHandle = ContentResolver
+                .addStatusChangeListener(mask, syncStatusObserver);
     }
 
     @Override
@@ -113,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                startLoading();
+                startLoading(true);
                 return true;
             case R.id.action_add:
                 startActivity(new Intent(MainActivity.this, TaskActivity.class));
@@ -218,10 +222,10 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Perform task loading
      */
-    private void startLoading() {
+    private void startLoading(boolean restart) {
         if (!swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(true);
-            loadTasks(false);
+            loadTasks(restart);
         }
     }
 
@@ -235,9 +239,11 @@ public class MainActivity extends AppCompatActivity implements
      */
     public void loadTasks(boolean restart) {
         if (restart)
-            getSupportLoaderManager().restartLoader(TaskLoader.TASK_LOADER_ID, null, this);
+            getSupportLoaderManager()
+                    .restartLoader(TaskLoader.TASK_LOADER_ID, null, this);
         else
-            getSupportLoaderManager().initLoader(TaskLoader.TASK_LOADER_ID, null, this);
+            getSupportLoaderManager()
+                    .initLoader(TaskLoader.TASK_LOADER_ID, null, this);
     }
     //endregion
 
@@ -249,13 +255,16 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
-        // Sort task list by date and show it
-        if (data != null) {
+        boolean success = data != null;
+        if (success) {
+            // Sort task list by date and show it
             sort(data);
-            adapter = new TaskAdapter(data, MainActivity.this, getSupportFragmentManager());
+            adapter = new TaskAdapter(
+                    data, MainActivity.this, getSupportFragmentManager());
             elvTasks.setAdapter(adapter);
         }
         swipeRefreshLayout.setRefreshing(false);
+        setVisibility(success);
     }
 
     @Override
@@ -274,6 +283,15 @@ public class MainActivity extends AppCompatActivity implements
                 return task2.getDate().compareTo(task1.getDate());
             }
         });
+    }
+
+    /**
+     * Set visibility for expandable list view and empty view
+     * @param success True if tasks were loaded successfully
+     */
+    private void setVisibility(boolean success) {
+        elvTasks.setVisibility(success ? View.VISIBLE : View.GONE);
+        layoutEmpty.setVisibility(success ? View.GONE : View.VISIBLE);
     }
     //endregion
 
