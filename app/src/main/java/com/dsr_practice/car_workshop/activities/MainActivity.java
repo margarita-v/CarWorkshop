@@ -227,23 +227,23 @@ public class MainActivity extends AppCompatActivity implements
     private void startLoading() {
         if (!swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(true);
-            onRefresh();
+            loadTasks(false);
         }
     }
 
     @Override
     public void onRefresh() {
-        loadTasks();
+        loadTasks(true);
     }
 
     /**
      * Load tasks from server
      */
-    public void loadTasks() {
-        if (adapter == null || adapter.getGroupCount() == 0)
-            getSupportLoaderManager().initLoader(TaskLoader.TASK_LOADER_ID, null, this);
-        else
+    public void loadTasks(boolean restart) {
+        if (restart)
             getSupportLoaderManager().restartLoader(TaskLoader.TASK_LOADER_ID, null, this);
+        else
+            getSupportLoaderManager().initLoader(TaskLoader.TASK_LOADER_ID, null, this);
     }
     //endregion
 

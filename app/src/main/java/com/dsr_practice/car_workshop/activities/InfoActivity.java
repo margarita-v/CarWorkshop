@@ -44,6 +44,12 @@ public class InfoActivity extends AppCompatActivity {
         rvJobs.setAdapter(adapter);
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+    
     @Nullable
     private String getNameFromDatabase(Uri baseUri, int id,
                                        String[] projection, String columnName) {

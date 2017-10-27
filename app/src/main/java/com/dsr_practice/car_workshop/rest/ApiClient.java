@@ -7,7 +7,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
-    private static final String BASE_URL = "http://kfxhbajtog.localtunnel.me";
+    private static final String BASE_URL = "http://rgigdecvov.localtunnel.me";
 
     public static ApiInterface getApi() {
         Gson gson = new GsonBuilder().create();

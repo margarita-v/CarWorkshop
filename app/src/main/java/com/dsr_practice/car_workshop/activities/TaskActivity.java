@@ -156,6 +156,12 @@ public class TaskActivity extends AppCompatActivity
         getSupportLoaderManager().initLoader(MARK_LOADER_ID, null, this);
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
     /**
      * Spinner item selection listener
      */
