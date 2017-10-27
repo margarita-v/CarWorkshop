@@ -33,7 +33,8 @@
     <string name="close_job">Close Job</string>
     <string name="date">Дата</string>
     <string name="status">Статус</string>
-    <string name="empty_list">Не удалось загрузить данные.\nПроверьте подключение к Интернету</string>
+    <string name="error_loading">Не удалось загрузить данные.\nПроверьте подключение к Интернету</string>
+    <string name="empty_list">Список задач пуст</string>
     <string name="empty_database">Can not load data\nPlease, sync local database with server</string>
 
     <!-- TextView's hints -->

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    android:id="@+id/layoutEmpty"
+    android:id="@+id/layoutError"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,9 +19,9 @@
         android:layout_gravity="center"
         android:layout_weight="4"
         android:adjustViewBounds="true"
-        android:contentDescription="@string/empty_list"
+        android:contentDescription="@string/error_loading"
         android:cropToPadding="false"
-        app:srcCompat="@drawable/ic_assignment_black_24dp" />
+        app:srcCompat="@drawable/ic_assignment_late_black_24dp" />
 
     <TextView
         android:id="@+id/tvEmpty"
@@ -30,7 +30,7 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="@string/empty_list"
+        android:text="@string/error_loading"
         android:textSize="18sp" />
 
     <Space

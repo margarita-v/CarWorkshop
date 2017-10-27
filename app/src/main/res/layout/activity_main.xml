@@ -30,6 +30,8 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <include layout="@layout/list_error" android:visibility="gone" />
+
     <include layout="@layout/list_empty" android:visibility="gone" />
 
     <include layout="@layout/content_main"/>

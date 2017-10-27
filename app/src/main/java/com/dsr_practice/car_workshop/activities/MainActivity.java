@@ -39,10 +39,16 @@ public class MainActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, CloseDialog.CloseInterface,
         LoaderManager.LoaderCallbacks<List<Task>> {
 
+    // ProgressBar for showing while closing action performing
     private ProgressBar progressBar;
+    // Main widgets
     private SwipeRefreshLayout swipeRefreshLayout;
     private ExpandableListView elvTasks;
+    // Adapter for task list
     private TaskAdapter adapter;
+    // Connection error view
+    private LinearLayout layoutError;
+    // Empty view for task list
     private LinearLayout layoutEmpty;
 
     /**
@@ -66,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         progressBar = findViewById(R.id.progressBar);
+        layoutError = findViewById(R.id.layoutError);
         layoutEmpty = findViewById(R.id.layoutEmpty);
         setSupportActionBar(toolbar);
         setTitle(R.string.main_title);
@@ -255,8 +262,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
+        // If task loading has finished successfully
         boolean success = data != null;
-        if (success) {
+        // If task list is not empty
+        boolean hasTasks = success && data.size() > 0;
+
+        if (hasTasks) {
             // Sort task list by date and show it
             sort(data);
             adapter = new TaskAdapter(
@@ -264,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements
             elvTasks.setAdapter(adapter);
         }
         swipeRefreshLayout.setRefreshing(false);
-        setVisibility(success);
+        setVisibility(success, hasTasks);
     }
 
     @Override
@@ -288,10 +299,19 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Set visibility for expandable list view and empty view
      * @param success True if tasks were loaded successfully
+     * @param hasTasks True if task list is not empty
      */
-    private void setVisibility(boolean success) {
-        elvTasks.setVisibility(success ? View.VISIBLE : View.GONE);
-        layoutEmpty.setVisibility(success ? View.GONE : View.VISIBLE);
+    private void setVisibility(boolean success, boolean hasTasks) {
+        if (hasTasks) {
+            elvTasks.setVisibility(View.VISIBLE);
+            layoutError.setVisibility(View.GONE);
+            layoutEmpty.setVisibility(View.GONE);
+        }
+        else {
+            elvTasks.setVisibility(View.GONE);
+            layoutError.setVisibility(success ? View.GONE : View.VISIBLE);
+            layoutEmpty.setVisibility(success ? View.VISIBLE : View.GONE);
+        }
     }
     //endregion
 
