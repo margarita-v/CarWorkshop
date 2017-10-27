@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SyncStatusObserver;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -74,14 +73,6 @@ public class MainActivity extends AppCompatActivity implements
 
         elvTasks = findViewById(R.id.elvTasks);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, TaskActivity.class));
-            }
-        });
-
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
         AccountGeneral.createSyncAccount(this);
@@ -123,6 +114,9 @@ public class MainActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 startLoading();
+                return true;
+            case R.id.action_add:
+                startActivity(new Intent(MainActivity.this, TaskActivity.class));
                 return true;
             case R.id.action_sync:
                 SyncAdapter.performSync();
