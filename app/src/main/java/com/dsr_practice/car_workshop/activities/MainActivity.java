@@ -51,6 +51,11 @@ public class MainActivity extends AppCompatActivity implements
     // Empty view for task list
     private LinearLayout layoutEmpty;
 
+    // Flag which is True if we need to restart task loading
+    private boolean restart;
+    // String key for Bundle
+    private static final String RESTART_KEY = "RESTART_KEY";
+
     /**
      * Handle to a SyncObserver.
      * The ProgressBar element is visible until the SyncObserver reports
@@ -77,6 +82,9 @@ public class MainActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
         setTitle(R.string.main_title);
 
+        if (savedInstanceState != null)
+            restart = savedInstanceState.getBoolean(RESTART_KEY);
+
         swipeRefreshLayout = findViewById(R.id.swipeContainer);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
@@ -86,7 +94,15 @@ public class MainActivity extends AppCompatActivity implements
         // This will create a new account with the system for our application, register our
         // SyncService with it, and establish a sync schedule
         AccountGeneral.createSyncAccount(this);
-        startLoading(false);
+        startLoading(restart);
+        // Objects were reloaded so we should set restart to false
+        restart = false;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(RESTART_KEY, restart);
     }
 
     //region Activity lifecycle
@@ -374,5 +390,7 @@ public class MainActivity extends AppCompatActivity implements
         else
             MessageDialog.showConnectionError(getSupportFragmentManager());
         progressBar.setVisibility(View.GONE);
+        // Task or job were changed so we need reload data from server when Activity recreate
+        restart = true;
     }
 }
